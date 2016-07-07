@@ -69,7 +69,7 @@ public class QtcyryDao {
     	   Map<String,Object> ob = new HashMap<>();
    		    ob.put("Data", bg);
       		return ob;
-      		 }//
+      		 }
 
 }
 
