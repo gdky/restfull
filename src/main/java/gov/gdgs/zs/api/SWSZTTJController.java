@@ -1,12 +1,10 @@
-/**
- * controller用于分配任务
- */
-
 package gov.gdgs.zs.api;
 
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.AddcwbbService;
 import gov.gdgs.zs.service.SwsService;
+import gov.gdgs.zs.service.SwsztService;
+
 import java.util.List;
 import java.util.Map;
 
@@ -23,22 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.configuration.Constants;
 
-import gov.gdgs.zs.service.SwstjService;
 
 @RestController
 @RequestMapping(value = Constants.URI_API_PREFIX + Config.URI_API_ZS)
-public class SWSTJController {
+
+public class SWSZTTJController {
 
 	@Autowired
-	private SwstjService swstjservice;
-
-	@RequestMapping(value = "/swstj1", method = { RequestMethod.GET })
-	// 根据年份返回事务所统计信息
-	public ResponseEntity<?> getSwstjb(
+	private SwsztService swsztservice;
+	@RequestMapping(value = "/swszt1", method = { RequestMethod.GET })
+	public ResponseEntity<?> getSwszttjb(
 			@RequestParam(value = "year", required = true) int year) {
-		Map<String, Object> ls = swstjservice.getSwstjb(year);
+		Map<String, Object> ls = swsztservice.getSwstjb(year);
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}
 
+	
 }

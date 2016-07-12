@@ -144,7 +144,7 @@ public class SWSTJDao extends BaseDao {
 	
 	}*/
 	
-	
+	//该方法其实已经拿到了数据
 	public Map<String, Object> swstj(int year){
 		
 	
