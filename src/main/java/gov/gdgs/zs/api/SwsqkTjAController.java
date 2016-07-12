@@ -29,8 +29,8 @@ public class SwsqkTjAController {
 	
 	@RequestMapping(value = "/swsqktjA", method = RequestMethod.GET )
 	public ResponseEntity<?> getSwsqkTjAs(
-			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value = "pagenum", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pageSize,
 			@RequestParam(value = "where", required = false) String where){
 		Map<String,Object> map=swsqkTjAService.getSwsqkTjAs(page, pageSize, where);
 		return new ResponseEntity<>(map, HttpStatus.OK);

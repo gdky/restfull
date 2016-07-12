@@ -54,6 +54,7 @@ public class SwsqkTjADao extends BaseDao{
 			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException {
 				Map<String,Object> map = new HashMap<String,Object>();
 				map.put("key", rs.getObject("key"));
+				map.put("xh", rs.getObject("key"));
 				map.put("jgmc", rs.getObject("jgmc"));
 				map.put("xz", rs.getObject("xz"));
 				map.put("frdb", rs.getObject("frdb"));
