@@ -1,5 +1,6 @@
 package gov.gdgs.zs.dao;
 
+import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.untils.Condition;
 
 import java.sql.ResultSet;
@@ -9,18 +10,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hashids.Hashids;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
-import com.gdky.restfull.dao.AuthDao.UserRowMapper;
+
 
 @Repository
 public class SwsqkTjADao extends BaseDao{
 
 	public Map<String, Object> getSwsqkTjAs(int page, int pageSize,
 			HashMap<String, Object> map) {
+		final String url=Config.URL_PROJECT;
 		Condition condition = new Condition();
 		StringBuffer sql=new StringBuffer(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', ");
+		sql.append("        qk.ID as id,");
 		sql.append("        jg.DWMC as jgmc, ");
 		sql.append("        jg.JGXZ_DM as xz, ");
 		sql.append("        qk.FRDBXM as frdb, ");
@@ -35,13 +40,13 @@ public class SwsqkTjADao extends BaseDao{
 		sql.append("        qk.SRZE as srze, ");
 		sql.append("        qk.LRZE as lrze, ");
 		sql.append("        cs.MC as cs");
-		sql.append("   from zs_jg jg ");
-		sql.append("   left join zs_sdsb_swsjbqk qk ");
-		sql.append("     on jg.ID = qk.JG_ID ");
+		sql.append("   from zs_sdsb_swsjbqk qk, ");
+		sql.append("        zs_jg jg ");
 		sql.append("   left join dm_cs cs ");
 		sql.append("     on jg.CS_DM = cs.ID, ");
 		sql.append("   (select @rownum:=?) jg_xh ");
 		sql.append(""+condition.getSql());
+		sql.append("    and jg.ID = qk.JG_ID");
 		sql.append(" order by jg.CS_DM,jg.ID ");
 		sql.append("		    LIMIT ?, ? ");
 		ArrayList<Object> params = condition.getParams();
@@ -52,9 +57,15 @@ public class SwsqkTjADao extends BaseDao{
 
 			@Override
 			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException {
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				Map<String,Object> link = new HashMap<>();
+				String id = hashids.encodeHex(rs.getString("id"));
+				link.put("herf_xxzl", url+"/swsqktjA/swsxxzl/"+id);
+				link.put("herf_bgjl", url+"/swsqktjA/swsbgjl/"+id);
 				Map<String,Object> map = new HashMap<String,Object>();
 				map.put("key", rs.getObject("key"));
 				map.put("xh", rs.getObject("key"));
+				map.put("_links", link);
 				map.put("jgmc", rs.getObject("jgmc"));
 				map.put("xz", rs.getObject("xz"));
 				map.put("frdb", rs.getObject("frdb"));
@@ -83,6 +94,41 @@ public class SwsqkTjADao extends BaseDao{
 		ob.put("page", meta);
 		
 		return ob;
+	}
+
+	public Map<String, Object> getSwsXxzl(String id) {
+		Map<String, Object> rs=null;
+		StringBuffer sqlJgID=new StringBuffer(" SELECT t.JG_ID ");
+		sqlJgID.append(" FROM zs_sdsb_swsjbqk t ");
+		sqlJgID.append(" WHERE t.ID=? ");
+		List<String> jgIds=this.jdbcTemplate.queryForList(sqlJgID.toString(),new Object[]{id},String.class);
+		String jgId="";
+		if(jgIds.size()>0){
+			jgId=jgIds.get(0);
+			if(jgId!=null&&!StringUtils.isEmpty(jgId)){
+				
+			}
+		}
+		return rs;
+	}
+
+	public List<Map<String,Object>> getSwsBgjl(String id) {
+		List<Map<String,Object>> rs=null;
+		StringBuffer sqlJgID=new StringBuffer(" SELECT t.JG_ID ");
+		sqlJgID.append(" FROM zs_sdsb_swsjbqk t ");
+		sqlJgID.append(" WHERE t.ID=? ");
+		List<String> jgIds=this.jdbcTemplate.queryForList(sqlJgID.toString(),new Object[]{id},String.class);
+		String jgId="";
+		if(jgIds.size()>0){
+			jgId=jgIds.get(0);
+			if(jgId!=null&&!StringUtils.isEmpty(jgId)){
+				StringBuffer sql=new StringBuffer(" SELECT bg.ID,bg.MC as bgmc,bg.JZHI as jzhi,bg.XZHI as xzhi,DATE_FORMAT(bg.GXSJ,'%Y-%m-%d') as gxsj ");
+				sql.append(" FROM zs_jglsbgxxb bg ");
+				sql.append(" WHERE bg.JGB_ID=? ");
+				rs=this.jdbcTemplate.queryForList(sql.toString(),new Object[]{jgId});
+			}
+		}
+		return rs;
 	}
 
 }

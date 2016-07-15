@@ -10,6 +10,7 @@ import gov.gdgs.zs.service.SwsqkTjAService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,14 @@ public class SwsqkTjAController {
 			@RequestParam(value = "where", required = false) String where){
 		Map<String,Object> map=swsqkTjAService.getSwsqkTjAs(page, pageSize, where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/swsqktjA/{swsqktjTab:^[A-Za-z]+$}/{swsqktjId}", method = RequestMethod.GET )
+	public ResponseEntity<Map<String, Object>> swsxx(
+			@PathVariable(value = "swsqktjTab") String xqTab,
+			@PathVariable(value = "swsqktjId") String gid) {
+		Map<String, Object> map=swsqkTjAService.kzxx(xqTab, gid);
+		return new ResponseEntity<>(map,HttpStatus.OK);		
 	}
 	
 }
