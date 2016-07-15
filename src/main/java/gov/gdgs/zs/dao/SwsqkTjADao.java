@@ -97,7 +97,8 @@ public class SwsqkTjADao extends BaseDao{
 	}
 
 	public Map<String, Object> getSwsXxzl(String id) {
-		Map<String, Object> rs=null;
+		Map<String, Object> rs=new HashMap<String, Object>();
+		List<Map<String,Object>> nbjgs=new ArrayList<Map<String,Object>>();
 		StringBuffer sqlJgID=new StringBuffer(" SELECT t.JG_ID ");
 		sqlJgID.append(" FROM zs_sdsb_swsjbqk t ");
 		sqlJgID.append(" WHERE t.ID=? ");
@@ -106,9 +107,44 @@ public class SwsqkTjADao extends BaseDao{
 		if(jgIds.size()>0){
 			jgId=jgIds.get(0);
 			if(jgId!=null&&!StringUtils.isEmpty(jgId)){
-				
+				StringBuffer sql=new StringBuffer(" SELECT jg.DWMC as dwmc, ");
+				sql.append("        cs.MC as cs, ");
+				sql.append("        jg.FDDBR as fddbr, ");
+				sql.append("        jg.DZHI as dz, ");
+				sql.append("        jg.YZBM as yzbm, ");
+				sql.append("        jg.DHUA as dh, ");
+				sql.append("        jg.CZHEN as cz, ");
+				sql.append("        xz.MC as jgxz, ");
+				sql.append("        jg.JGZCH AS zsbh, ");
+				sql.append("        jg.ZCZJ as zczj, ");
+				sql.append("        jg.JYFW as jyfw, ");
+				sql.append("        jg.SWDJHM as swdjhm, ");
+				sql.append("        jg.JGDMZH as jgdmzh, ");
+				sql.append("        qk.RYZS as zrs, ");
+				sql.append("        jg.DZYJ as dzyj, ");
+				sql.append("        DATE_FORMAT(jg.SBCLSJ,'%Y-%m-%d') as sqslsj, ");
+				sql.append("        jg.SJLZXSBWH as sjsbwh, ");
+				sql.append("        DATE_FORMAT(jg.SGLZXSBSJ,'%Y-%m-%d') as sjsbzjsj, ");
+				sql.append("        jg.ZJPZWH as zjpzwh, ");
+				sql.append("        DATE_FORMAT(jg.ZJPZSJ,'%Y-%m-%d') as zjpzsj, ");
+				sql.append("        jg.ZFWH as sjzfwh, ");
+				sql.append("        DATE_FORMAT(jg.ZFSJ,'%Y-%m-%d') as sjzfsj, ");
+				sql.append("        DATE_FORMAT(jg.SWSZSCLSJ,'%Y-%m-%d') as zsclsj, ");
+				sql.append("        jg.YYZZHM as yyzzh, ");
+				sql.append("        jg.KHH as khh, ");
+				sql.append("        jg.KHHZH as khhzh, ");
+				sql.append("        jg.JBQK as qkjj ");
+				sql.append("   FROM zs_jg jg, dm_cs cs, dm_jgxz xz, zs_sdsb_swsjbqk qk ");
+				sql.append("  WHERE jg.CS_DM = cs.ID ");
+				sql.append("    AND jg.JGXZ_DM = xz.ID ");
+				sql.append("    AND jg.ID = qk.JG_ID ");
+				sql.append("    AND jg.ID = ? ");
+				rs=this.jdbcTemplate.queryForMap(sql.toString(), new Object[]{jgId});
+				String sqlNbjg="select n.BMMC as jgmc,n.JBZN as jbzn,n.RS as rs from zs_nbjgsz n where n.JG_ID=?";
+				nbjgs=this.jdbcTemplate.queryForList(sqlNbjg, new Object[]{jgId});
 			}
 		}
+		rs.put("nbjg", nbjgs);
 		return rs;
 	}
 
@@ -122,7 +158,7 @@ public class SwsqkTjADao extends BaseDao{
 		if(jgIds.size()>0){
 			jgId=jgIds.get(0);
 			if(jgId!=null&&!StringUtils.isEmpty(jgId)){
-				StringBuffer sql=new StringBuffer(" SELECT bg.ID,bg.MC as bgmc,bg.JZHI as jzhi,bg.XZHI as xzhi,DATE_FORMAT(bg.GXSJ,'%Y-%m-%d') as gxsj ");
+				StringBuffer sql=new StringBuffer(" SELECT bg.MC as bgmc,bg.JZHI as jzhi,bg.XZHI as xzhi,DATE_FORMAT(bg.GXSJ,'%Y-%m-%d') as gxsj ");
 				sql.append(" FROM zs_jglsbgxxb bg ");
 				sql.append(" WHERE bg.JGB_ID=? ");
 				rs=this.jdbcTemplate.queryForList(sql.toString(),new Object[]{jgId});

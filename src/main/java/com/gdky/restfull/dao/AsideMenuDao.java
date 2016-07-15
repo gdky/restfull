@@ -94,15 +94,6 @@ public class AsideMenuDao extends BaseJdbcDao implements IAsideMenuDao {
 		List<AsideMenu> ls = this.jdbcTemplate.query(sb.toString(),
 				new Object[] { userId }, new BeanPropertyRowMapper<AsideMenu>(
 						AsideMenu.class));
-		AsideMenu asideMenu=new AsideMenu();
-		asideMenu.setId(111);
-		asideMenu.setLx("A");
-		asideMenu.setHref("/xttjbb/swsqktjA");
-		asideMenu.setName("事务所情况统计A"); 
-		asideMenu.setPath("000-007");
-		asideMenu.setPid(007);
-		asideMenu.setVisble(1);
-		ls.add(asideMenu);
 		return ls;
 	}
 	
