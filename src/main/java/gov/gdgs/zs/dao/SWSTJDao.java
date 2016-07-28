@@ -26,7 +26,7 @@ public class SWSTJDao extends BaseDao {
 		
 	
 		StringBuffer sb=new StringBuffer();
-	    sb.append(" select date_format(sysdate(),'%Y') as nd, count(distinct jg.id) zjgs, ");
+	    sb.append(" select ? as nd, count(distinct jg.id) zjgs, ");
 		sb.append("        sum(case ");
 		sb.append("              when jg.jgxz_dm = '1' then ");
 		sb.append("               1 ");
@@ -143,7 +143,7 @@ public class SWSTJDao extends BaseDao {
 		sb.append("   ");
 	
 		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
-				new Object[]{year,year,year,year,year,year});
+				new Object[]{year,year,year,year,year,year,year});
 		Map<String, Object> obj = new HashMap<String, Object>();
 		obj.put("data", ls);
 		obj.put("total", 1);
