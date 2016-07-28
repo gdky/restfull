@@ -13,7 +13,7 @@ public class SWSZTTJDao extends BaseDao {
 	
 	public Map<String, Object> swszttjb(int year){
 	StringBuffer sb=new StringBuffer();
-	sb.append(" select '2015', 0, ");
+	sb.append(" select '2015' as nd, 0, ");
 	sb.append("    (a.zy_zrs+b.fzy_zrs) ba_zrs,  ");
 	sb.append("    a.zy_zrs, ");
 	sb.append("    b.fzy_zrs,");
