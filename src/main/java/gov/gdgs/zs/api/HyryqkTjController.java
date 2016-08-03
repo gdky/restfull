@@ -25,6 +25,13 @@ public class HyryqkTjController {
 
 	@Resource
 	private HyryqkTjService hyryqkTjService;
+
+	@RequestMapping(value = "/hyryqktj", method = RequestMethod.GET )
+	public ResponseEntity<?> getHyryqkTj(
+			@RequestParam(value="where",required=false) String where){
+		Map<String,Object> map=hyryqkTjService.getHyryqkTj(where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
 	
 	@RequestMapping(value = "/hyryqktjMx", method = RequestMethod.GET )
 	public ResponseEntity<?> getHyryqkTjMx(
@@ -34,4 +41,5 @@ public class HyryqkTjController {
 		Map<String,Object> map=hyryqkTjService.getHyryqkTjMx(type,lx,where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
+	
 }
