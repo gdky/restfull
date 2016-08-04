@@ -1,21 +1,15 @@
-/**
- * controller用于分配任务
+/*
+ * 执业资质数据分析 
  */
-
 package gov.gdgs.zs.api;
-
-import gov.gdgs.zs.configuration.Config;
-
-
-import java.util.List;
 import java.util.Map;
 
-
+import gov.gdgs.zs.configuration.Config;
+import gov.gdgs.zs.service.ZYZZSJFXService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,22 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.configuration.Constants;
 
-import gov.gdgs.zs.service.SwstjService;
-
 @RestController
 @RequestMapping(value = Constants.URI_API_PREFIX + Config.URI_API_ZS)
-public class SWSTJController {
 
+public class ZYZZSJFXController {
 	@Autowired
-	private SwstjService swstjservice;
-
-	@RequestMapping(value = "/swstj1", method = { RequestMethod.GET })
-	// 根据年份返回事务所统计信息
-	public ResponseEntity<?> getSwstjb(
-			@RequestParam(value = "year", required = true) int year) {
-		Map<String, Object> ls = swstjservice.getSwstjb(year);
+	private ZYZZSJFXService zyzzsjfxService;
+	@RequestMapping(value = "/zyzzsjfx", method = { RequestMethod.GET })
+	public ResponseEntity<?> getNdjysrtjb(
+			@RequestParam(value = "nd", required = true) int nd) {
+		Map<String, Object> ls = zyzzsjfxService.getZyzzsjfxb(nd);
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}
-
 }

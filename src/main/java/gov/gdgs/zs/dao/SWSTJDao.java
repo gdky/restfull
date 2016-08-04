@@ -127,7 +127,7 @@ public class SWSTJDao extends BaseDao {
 		sb.append("                From zs_jgbgspb b, zs_jgbgxxb x ");
 		sb.append("               where x.JGBGSPB_ID = b.id ");
 		sb.append("                 and spzt_dm = '8' ");
-		sb.append("                 and year(bgrq = ?)) bg ");
+		sb.append("                 and year(bgrq) = ?) bg ");
 		sb.append("     on jg.id = bg.jg_id ");
 		sb.append("   left join (select * ");
 		sb.append("                from zs_jgzx ");

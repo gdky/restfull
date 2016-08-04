@@ -20,13 +20,7 @@ public class SwstjService {
 private SWSTJDao swsTjDao;
 
 
-    /* public List<Map<String, Object>> getSwstjb(int id) {
-	HashMap<String, Object> map = new HashMap<String, Object>();
-	List<Map<String, Object>> rs = swsTjDao.swstj(id);
-	return rs;
-	
-	
-}*/
+  
       public Map<String, Object> getSwstjb(int year){
     	  Map<String, Object> rs=swsTjDao.swstj(year);
     	  return rs;

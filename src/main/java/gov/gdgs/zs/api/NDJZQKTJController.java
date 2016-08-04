@@ -1,16 +1,13 @@
-/**
- * controller用于分配任务
+/*
+ * 年度鉴证情况统计表
  */
-
 package gov.gdgs.zs.api;
 
 import gov.gdgs.zs.configuration.Config;
+import gov.gdgs.zs.service.NDJZQKTJService;
+import gov.gdgs.zs.service.SwsztService;
 
-
-import java.util.List;
 import java.util.Map;
-
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,22 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.configuration.Constants;
 
-import gov.gdgs.zs.service.SwstjService;
 
 @RestController
 @RequestMapping(value = Constants.URI_API_PREFIX + Config.URI_API_ZS)
-public class SWSTJController {
+
+public class NDJZQKTJController {
 
 	@Autowired
-	private SwstjService swstjservice;
-
-	@RequestMapping(value = "/swstj1", method = { RequestMethod.GET })
-	// 根据年份返回事务所统计信息
-	public ResponseEntity<?> getSwstjb(
-			@RequestParam(value = "year", required = true) int year) {
-		Map<String, Object> ls = swstjservice.getSwstjb(year);
+	private NDJZQKTJService ndjzqktjservice;
+	@RequestMapping(value = "/ndjzqktj", method = { RequestMethod.GET })
+	public ResponseEntity<?> getSwszttjb(
+			@RequestParam(value = "nd", required = true) int nd) {
+		Map<String, Object> ls = ndjzqktjservice.getNdjzqktjb(nd);
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}
 
+	
 }
+

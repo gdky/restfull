@@ -13,7 +13,7 @@ public class SWSZTTJDao extends BaseDao {
 	
 	public Map<String, Object> swszttjb(int year){
 	StringBuffer sb=new StringBuffer();
-	sb.append(" select '2015' as nd, 0, ");
+	sb.append(" select ? as nd, 0, ");
 	sb.append("    (a.zy_zrs+b.fzy_zrs) ba_zrs,  ");
 	sb.append("    a.zy_zrs, ");
 	sb.append("    b.fzy_zrs,");
@@ -77,7 +77,7 @@ public class SWSZTTJDao extends BaseDao {
 	sb.append("            and year(zxrq) = ?) e ");
 	sb.append("  ");
 	
-	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString(),new Object[]{year,year,year});
+	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString(),new Object[]{year,year,year,year});
 	Map<String, Object> obj = new HashMap<String, Object>();
 	obj.put("data", ls);
 	obj.put("total", 1);

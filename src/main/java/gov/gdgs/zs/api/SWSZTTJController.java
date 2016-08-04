@@ -4,14 +4,10 @@
 package gov.gdgs.zs.api;
 
 import gov.gdgs.zs.configuration.Config;
-import gov.gdgs.zs.service.AddcwbbService;
-import gov.gdgs.zs.service.SwsService;
+
 import gov.gdgs.zs.service.SwsztService;
 
-import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
