@@ -1,10 +1,7 @@
-/*
- * 年度鉴证情况统计表
- */
 package gov.gdgs.zs.api;
 
 import gov.gdgs.zs.configuration.Config;
-import gov.gdgs.zs.service.NDJZQKTJService;
+import gov.gdgs.zs.service.JGSJFXService;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +18,21 @@ import com.gdky.restfull.configuration.Constants;
 @RestController
 @RequestMapping(value = Constants.URI_API_PREFIX + Config.URI_API_ZS)
 
-public class NDJZQKTJController {
+public class JGSJFXController {
 
 	@Autowired
-	private NDJZQKTJService ndjzqktjservice;
-	@RequestMapping(value = "/ndjzqktj", method = { RequestMethod.GET })
-	public ResponseEntity<?> getSwszttjb(
+	private JGSJFXService jgsjfxservice;
+	/*
+	 * 行业学历数据分析
+	 */
+	
+	@RequestMapping(value = "/hyxlsjfx", method = { RequestMethod.GET })
+	public ResponseEntity<?> getHyxlsjfxb(
 			@RequestParam(value = "nd", required = true) int nd) {
-		Map<String, Object> ls = ndjzqktjservice.getNdjzqktjb(nd);
+		Map<String, Object> ls = jgsjfxservice.getHyxlsjfxb(nd);
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}
 
 	
 }
-

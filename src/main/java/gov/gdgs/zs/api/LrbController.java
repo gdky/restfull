@@ -126,7 +126,7 @@ public class LrbController {
 
 	}
 	
-	@RequestMapping(value="",method=RequestMethod.GET)
+	/*@RequestMapping(value="",method=RequestMethod.GET)
 	public  ResponseEntity<Map<String,Object>> getZjgs( 
  			@RequestParam(value = "page", required = true) int page, 
  			@RequestParam(value = "pageSize", required = true) int pageSize, 
@@ -135,6 +135,6 @@ public class LrbController {
  		return new ResponseEntity<>(obj,HttpStatus.OK); 
 	
 	
-}
+}*/
 	
 }
