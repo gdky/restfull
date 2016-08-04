@@ -28,8 +28,12 @@ public class SPservice {
 	public List<Map<String,Object>> cklc(int lid){
 		return spDao.cklc(lid);
 	}
-	
-	public Map<String,Object> wspmxcx(int pn,int ps,int uid,int lcid,String where){
+	/**
+	 * 审批明细查询
+	 * @param pn ps uid lcid cxlx where
+	 * @return
+	 */
+	public Map<String,Object> wspmxcx(int pn,int ps,int uid,int lcid,String cxlx,String where){
 		HashMap<String, Object> qury = new HashMap<String, Object>();
 		if (where != null) {
 			try {
@@ -42,38 +46,82 @@ public class SPservice {
 				e.printStackTrace();
 			}
 		}
-		return spDao.wspmxcx(pn,ps,uid,lcid,qury);
+		switch(cxlx){
+		case "jgsl":
+			return spDao.jgslspcx(pn,ps,uid,lcid,qury);
+		case "jg":
+			return spDao.jgspcx(pn,ps,uid,lcid,qury);
+		case "ry":
+			return spDao.ryspcx(pn,ps,uid,lcid,qury);
+		};
+		return null;
 	}
-	
-	public List<Map<String, Object>> spmxxx(String lcid,int sjid){
+	/**
+	 * 审批项目详细信息
+	 * @param lcid sjid
+	 * @return
+	 */
+	public Object spmxxx(String lcid,String sjid){
 		return spDao.spmxxx(lcid,sjid);
 	}
-	
+	/**
+	 * 上级驳回意见
+	 * @param spid
+	 * @param lcbz
+	 * @return
+	 */
 	public Map<String, Object> sjbhyj(String spid,int lcbz){
 		return spDao.sjbhyj(spid,lcbz);
 	}
-	
+	/**
+	 * 审批提交
+	 * @param spsq
+	 * @param spid
+	 * @param uid
+	 * @param uname
+	 * @return
+	 * @throws Exception
+	 */
 	public boolean sptj(Map<String,Object> spsq,String spid,int uid,String uname)throws Exception{
 		spsq.put("spid", spid);
 		spsq.put("uid", uid);
 		spsq.put("uname", uname);
 		return spDao.sptj(spsq);
 	}
-	
+	/**
+	 * 审批申请
+	 * @param sqxm
+	 * @param splx
+	 * @throws Exception
+	 */
 	public void spsq(Map<String, Object> sqxm,String splx) throws Exception{
 		switch (splx) {
-		case "jgbgsq":
-			this.spDao.swsbgsq(sqxm,(int)sqxm.get("uid"),(int)sqxm.get("jgid"));break;
-		//非执业备案
-		case"fzyswsbasq":
-			this.spDao.fzyswsba(sqxm);break;
-		case"jgzxsq":
+		case "jgbgsq"://机构变更申请
+			this.spDao.swsbgsq(sqxm);break;
+		case"jgzxsq"://机构注销申请
 			this.spDao.swszxsq(sqxm);break;
-		case"jghbsq":
+		case"jghbsq"://机构合并申请
 			this.spDao.swshbsq(sqxm);break;
+		case "zyswsbgsq"://执业变更申请
+			this.spDao.zyswsbgsq(sqxm);break;
+		case"zyzjsq"://执业转籍申请
+			this.spDao.zyzjsq(sqxm);break;
+		case"zyzfzysq"://执业注销申请
+			this.spDao.zyzfzysq(sqxm);break;
+		case"zyzxsq"://执业注销申请
+			this.spDao.zyzxsq(sqxm);break;
+		case"fzyswsbasq"://非执业备案申请
+			this.spDao.fzyswsba(sqxm);break;
+		case"fzyswszjsq"://非执业转籍申请
+			this.spDao.fzyzjsq(sqxm);break;
 		}
 	}
-	
+	/**
+	 * 非审批申请
+	 * @param ptxm
+	 * @param splx
+	 * @throws Exception
+	 */
 	public void fspsq(Map<String,Object> ptxm,String splx)throws Exception {
 		 switch (splx) {
 			case "jgbgsq":

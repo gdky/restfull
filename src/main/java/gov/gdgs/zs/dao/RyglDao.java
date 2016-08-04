@@ -16,6 +16,10 @@ import java.util.Map;
 
 
 
+
+
+
+
 import org.hashids.Hashids;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -188,14 +192,13 @@ public class RyglDao extends BaseDao{
 		sb.append("	a.cze,");	
 		sb.append("	case a.fqr_dm when 1 then \"是\"  when 2 then \"否\" else null end as fqr,");	
 		sb.append("	c.rydazt,");	
-		sb.append("	c.xpian");	
+		sb.append("	c.xpian,c.XB_DM,c.XL_DM,c.CS_DM,c.MZ_DM,c.ZZMM_DM,a.ZW_DM,a.czr_dm,a.fqr_dm");	
 		sb.append("	from ");	
 		sb.append("	zs_zysws a,zs_jg b ,zs_ryjbxx c ,");	
 		sb.append("	dm_xb d,dm_xl e,dm_cs f,dm_mz g,dm_zzmm h,dm_zw i,(select @rownum:=0) zs_sws");	
 		sb.append("	where");	
 		sb.append("		b.id=a.jg_id");	
 		sb.append("		 and a.ry_id = c.ID ");	
-		sb.append("		and a.ZYZT_DM = '1'");	
 		sb.append("		and d.ID = c.XB_DM");	
 		sb.append("	and e.ID = c.XL_DM");	
 		sb.append("		and f.ID = c.CS_DM");	
@@ -205,7 +208,10 @@ public class RyglDao extends BaseDao{
 		sb.append("	and c.ID = ?");	
 		String sql = "SELECT @rownum:=@rownum+1 as 'key',a.qzny,a.xxxx,a.zmr FROM zs_jl a,zs_ryjbxx c,(select @rownum:=0) zs_sws WHERE a.ry_id = c.id  and a.xxxx is not null and c.ID = ? order by a.ID";
 		List<Map<String, Object>> tl = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
-		Map<String,Object> ll =tl.get(0);
+		Map<String,Object> ll =new HashMap<String,Object>();
+		if(tl.size()!=0){
+			ll =tl.get(0);
+		}
 		ll.put("ryjl", this.jdbcTemplate.queryForList(sql,new Object[]{id}));
 		return ll;
 	}
@@ -363,7 +369,7 @@ public class RyglDao extends BaseDao{
 		sb.append("		and a.RY_ID = h.ID");
 		sb.append("		and a.RY_ID=?");
 		sb.append("		order by a.ID");
-		String sql = "SELECT @rownum:=@rownum+1 as 'key',a.qzny,a.xxxx,a.zmr FROM zs_fzyjl a,(select @rownum:=0) zs_sws,zs_fzysws b WHERE a.xxxx is not null and a.FZY_ID = b.ID and b.RY_ID=? order by a.ID";
+		String sql = "SELECT @rownum:=@rownum+1 as 'key',a.qzny,a.xxxx,a.zmr FROM zs_fzyjl a,(select @rownum:=0) zs_sws,zs_fzysws b WHERE a.xxxx is not null and a.xxxx<>'' and a.FZY_ID = b.ID and b.RY_ID=? order by a.ID";
 		List<Map<String, Object>> tl = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 		Map<String,Object> ll =tl.get(0);
 		ll.put("ryjl", this.jdbcTemplate.queryForList(sql,new Object[]{id}));
@@ -496,4 +502,183 @@ public class RyglDao extends BaseDao{
 		sb.append("		order by a.gxsj");
 		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 	}
+	/**
+	 * 
+	 * 事务所端执业查询
+	 * @param jgid
+	 * @return 
+	 */
+	public Map<String, Object> swszycx(int pn,int ps,int jgid,Map<String, Object> qury){
+		final String url=Config.URL_PROJECT;
+		Condition condition = new Condition();
+		condition.add("b.xming", Condition.FUZZY, qury.get("xm"));
+		condition.add("a.RYSPGCZT_DM", Condition.EQUAL, qury.get("ryzt"));
+		condition.add("b.sfzh", Condition.FUZZY_LEFT, qury.get("sfzh"));
+		condition.add("b.CS_DM", Condition.EQUAL, qury.get("cs"));
+		condition.add("b.xb_DM", Condition.EQUAL, qury.get("xb"));
+		condition.add("b.xl_dm", Condition.EQUAL, qury.get("xl"));
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.id as zyswsid, b.id,b.xming,d.mc as xb,b.sfzh,a.zyzsbh,e.mc as cs,f.mc as xl,g.mc as zw,c.mc as ryzt, ");
+		sb.append("		a.ryspgczt_dm from zs_zysws a,zs_ryjbxx b,dm_ryspgczt c,dm_xb d,dm_cs e,dm_xl f,dm_zw g,(select @rownum:=?) zs_ry  ");
+		sb.append(condition.getSql());
+		sb.append("		and  a.JG_ID=? and b.ID=a.ry_id and c.ID=a.RYSPGCZT_DM and ZYZT_DM in (1,2,3)");
+		sb.append("		and b.XB_DM=d.ID and b.CS_DM=e.ID and f.ID=b.XL_DM and a.ZW_DM=g.ID");
+		if(qury.containsKey("sorder")){
+			Boolean asc = qury.get("sorder").toString().equals("ascend");
+			switch (qury.get("sfield").toString()) {
+			case "xm":
+				if(asc){
+					sb.append("		    order by convert( b.xming USING gbk) COLLATE gbk_chinese_ci ");
+				}else{
+					sb.append("		    order by convert( b.xming USING gbk) COLLATE gbk_chinese_ci desc");
+				}
+				break;
+			case "xl":
+				if(asc){
+					sb.append("		    order by b.xl_dm ");
+				}else{
+					sb.append("		    order by b.xl_dm desc");
+				}
+				break;
+			case "zw":
+				if(asc){
+					sb.append("		    order by a.ZW_DM");
+				}else{
+					sb.append("		    order by a.ZW_DM desc");
+				}
+				break;
+			case "ryzt":
+				if(asc){
+					sb.append("		    order by a.RYSPGCZT_DM ");
+				}else{
+					sb.append("		    order by a.RYSPGCZT_DM desc");
+				}
+				break;
+			}
+		}
+		sb.append("		    LIMIT ?, ? ");
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add(jgid);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		List<Map<String,Object>> ls = this.jdbcTemplate.query(sb.toString(),params.toArray(),
+				new RowMapper<Map<String,Object>>(){
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				Map<String,Object> map = new HashMap<String,Object>();
+				Map<String,Object> link = new HashMap<>();
+				String id = hashids.encode(rs.getLong("id"));
+				link.put("herf_xxzl", url+"/ryxx/zyryxx/"+id);
+				link.put("herf_bgjl", url+"/ryxx/zyrybgjl/"+id);
+				link.put("herf_njjl", url+"/ryxx/zyrynjjl/"+id);
+				map.put("key", rs.getObject("key"));
+				map.put("xh", rs.getObject("key"));
+				map.put("_links", link);
+				map.put("xm", rs.getObject("xming"));
+				map.put("xb", rs.getObject("xb"));
+				map.put("cs", rs.getObject("cs"));
+				map.put("sfzh", rs.getObject("sfzh"));
+				map.put("zyzsbh", rs.getObject("zyzsbh"));
+				map.put("zw", rs.getObject("zw"));
+				map.put("ryzt", rs.getObject("ryzt"));
+				map.put("xl", rs.getObject("xl"));
+				map.put("ryztdm", rs.getObject("ryspgczt_dm"));
+				map.put("zyswsid", hashids.encode(rs.getLong("zyswsid")));
+				return map;
+				}
+	});
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		meta.put("pageAll",(total + ps - 1) / ps);
+		ob.put("page", meta);
+		
+		return ob;
+	}
+	//非执业备案通过列表
+	public Map<String,Object> fzybatg(int pn,int ps,Map<String,Object> qury) {
+		Condition condition = new Condition();
+		condition.add("c.XMING", Condition.FUZZY, qury.get("XMING"));
+		condition.add("b.ZYZGZSBH", Condition.EQUAL, qury.get("ZYZGZSBH"));
+		StringBuffer sb = new StringBuffer();
+		sb.append("		SELECT sql_calc_found_rows	 @rownum:=@rownum+1 'key', c.XMING,f.mc as XB,b.ZYZGZSBH,b.ZZDW,b.FZYZCZSBH,");
+		sb.append(" DATE_FORMAT(d.TJSJ,'%Y-%m-%d') as TJSJ, ");
+		sb.append(" DATE_FORMAT(e.SPSJ,'%Y-%m-%d') as SPSJ ");
+		sb.append("		FROM zs_fzybasp a,zs_fzysws b,zs_ryjbxx c,zs_spzx d,zs_spxx e,dm_xb f,(SELECT @rownum:=?) tmp");
+		sb.append("		 "+condition.getSql()+" ");
+		sb.append("		and a.FZYSWS_ID=b.ID AND b.RY_ID=c.ID AND a.ID=d.SJID AND d.ID=e.SPID AND a.SPZT_DM=2 and e.ISPASS='Y' and b.FZYZT_DM=1");
+		sb.append("		and f.ID=c.XB_DM order by e.SPSJ desc");
+		sb.append("		    LIMIT ?, ? ");
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		meta.put("pageAll",(total + ps - 1) / ps);
+		ob.put("page", meta);
+		return ob;
+	}
+	//执业转非执业通过列表
+	public Map<String,Object> fzyzzytg(int pn,int ps,Map<String,Object> qury) {
+		Condition condition = new Condition();
+		condition.add("c.XMING", Condition.FUZZY, qury.get("XMING"));
+		condition.add("b.ZYZGZSBH", Condition.EQUAL, qury.get("ZYZGZSBH"));
+		StringBuffer sb = new StringBuffer();
+		sb.append("		SELECT sql_calc_found_rows @rownum:=@rownum+1 as 'key', c.XMING,d.MC AS XB,");
+		sb.append("	b.ZYZGZSBH,b.FZYZCZSBH,b.ZZDW,date_format(a.TBRQ,'%Y-%m-%d') as TBRQ,date_format(a.SGLZXYJRQ,'%Y-%m-%d') as SGLZXYJRQ");
+		sb.append("		FROM zs_zyswszfzy a,zs_fzysws b,zs_ryjbxx c,dm_xb d,(select @rownum:=?) zs_ry");
+		sb.append("		 "+condition.getSql()+" ");
+		sb.append("		and a.FZYSWS_ID=b.ID AND b.RY_ID=c.ID AND a.SPZT_DM='2' and d.ID=c.XB_DM");
+		sb.append("		    LIMIT ?, ? ");
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		meta.put("pageAll",(total + ps - 1) / ps);
+		ob.put("page", meta);
+		return ob;
+	}
+	//非执业税务师转籍
+	public Object fzyzjcx(String sfzh) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("		SELECT c.XMING,'跨省转籍审批中' AS SPZT,'0' as JGLX ");
+		sb.append("	FROM zs_fzyswszj a,zs_fzysws b,zs_ryjbxx c,dm_xb d ");
+		sb.append("	WHERE a.FZY_ID=b.ID AND b.RY_ID=c.ID AND d.ID=c.XB_DM AND a.RYSPZT='0' and b.FZYZT_DM='1' and c.SFZH=? ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),sfzh);
+		if(ls.size()!=0){
+			return ls.get(0);
+		}else{
+			StringBuffer sb2 = new StringBuffer();
+			sb2.append("		SELECT b.XMING,c.MC AS XB,a.ID as FID,b.CS_DM as CS,'1' as JGLX");
+			sb2.append("			FROM zs_fzysws a,zs_ryjbxx b,dm_xb c");
+			sb2.append("			WHERE a.RY_ID=b.ID AND b.XB_DM=c.ID AND a.FZYZT_DM='1' AND a.RYSPGCZT_DM='1'");
+			sb2.append("			and b.SFZH=?");
+			List<Map<String, Object>> ls2 = this.jdbcTemplate.queryForList(sb2.toString(),sfzh);
+			if(ls2.size()!=0){
+				return ls2.get(0);
+			}
+		}
+		return false;
+	}
 }
+
