@@ -25,7 +25,6 @@ public class JGSJFXController {
 	/*
 	 * 行业学历数据分析
 	 */
-	
 	@RequestMapping(value = "/hyxlsjfx", method = { RequestMethod.GET })
 	public ResponseEntity<?> getHyxlsjfxb(
 			@RequestParam(value = "nd", required = true) int nd) {
@@ -33,6 +32,14 @@ public class JGSJFXController {
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}
+/*
+ * 资金规模数据分析
+ */
+	@RequestMapping(value = "/zjgmsjfx", method = { RequestMethod.GET })
+	public ResponseEntity<?> getZjgmsjfxb(
+			@RequestParam(value = "nd", required = true) int nd) {
+		Map<String, Object> ls = jgsjfxservice.getZjgmsjfxb(nd);
+		return new ResponseEntity<>(ls, HttpStatus.OK);
 
-	
+	}
 }

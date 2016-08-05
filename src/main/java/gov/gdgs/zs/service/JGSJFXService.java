@@ -26,7 +26,10 @@ private JGSJFXDao jgsjfxDao;
     	  return rs;
       }
 	
-
+      public Map<String, Object> getZjgmsjfxb(int nd){
+    	  Map<String, Object> rs=jgsjfxDao.getZjgmsjfxb(nd);
+    	  return rs;
+      }
 
 
 }

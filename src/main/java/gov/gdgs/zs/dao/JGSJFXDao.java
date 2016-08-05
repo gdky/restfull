@@ -17,6 +17,7 @@ public class JGSJFXDao extends BaseDao {
 	 */
 	public Map<String, Object> getHyxlsjfxb(int nd){
 		StringBuffer sb = new StringBuffer();
+		//sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', ");
 		sb.append(" select ? as nd, ");
 		sb.append("  cs.ID, ");
 		sb.append("        cs.PARENT_ID, ");
@@ -291,13 +292,19 @@ public class JGSJFXDao extends BaseDao {
 		sb.append("  right join dm_cs cs ");
 		sb.append("     on jg.CS_DM = cs.id ");
 		sb.append("  where cs.parent_id is not null ");
-		sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc; ");
+		sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc ");
 		sb.append("  ");
-	
+	//StringBuffer sqlCount = new StringBuffer(" select count(*) from( ");
+	//sqlCount.append(sb).append(" )t ");
 	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString(),new Object[]{nd,nd});
+	//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(),new Object[]{nd,nd}, int.class);
+	
+		//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(), new Object[]{nd,nd}, Integer.class);
 	Map<String, Object> obj = new HashMap<String, Object>();
+	
+	
 	obj.put("data", ls);
-	obj.put("total", 1);
+	//obj.put("total", total);
 	//obj.put("pageSize", 1);
 	//obj.put("current", 1);
 
@@ -305,6 +312,153 @@ public class JGSJFXDao extends BaseDao {
 	
 	}
 
+	
+	public Map<String, Object> getZjgmsjfxb(int nd){
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append(" select *, ");
+		sb.append("        round(fhzcgd_yx * 100 / zjgs, 2) fhzcgd_yx_bl, ");
+		sb.append("        round(fhzcgd_hh * 100 / zjgs, 2) fhzcgd__hh_bl, ");
+		sb.append("        round(fhzcgd_fs * 100 / zjgs, 2) fhzcgd_fs_bl, ");
+		sb.append("        round(bfhzcgd_yx * 100 / zjgs, 2) bfhzcgd_yx_bl, ");
+		sb.append("        round(bfhzcgd_hh * 100 / zjgs, 2) bfhzcgd__hh_bl, ");
+		sb.append("        round(bfhzcgd_fs * 100 / zjgs, 2) bfhzcgd_fs_bl ");
+		sb.append("   from (select cs.ID, ");
+		sb.append(" ? as nd,");
+		sb.append("                cs.PARENT_ID, ");
+		sb.append("                cs.mc, ");
+		sb.append("                ifnull(sum(case ");
+		sb.append("                  when parent_id is null then ");
+		sb.append("                   (select sum(zczj) from zs_jg where yxbz = '1') ");
+		sb.append("                  when parent_id = '0' then ");
+		sb.append("                  zczj ");
+		sb.append("                  when parent_id <> '0' and parent_id is not null then ");
+		sb.append("                  zczj ");
+		sb.append("                end),0) zjgs,  ");
+		sb.append("                 ");
+		sb.append("               ifnull( sum(case ");
+		sb.append("                  when parent_id is null then ");
+		sb.append("                   (select sum(jg.zczj) ");
+		sb.append("                      from zs_jg jg ");
+		sb.append("                      left join zs_jgyjxxb yj ");
+		sb.append("                        on jg.id = yj.id ");
+		sb.append("                     where yxbz = '1' ");
+		sb.append("                       and flag = '1' ");
+		sb.append("                       and jgxz_dm = '2') ");
+		sb.append("                  when parent_id = '0' and flag = '1' and jgxz_dm = '2' then ");
+		sb.append("                   zczj ");
+		sb.append("                  when parent_id <> '0' and parent_id is not null and ");
+		sb.append("                       flag = '1' and jgxz_dm = '2' then ");
+		sb.append("                   zczj ");
+		sb.append("                end),0) fhzcgd_yx,  ");
+		sb.append("                 ");
+		sb.append("               ifnull( sum(case ");
+		sb.append("                  when parent_id is null then ");
+		sb.append("                   (select sum(jg.zczj) ");
+		sb.append("                      from zs_jg jg ");
+		sb.append("                      left join zs_jgyjxxb yj ");
+		sb.append("                        on jg.id = yj.id ");
+		sb.append("                     where yxbz = '1' ");
+		sb.append("                       and flag = '1' ");
+		sb.append("                       and jgxz_dm = '1') ");
+		sb.append("                  when parent_id = '0' and flag = '1' and jgxz_dm = '1' then ");
+		sb.append("                   zczj ");
+		sb.append("                  when parent_id <> '0' and parent_id is not null and ");
+		sb.append("                       flag = '1' and jgxz_dm = '1' then ");
+		sb.append("                   zczj ");
+		sb.append("                end) ,0)fhzcgd_hh,  ");
+		sb.append("                 ");
+		sb.append("               ifnull( sum(case ");
+		sb.append("                  when parent_id is null then ");
+		sb.append("                   (select sum(jg.zczj) ");
+		sb.append("                      from zs_jg jg ");
+		sb.append("                      left join zs_jgyjxxb yj ");
+		sb.append("                        on jg.id = yj.id ");
+		sb.append("                     where yxbz = '1' ");
+		sb.append("                       and flag = '1' ");
+		sb.append("                       and jgxz_dm = '3') ");
+		sb.append("                  when parent_id = '0' and flag = '1' and jgxz_dm = '3' then ");
+		sb.append("                   zczj ");
+		sb.append("                  when parent_id <> '0' and parent_id is not null and ");
+		sb.append("                       flag = '1' and jgxz_dm = '3' then ");
+		sb.append("                   zczj ");
+		sb.append("                end) ,0)fhzcgd_fs,  ");
+		sb.append("                 ");
+		sb.append("               ifnull(sum( case ");
+		sb.append("                  when parent_id is null then ");
+		sb.append("                   (select sum(jg.zczj) ");
+		sb.append("                      from zs_jg jg ");
+		sb.append("                      left join zs_jgyjxxb yj ");
+		sb.append("                        on jg.id = yj.id ");
+		sb.append("                     where yxbz = '1' ");
+		sb.append("                       and flag = '0' ");
+		sb.append("                       and jgxz_dm = '2') ");
+		sb.append("                  when parent_id = '0' and flag = '0' and jgxz_dm = '2' then ");
+		sb.append("                   zczj ");
+		sb.append("                  when parent_id <> '0' and parent_id is not null and ");
+		sb.append("                       flag = '0' and jgxz_dm = '2' then ");
+		sb.append("                   zczj ");
+		sb.append("                end),0) bfhzcgd_yx,  ");
+		sb.append("                 ");
+		sb.append("               ifnull( sum(case ");
+		sb.append("                  when parent_id is null then ");
+		sb.append("                   (select sum(jg.zczj) ");
+		sb.append("                      from zs_jg jg ");
+		sb.append("                      left join zs_jgyjxxb yj ");
+		sb.append("                        on jg.id = yj.id ");
+		sb.append("                     where yxbz = '1' ");
+		sb.append("                       and flag = '0' ");
+		sb.append("                       and jgxz_dm = '1') ");
+		sb.append("                  when parent_id = '0' and flag = '0' and jgxz_dm = '1' then ");
+		sb.append("                   zczj ");
+		sb.append("                  when parent_id <> '0' and parent_id is not null and ");
+		sb.append("                       flag = '0' and jgxz_dm = '1' then ");
+		sb.append("                   zczj ");
+		sb.append("                end),0) bfhzcgd_hh,  ");
+		sb.append("                 ");
+		sb.append("               ifnull( sum(case ");
+		sb.append("                  when parent_id is null then ");
+		sb.append("                   (select sum(jg.zczj) ");
+		sb.append("                      from zs_jg jg ");
+		sb.append("                      left join zs_jgyjxxb yj ");
+		sb.append("                        on jg.id = yj.id ");
+		sb.append("                     where yxbz = '1' ");
+		sb.append("                       and flag = '0' ");
+		sb.append("                       and jgxz_dm = '3') ");
+		sb.append("                  when parent_id = '0' and flag = '0' and jgxz_dm = '3' then ");
+		sb.append("                   zczj ");
+		sb.append("                  when parent_id <> '0' and parent_id is not null and ");
+		sb.append("                       flag = '0' and jgxz_dm = '3' then ");
+		sb.append("                   zczj ");
+		sb.append("                end),0) bfhzcgd_fs ");
+		sb.append("           from (select jg.ID, jg.JGXZ_DM, yj.FLAG, jg.cs_dm, jg.zczj ");
+		sb.append("                   from zs_jg jg ");
+		sb.append("                   left join zs_jgyjxxb yj ");
+		sb.append("                     on jg.id = yj.id ");
+		sb.append("                  where jg.yxbz = '1') jg ");
+		sb.append("          right join dm_cs cs ");
+		sb.append("             on jg.CS_DM = cs.id ");
+		sb.append("          ");
+		sb.append("          group by cs.ID, cs.PARENT_ID, cs.mc) t; ");
+	//StringBuffer sqlCount = new StringBuffer(" select count(*) from( ");
+	//sqlCount.append(sb).append(" )t ");
+	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString(),new Object[]{nd});
+	//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(),new Object[]{nd,nd}, int.class);
+	
+		//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(), new Object[]{nd,nd}, Integer.class);
+	Map<String, Object> obj = new HashMap<String, Object>();
+	
+	
+	obj.put("data", ls);
+	//obj.put("total", total);
+	//obj.put("pageSize", 1);
+	//obj.put("current", 1);
+
+	return obj;
+	
+	}
+	
+	
 	
 }
 
