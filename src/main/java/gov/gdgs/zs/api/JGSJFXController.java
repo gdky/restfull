@@ -2,6 +2,7 @@ package gov.gdgs.zs.api;
 
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.JGSJFXService;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +28,22 @@ public class JGSJFXController {
 	 */
 	@RequestMapping(value = "/hyxlsjfx", method = { RequestMethod.GET })
 	public ResponseEntity<?> getHyxlsjfxb(
-			@RequestParam(value = "nd", required = true) int nd) {
-		Map<String, Object> ls = jgsjfxservice.getHyxlsjfxb(nd);
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value="where", required=false) String where) {
+		Map<String, Object> ls = jgsjfxservice.getHyxlsjfxb(page,pageSize,where);
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}
 /*
- * 资金规模数据分析
+  资金规模数据分析
  */
 	@RequestMapping(value = "/zjgmsjfx", method = { RequestMethod.GET })
 	public ResponseEntity<?> getZjgmsjfxb(
-			@RequestParam(value = "nd", required = true) int nd) {
-		Map<String, Object> ls = jgsjfxservice.getZjgmsjfxb(nd);
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value="where", required=false) String where) {
+		Map<String, Object> ls = jgsjfxservice.getZjgmsjfxb(page,pageSize,where);
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}

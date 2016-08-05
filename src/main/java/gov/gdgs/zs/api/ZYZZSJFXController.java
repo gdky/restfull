@@ -25,8 +25,10 @@ public class ZYZZSJFXController {
 	private ZYZZSJFXService zyzzsjfxService;
 	@RequestMapping(value = "/zyzzsjfx", method = { RequestMethod.GET })
 	public ResponseEntity<?> getNdjysrtjb(
-			@RequestParam(value = "nd", required = true) int nd) {
-		Map<String, Object> ls = zyzzsjfxService.getZyzzsjfxb(nd);
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value="where", required=false) String where) {
+		Map<String, Object> ls = zyzzsjfxService.getZyzzsjfxb(page,pageSize,where);
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}

@@ -16,10 +16,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ZYZZSJFXDao extends BaseDao{
 	
-	public Map<String, Object> zyzzsjfxb(int nd){
+	public Map<String, Object> getZyzzsjfxb(int page, int pageSize,
+			HashMap<String, Object> map){
 	StringBuffer sb = new StringBuffer();	
 	sb.append(" select cs.ID, ");
-	sb.append( " ? as nd, ");
+	sb.append( " date_format(now(),'%Y') as nd, ");
 	sb.append("        cs.PARENT_ID, ");
 	sb.append("        cs.mc, ");
 	sb.append("        case ");
@@ -139,7 +140,7 @@ public class ZYZZSJFXDao extends BaseDao{
 	sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc; ");
 	sb.append("  ");
 	
-	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString(),new Object[]{nd});
+	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString());
 	Map<String, Object> obj = new HashMap<String, Object>();
 	obj.put("data", ls);
 	return obj;
