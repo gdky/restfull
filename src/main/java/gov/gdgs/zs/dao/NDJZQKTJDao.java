@@ -9,9 +9,11 @@ import org.springframework.stereotype.Repository;
 public class NDJZQKTJDao extends BaseDao {
 	
 	
-	public Map<String, Object> ndjzqktj(int nd){
+	public Map<String, Object> ndjzqktj(int page, int pageSize,
+			HashMap<String, Object> map){
 	StringBuffer sb=new StringBuffer();
-	sb.append("  select '汇算清缴鉴证业务' xmlx, ");
+	sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1,t.*");
+	sb.append(" from( select '汇算清缴鉴证业务' xmlx, ");
 	sb.append("        hs_qn, ");
 	sb.append("        je_qn, ");
 	sb.append("        hs_bn, ");
@@ -39,7 +41,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(HSQJJE_JE), 0) - ifnull(sum(HSQJJE_JE0), 0) je_zj, ");
 	sb.append("                ifnull(sum(HSQJJE_HS), 0) - ifnull(sum(HSQJJE_HS0), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           ");
 	sb.append("           ");
 	sb.append(" union all ");
@@ -71,7 +73,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(MBKSJE_JE), 0) - ifnull(sum(MBKSJE_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(MBKSJE_HS), 0) - ifnull(sum(MBKSJE_HS0),0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           ");
 	sb.append("          union all ");
 	sb.append(" select '企业财产损失税前扣除鉴证业务金额', ");
@@ -102,7 +104,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(CCSSKC_JE), 0) - ifnull(sum(CCSSKC_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(CCSSKC_HS), 0) - ifnull(sum(CCSSKC_HS0),0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("  union all ");
 	sb.append(" select '其他鉴证业务金额', ");
 	sb.append("        hs_qn, ");
@@ -132,7 +134,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(QTJZ_JE), 0) - ifnull(sum(QTJZ_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(QTJZ_HS), 0) - ifnull(sum(QTJZ_HS0), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           union all ");
 	sb.append(" select '其他鉴证业务', ");
 	sb.append("        hs_qn, ");
@@ -162,7 +164,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(QTJZ_JE2), 0) - ifnull(sum(QTJZ_JE20),0) je_zj, ");
 	sb.append("                ifnull(sum(QTJZ_HS2), 0) - ifnull(sum(QTJZ_HS20), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           union all ");
 	sb.append(" select '其他鉴证业务', ");
 	sb.append("        hs_qn, ");
@@ -192,7 +194,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(QTJZ_JE3), 0) - ifnull(sum(QTJZ_JE30),0) je_zj, ");
 	sb.append("                ifnull(sum(QTJZ_HS3), 0) - ifnull(sum(QTJZ_HS30), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           union all ");
 	sb.append(" select '土地增值税清算签证业务', ");
 	sb.append("        hs_qn, ");
@@ -222,7 +224,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(TDZZSQSJZ_JE), 0) - ifnull(sum(TDZZSQSJZ_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(TDZZSQSJZ_HS), 0) - ifnull(sum(TDZZSQSJZ_HS0), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           union all ");
 	sb.append(" select '高新技术企业认定签证业务', ");
 	sb.append("        hs_qn, ");
@@ -252,7 +254,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(GXJSQYRDQZYW_JE), 0) - ifnull(sum(GXJSQYRDQZYW_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(GXJSQYRDQZYW_HS), 0) - ifnull(sum(GXJSQYRDQZYW_HS0), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           union all ");
 	sb.append(" select '企业注销税务登记税款清算签证业务', ");
 	sb.append("        hs_qn, ");
@@ -282,7 +284,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(QYZXSWDESKJSJZYW_JE), 0) - ifnull(sum(QYZXSWDESKJSJZYW_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(QYZXSWDESKJSJZYW_HS), 0) - ifnull(sum(QYZXSWDESKJSJZYW_HS0), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           union all ");
 	sb.append(" select '研发费加计扣除签证业务', ");
 	sb.append("        hs_qn, ");
@@ -312,7 +314,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(YFFJJKCJZYW_JE), 0) - ifnull(sum(YFFJJKCJZYW_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(YFFJJKCJZYW_HS), 0) - ifnull(sum(YFFJJKCJZYW_HS0), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a ");
 	sb.append("           union all ");
 	sb.append(" select '其他户数', ");
 	sb.append("        hs_qn, ");
@@ -342,12 +344,13 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(QT_JE), 0) - ifnull(sum(QT_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(QT_HS), 0) - ifnull(sum(QT_HS0), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = ?) a ");
+	sb.append("          where nd = 2014) a) as t ");
 	
-	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString(),new Object[]{nd,nd,nd,nd,nd,nd,nd,nd,nd,nd,nd});
+	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString());
+	int total=this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 	Map<String, Object> obj = new HashMap<String, Object>();
 	obj.put("data", ls);
-	obj.put("total", 1);
+	obj.put("total", total);
 	//obj.put("pageSize", 1);
 	//obj.put("current", 1);
 

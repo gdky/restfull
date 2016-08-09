@@ -18,8 +18,8 @@ public class JGSJFXDao extends BaseDao {
 	public Map<String, Object> getHyxlsjfxb(int page, int pageSize,
 			HashMap<String, Object> map){
 		StringBuffer sb = new StringBuffer();
-		//sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', ");
-		sb.append(" select date_format(now(),'%Y') as nd, ");
+		sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1,t.*");
+		sb.append("  from(select date_format(now(),'%Y') as nd, ");
 		sb.append("  cs.ID, ");
 		sb.append("        cs.PARENT_ID, ");
 		sb.append("        cs.mc, ");
@@ -293,32 +293,34 @@ public class JGSJFXDao extends BaseDao {
 		sb.append("  right join dm_cs cs ");
 		sb.append("     on jg.CS_DM = cs.id ");
 		sb.append("  where cs.parent_id is not null ");
-		sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc ");
-		sb.append("  ");
+		sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc )as t");
+		sb.append("    ");
 	//StringBuffer sqlCount = new StringBuffer(" select count(*) from( ");
 	//sqlCount.append(sb).append(" )t ");
 	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString());
 	//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(),new Object[]{nd,nd}, int.class);
 	
-		//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(), new Object[]{nd,nd}, Integer.class);
+   int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", Integer.class);
 	Map<String, Object> obj = new HashMap<String, Object>();
 	
 	
 	obj.put("data", ls);
-	//obj.put("total", total);
+	obj.put("total", total);
 	//obj.put("pageSize", 1);
 	//obj.put("current", 1);
 
 	return obj;
 	
 	}
-
+/*
+ * 资金规模数据分析
+ */
 	
 	public Map<String, Object> getZjgmsjfxb(int page, int pageSize,
 			HashMap<String, Object> map){
 		StringBuffer sb = new StringBuffer();
-		
-		sb.append(" select *, ");
+		sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1,t2.*");
+		sb.append("   from( select *, ");
 		sb.append("        round(fhzcgd_yx * 100 / zjgs, 2) fhzcgd_yx_bl, ");
 		sb.append("        round(fhzcgd_hh * 100 / zjgs, 2) fhzcgd__hh_bl, ");
 		sb.append("        round(fhzcgd_fs * 100 / zjgs, 2) fhzcgd_fs_bl, ");
@@ -441,18 +443,19 @@ public class JGSJFXDao extends BaseDao {
 		sb.append("          right join dm_cs cs ");
 		sb.append("             on jg.CS_DM = cs.id ");
 		sb.append("          ");
-		sb.append("          group by cs.ID, cs.PARENT_ID, cs.mc) t; ");
+		sb.append("          group by cs.ID, cs.PARENT_ID, cs.mc) as t) as t2");
+		sb.append("    ");
 	//StringBuffer sqlCount = new StringBuffer(" select count(*) from( ");
 	//sqlCount.append(sb).append(" )t ");
 	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString());
-	//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(),new Object[]{nd,nd}, int.class);
+	int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 	
-		//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(), new Object[]{nd,nd}, Integer.class);
+   //int total = this.jdbcTemplate.queryForObject(sqlCount.toString(), Integer.class);
 	Map<String, Object> obj = new HashMap<String, Object>();
 	
 	
 	obj.put("data", ls);
-	//obj.put("total", total);
+	obj.put("total", total);
 	//obj.put("pageSize", 1);
 	//obj.put("current", 1);
 

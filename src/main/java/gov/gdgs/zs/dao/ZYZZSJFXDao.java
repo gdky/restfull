@@ -19,7 +19,8 @@ public class ZYZZSJFXDao extends BaseDao{
 	public Map<String, Object> getZyzzsjfxb(int page, int pageSize,
 			HashMap<String, Object> map){
 	StringBuffer sb = new StringBuffer();	
-	sb.append(" select cs.ID, ");
+	sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1,t.*");
+	sb.append("  from (select cs.ID, ");
 	sb.append( " date_format(now(),'%Y') as nd, ");
 	sb.append("        cs.PARENT_ID, ");
 	sb.append("        cs.mc, ");
@@ -137,12 +138,15 @@ public class ZYZZSJFXDao extends BaseDao{
 	sb.append("  right join dm_cs cs ");
 	sb.append("     on jg.CS_DM = cs.id ");
 	sb.append("  ");
-	sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc; ");
+	sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc) as t ");
 	sb.append("  ");
 	
 	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString());
+	int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+	
 	Map<String, Object> obj = new HashMap<String, Object>();
 	obj.put("data", ls);
+	obj.put("total", total);
 	return obj;
 	
 	}	

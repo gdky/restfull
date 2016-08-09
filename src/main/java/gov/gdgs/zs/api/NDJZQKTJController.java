@@ -5,6 +5,7 @@ package gov.gdgs.zs.api;
 
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.NDJZQKTJService;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,10 @@ public class NDJZQKTJController {
 	private NDJZQKTJService ndjzqktjservice;
 	@RequestMapping(value = "/ndjzqktj", method = { RequestMethod.GET })
 	public ResponseEntity<?> getSwszttjb(
-			@RequestParam(value = "nd", required = true) int nd) {
-		Map<String, Object> ls = ndjzqktjservice.getNdjzqktjb(nd);
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value="where", required=false) String where) {
+		Map<String, Object> ls = ndjzqktjservice.getNdjzqktjb(page,pageSize,where);
 		return new ResponseEntity<>(ls, HttpStatus.OK);
 
 	}
