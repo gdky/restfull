@@ -126,5 +126,15 @@ public class LrbController {
 
 	}
 	
-
+	/*@RequestMapping(value="",method=RequestMethod.GET)
+	public  ResponseEntity<Map<String,Object>> getZjgs( 
+ 			@RequestParam(value = "page", required = true) int page, 
+ 			@RequestParam(value = "pageSize", required = true) int pageSize, 
+ 			@RequestParam(value="where", required=false) String where){ 
+ 		Map<String,Object> obj = addlrService.getlrb(page,pageSize,where); 
+ 		return new ResponseEntity<>(obj,HttpStatus.OK); 
+	
+	
+}*/
+	
 }
