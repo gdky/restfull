@@ -828,5 +828,31 @@ public class XtywbbDao extends BaseJdbcDao {
 		obj.put("data", ls);
 		return obj;
 	}
+
+	public Map<String, Object> getHyjygmqktj(int page, int pageSize,
+			HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		StringBuffer where = new StringBuffer();
+			where.append(" from (select jg.dwmc,jb.bz, ")
+				.append(" ifnull(sum(BNSRZE_HJ), 0) bnhj, ")
+				.append(" ifnull(sum(BNSRZE_SSFW), 0) ssfw, ")
+				.append(" ifnull(sum(BNSRZE_SSJZ), 0) ssjz, ")
+				.append(" ifnull(sum(BNSRZE_QTYW), 0) qtyw, ")
+				.append(" ifnull(sum(SNSRZE), 0) qnhj, ")
+				.append(" ifnull(sum(BNSRZE_HJ), 0) - ifnull(sum(SNSRZE), 0) zz ")
+				.append(" from zs_sdsb_jygmtjb jb, zs_jg jg ")
+				.append(" where jb.JG_ID = jg.ID and nd = '2014' group by jg.dwmc ,jb.bz) t ");
+		StringBuffer sql = new StringBuffer(" select t.*,round(zz * 100 / (case when qnhj = 0 then null else qnhj end),2) zz_bl ");
+		StringBuffer sqlCount = new StringBuffer(" select count(*) ");
+		int total = this.jdbcTemplate.queryForObject(sqlCount.append(where).toString(), Integer.class);
+		where.append("limit "+pageSize * (page - 1)+","+pageSize);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql.append(where).toString());
+		Map<String,Object> obj = new HashMap<String,Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pageSize", pageSize);
+		obj.put("current", page);
+		return obj;
+	}
 	
 }
