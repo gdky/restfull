@@ -8,9 +8,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class HtmlController {
 
-	@RequestMapping(value = "/html", method = RequestMethod.GET)
+	@RequestMapping(value = "/html/jzbgfm", method = RequestMethod.GET)
 	public String index(Model model) {
 		model.addAttribute("name","gdzs");
-		return "index";
+		model.addAttribute("age","25");
+		return "index.html";
 	}
 }
