@@ -51,7 +51,7 @@
 		</property>
 	</bean>
 	
-	 <bean id="templateResolver"  
+<!-- 	 <bean id="templateResolver"  
         class="org.thymeleaf.templateresolver.ServletContextTemplateResolver">  
     <property name="prefix" value="/WEB-INF/templates/" />  
     <property name="suffix" value=".html" />  
@@ -65,7 +65,28 @@
      
   <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">  
     <property name="templateEngine" ref="templateEngine" />  
-  </bean>     
+  </bean>    -->  
+  
+      <!-- Thymeleaf View Resolver - implementation of Spring's ViewResolver interface -->
+    <bean id="viewResolver" class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine" />
+        <property name="characterEncoding" value="UTF-8" />
+    </bean>
+    
+    <!-- Thymeleaf Template Engine (Spring4-specific version) -->
+    <bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolvers">
+            <set>
+                <ref bean="templateResolver" />
+            </set>
+        </property>
+    </bean>
+    
+    <!-- Thymeleaf Template Resolver -->
+    <bean id="templateResolver" class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/templates/" />
+        <property name="templateMode" value="HTML5" />
+    </bean>
 		
 	
 </beans>  
