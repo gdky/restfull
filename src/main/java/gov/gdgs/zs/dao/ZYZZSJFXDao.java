@@ -19,9 +19,8 @@ public class ZYZZSJFXDao extends BaseDao{
 	public Map<String, Object> getZyzzsjfxb(int page, int pageSize,
 			HashMap<String, Object> map){
 	StringBuffer sb = new StringBuffer();	
-	sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1,t.*");
-	sb.append("  from (select cs.ID, ");
-	sb.append( " date_format(now(),'%Y') as nd, ");
+	sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1,t.*,date_format(now(),'%Y') as nd");
+	sb.append(" from( select cs.ID, ");
 	sb.append("        cs.PARENT_ID, ");
 	sb.append("        cs.mc, ");
 	sb.append("        case ");
@@ -81,7 +80,7 @@ public class ZYZZSJFXDao extends BaseDao{
 	sb.append("          when parent_id <> '0' and parent_id is not null and flag = '1' and ");
 	sb.append("               jgxz_dm = '3' then ");
 	sb.append("           1 else 0 ");
-	sb.append("        end),0) fhzcgd_fs,  ");
+	sb.append("        end),0) fhzcgd_fs, ");
 	sb.append("         ");
 	sb.append("       ifnull(sum( case ");
 	sb.append("          when parent_id is null then ");
@@ -97,7 +96,7 @@ public class ZYZZSJFXDao extends BaseDao{
 	sb.append("          when parent_id <> '0' and parent_id is not null and flag = '0' and ");
 	sb.append("               jgxz_dm = '2' then ");
 	sb.append("           1 else 0 ");
-	sb.append("        end),0) bfhzcgd_yx,  ");
+	sb.append("        end),0) bfhzcgd_yx, ");
 	sb.append("         ");
 	sb.append("       ifnull(sum( case ");
 	sb.append("          when parent_id is null then ");
@@ -113,7 +112,7 @@ public class ZYZZSJFXDao extends BaseDao{
 	sb.append("          when parent_id <> '0' and parent_id is not null and flag = '0' and ");
 	sb.append("               jgxz_dm = '1' then ");
 	sb.append("           1 else 0 ");
-	sb.append("        end),0) bfhzcgd_hh,  ");
+	sb.append("        end),0) bfhzcgd_hh, ");
 	sb.append("         ");
 	sb.append("        ifnull(sum(case ");
 	sb.append("          when parent_id is null then ");
@@ -129,7 +128,7 @@ public class ZYZZSJFXDao extends BaseDao{
 	sb.append("          when parent_id <> '0' and parent_id is not null and flag = '0' and ");
 	sb.append("               jgxz_dm = '3' then ");
 	sb.append("           1 else 0 ");
-	sb.append("        end),0) bfhzcgd_fs ");
+	sb.append("        end),0) bfhzcgd_fs  ");
 	sb.append("   from (select jg.ID, jg.JGXZ_DM, yj.FLAG, jg.cs_dm ");
 	sb.append("           from zs_jg jg ");
 	sb.append("           left join zs_jgyjxxb yj ");
@@ -137,9 +136,10 @@ public class ZYZZSJFXDao extends BaseDao{
 	sb.append("          where jg.yxbz = '1') jg ");
 	sb.append("  right join dm_cs cs ");
 	sb.append("     on jg.CS_DM = cs.id ");
+	sb.append("        where cs.PARENT_ID =0 ");
+	sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc) as t");
 	sb.append("  ");
-	sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc) as t ");
-	sb.append("  ");
+	
 	
 	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString());
 	int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
