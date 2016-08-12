@@ -90,7 +90,7 @@ public class XtsjfxDao extends BaseJdbcDao{
 			.append(" t4.scjfzy_wtg_rs,t4.scjfzy_clz_rs,(t2.zrs - t4.scjfzy_rs) wcjzy_rs2, ")
 			.append(" 100 - round(t4.scjfzy_rs * 100 / t2.zrs, 2) wcjzy_bl2 ")
 		;
-		StringBuffer sqlCount = new StringBuffer(" select count(t1.id) ");
+		//StringBuffer sqlCount = new StringBuffer(" select count(t1.id) ");
 		StringBuffer sqlTableWhere = new StringBuffer(" from ")
 			.append(" ( ")
 			.append(" select cs.id,cs.parent_id,cs.mc, ")
@@ -175,15 +175,17 @@ public class XtsjfxDao extends BaseJdbcDao{
 			.append(" on cs.id = t.cs_dm group by cs.id, cs.parent_id, cs.mc ")
 			.append(" ) t4 ")
 			.append(" where t1.id = t2.id and t2.id = t3.id and t3.id = t4.id ")
+			.append(" and t1.parent_id < 2 ")
 		;
-		int total = this.jdbcTemplate.queryForObject(sqlCount.append(sqlTableWhere).toString(), Integer.class);
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql.append(sqlTableWhere.append(" order by t1.parent_id,t1.id ").append(" limit "+pageSize * (page - 1)+","+pageSize)).toString());
+		//int total = this.jdbcTemplate.queryForObject(sqlCount.append(sqlTableWhere).toString(), Integer.class);
+		//List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql.append(sqlTableWhere.append(" order by t1.parent_id,t1.id ").append(" limit "+pageSize * (page - 1)+","+pageSize)).toString());
 		//List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql.append(sqlTableWhere).append(" llimit "+pageSize * (page - 1)+","+pageSize+" ").toString());
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql.append(sqlTableWhere).toString());
 		Map<String,Object> obj = new HashMap<String,Object>();
 		obj.put("data", ls);
-		obj.put("total", total);
-		obj.put("pageSize", pageSize);
-		obj.put("current", page);
+		//obj.put("total", total);
+		//obj.put("pageSize", pageSize);
+		//obj.put("current", page);
 		return obj;
 	}
 
