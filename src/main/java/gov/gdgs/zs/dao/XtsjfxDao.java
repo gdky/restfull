@@ -175,8 +175,11 @@ public class XtsjfxDao extends BaseJdbcDao{
 			.append(" on cs.id = t.cs_dm group by cs.id, cs.parent_id, cs.mc ")
 			.append(" ) t4 ")
 			.append(" where t1.id = t2.id and t2.id = t3.id and t3.id = t4.id ")
-			.append(" and t1.parent_id < 2 ")
-		;
+			.append(" and t1.id in (select id from dm_cs where parent_id is null or parent_id < 1) ");
+		if(map != null && map.get("year") != null && !"".equals(map.get("year"))){
+			//Object year = map.get("year");
+			sqlTableWhere.append(" and date_format(now(),'%Y') = "+map.get("year"));
+		}
 		//int total = this.jdbcTemplate.queryForObject(sqlCount.append(sqlTableWhere).toString(), Integer.class);
 		//List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql.append(sqlTableWhere.append(" order by t1.parent_id,t1.id ").append(" limit "+pageSize * (page - 1)+","+pageSize)).toString());
 		//List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql.append(sqlTableWhere).append(" llimit "+pageSize * (page - 1)+","+pageSize+" ").toString());
