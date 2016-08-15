@@ -53,4 +53,29 @@ public class XttjbbController {
 		Map<String, Object> obj = xttjbbService.getHyryqktj(page,pageSize,where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
+	
+	/**
+	 * 行业年龄数据分析
+	 * @param page
+	 * @param pageSize
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/jgsjfx/hynlsjfx", method = RequestMethod.GET)
+	public ResponseEntity<?> getHynlsjfx(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value="where", required=false) String where){
+		Map<String, Object> obj = xttjbbService.getHynlsjfx(page,pageSize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/jgsjfx/ryztsjfx", method = RequestMethod.GET)
+	public ResponseEntity<?> getRyztsjfx(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value="where", required=false) String where){
+		Map<String, Object> obj = xttjbbService.getRyztsjfx(page,pageSize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
 }
