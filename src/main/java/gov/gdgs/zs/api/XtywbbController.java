@@ -22,13 +22,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class XtywbbController {
 	@Autowired
 	private XtywbbService xtywbbService;
-	
+	/**
+	 * 年度经营规模情况统计
+	 * @param page
+	 * @param pageSize
+	 * @param where
+	 * @return
+	 */
 	@RequestMapping(value = "/xtywbb/ndjysrtj", method = RequestMethod.GET)
 	public ResponseEntity<?> getNdjysrtj(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pageSize", required = true) int pageSize,
 			@RequestParam(value="where", required=false) String where){
 		Map<String, Object> obj = xtywbbService.getNdjysrtj(page, pageSize, where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/xtywbb/hyjygmqktj", method = RequestMethod.GET)
+	public ResponseEntity<?> getHyjygmqktj(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value="where", required=false) String where){
+		Map<String, Object> obj = xtywbbService.getHyjygmqktj(page, pageSize, where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 }

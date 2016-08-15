@@ -64,12 +64,36 @@ public class HfglController {
 		return new ResponseEntity<>(hfglService.fpdy(pn, ps, where),HttpStatus.OK);
 		
 	}
+	
+	/**
+	 * 发票金额分配
+	 * @param jlid
+	 * @param fptj
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/fpdy/ttgrfyfp/{jlid}", method = RequestMethod.PUT)
-	public ResponseEntity<?> sptj(@PathVariable(value = "jlid") String jlid,
+	public ResponseEntity<?> ttgefp(@PathVariable(value = "jlid") String jlid,
 			@RequestBody Map<String, Object> fptj,HttpServletRequest request) throws Exception{
 		User user =  accountService.getUserFromHeaderToken(request);
 		return new ResponseEntity<>(hfglService.ttgefp(jlid, fptj, user.getNames()),HttpStatus.OK);
 	}
+	/**
+	 * 发票金额修改
+	 * @param jlid
+	 * @param fptj
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/fpdy/fpjexg/{jlid}", method = RequestMethod.PUT)
+	public ResponseEntity<?> fpjexg(@PathVariable(value = "jlid") String jlid,
+			@RequestBody Map<String, Object> fptj,HttpServletRequest request) throws Exception{
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(hfglService.fpjexg(jlid, fptj, user.getNames()),HttpStatus.OK);
+	}
+	
 	/**
 	 * 费用统计
 	 * @param where
@@ -91,9 +115,92 @@ public class HfglController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/hyhfjn/jfsc", method = RequestMethod.POST)
-	public ResponseEntity<?> spsq(@RequestParam("file") MultipartFile file,HttpServletRequest request) throws Exception{
+	public ResponseEntity<?> upLoadJFSC(@RequestParam("file") MultipartFile file,HttpServletRequest request) throws Exception{
 		User user =  accountService.getUserFromHeaderToken(request);
-		return new ResponseEntity<>(hfglService.upLoadJFSC(file,user.getId()),HttpStatus.CREATED);
+		return new ResponseEntity<>(hfglService.upLoadJFSC(file,user.getNames()),HttpStatus.CREATED);
 	}
 	
+	/**
+	 * 非执业会费缴纳查询
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/hyhf/fzyhfjn", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> fzyhfjn(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where) throws Exception  {
+		
+		return new ResponseEntity<>(hfglService.fzyhfjn(pn, ps, where),HttpStatus.OK);
+		
+	}
+	/**
+	 * 非执业添加
+	 * @param jlid
+	 * @param fptj
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/hyhf/fzytj", method = RequestMethod.POST)
+	public ResponseEntity<?> fzytj(
+			@RequestBody Map<String, Object> fptj,HttpServletRequest request) throws Exception{
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(hfglService.fzytj(fptj, user.getNames()),HttpStatus.OK);
+	}
+	/**
+	 * 非执业修改
+	 * @param jlid
+	 * @param fptj
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/hyhf/fzyxg/{jlid}", method = RequestMethod.PUT)
+	public ResponseEntity<?> fzyxg(@PathVariable(value = "jlid") String jlid,
+			@RequestBody Map<String, Object> fptj,HttpServletRequest request) throws Exception{
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(hfglService.fzyxg(jlid, fptj, user.getNames()),HttpStatus.OK);
+	}
+	/**
+	 * 非执业删除
+	 * @param jlid
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/hyhf/fzyDel/{jlid}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> fzyDel(@PathVariable(value = "jlid") String jlid,
+			HttpServletRequest request) throws Exception{
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(hfglService.fzyDel(jlid, user.getNames()),HttpStatus.OK);
+	}
+	/**
+	 * 非执业批量上传
+	 * @param file
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/hyhf/fzyhyhfplsc", method = RequestMethod.POST)
+	public ResponseEntity<?> upLoadfzy(@RequestParam("file") MultipartFile file,HttpServletRequest request) throws Exception{
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(hfglService.upLoadfzy(file,user.getNames()),HttpStatus.CREATED);
+	}
+	/**
+	 * 发票打印累加
+	 * @param jlid
+	 * @param fptj
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/hyhf/fpdy/fpdylj", method = RequestMethod.PUT)
+	public ResponseEntity<?> fpdylj(
+			@RequestBody Object fptj) throws Exception{
+		return new ResponseEntity<>(hfglService.fpdylj(fptj),HttpStatus.OK);
+	}
 }

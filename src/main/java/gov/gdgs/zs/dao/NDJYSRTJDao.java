@@ -1,0 +1,118 @@
+package gov.gdgs.zs.dao;
+import gov.gdgs.zs.configuration.Config;
+import gov.gdgs.zs.untils.Condition;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hashids.Hashids;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
+@Repository
+public class NDJYSRTJDao extends BaseDao{
+	
+	public Map<String, Object> ndjysrtjb(int nd){
+	StringBuffer sb = new StringBuffer();	
+	sb.append(" select '一、收入总额' xmlx, ");
+	sb.append("        hs_qn,  ");
+	sb.append("        je_qn,  ");
+	sb.append("        hs_bn,  ");
+	sb.append("        je_bn,");
+	sb.append("         hs_zj,  ");
+	sb.append("        je_zj,  ");
+	sb.append("        round(hs_zj* 100 / (case ");
+	sb.append("                when hs_bn = 0 then ");
+	sb.append("                 null ");
+	sb.append("                else ");
+	sb.append("                 hs_bn ");
+	sb.append("              end), ");
+	sb.append("              2) hs_bl,  ");
+	sb.append("        round(je_zj * 100 / (case ");
+	sb.append("                when je_bn = 0 then ");
+	sb.append("                 null ");
+	sb.append("                else ");
+	sb.append("                 je_bn  ");
+	sb.append("              end), ");
+	sb.append("              2) je_bl  ");
+	sb.append("   from (select ifnull(sum(srze), 0) je_bn, ");
+	sb.append("                ifnull(null, 0) hs_bn, ");
+	sb.append("                ifnull(sum(SRZE0),0)je_qn, ");
+	sb.append("                ifnull(null, 0) hs_qn, ");
+	sb.append("                ifnull(sum(srze),0)-ifnull(sum(srze0),0) je_zj, ");
+	sb.append("                ifnull(null,0)-ifnull(null,0) hs_zj ");
+	sb.append("           from zs_sdsb_jysrqk ");
+	sb.append("          where nd = ?) a ");
+	sb.append("  union all ");
+	sb.append("  select '(一)、主营业务合计', ");
+	sb.append("        hs_qn, ");
+	sb.append("        je_qn, ");
+	sb.append("        hs_bn, ");
+	sb.append("        je_bn, ");
+	sb.append("         hs_zj, ");
+	sb.append("        je_zj, ");
+	sb.append("        round(hs_zj* 100 / (case ");
+	sb.append("                when hs_bn = 0 then ");
+	sb.append("                 null ");
+	sb.append("                else ");
+	sb.append("                 hs_bn ");
+	sb.append("              end), ");
+	sb.append("              2) hs_bl, ");
+	sb.append("        round(je_zj * 100 / (case ");
+	sb.append("                when je_bn = 0 then ");
+	sb.append("                 null ");
+	sb.append("                else ");
+	sb.append("                 je_bn  ");
+	sb.append("              end), ");
+	sb.append("              2) je_bl ");
+	sb.append("   from (select ifnull(sum(ZYYWSRHJ_JE), 0) je_bn, ");
+	sb.append("                ifnull(sum(ZYYWSRHJ_HS), 0) hs_bn, ");
+	sb.append("                ifnull(sum(ZYYWSRHJ_JE0),0) je_qn, ");
+	sb.append("                ifnull(sum(ZYYWSRHJ_HS0), 0) hs_qn, ");
+	sb.append("                ifnull(sum(ZYYWSRHJ_JE),0)-ifnull(sum(ZYYWSRHJ_JE0),0) je_zj, ");
+	sb.append("                ifnull(sum(ZYYWSRHJ_HS),0)-ifnull(sum(ZYYWSRHJ_HS0),0) hs_zj ");
+	sb.append("           from zs_sdsb_jysrqk ");
+	sb.append("          where nd = ?) a ");
+	sb.append("  ");
+	sb.append(" union all ");
+	sb.append(" select '1、代理税务登记', ");
+	sb.append("        hs_qn, ");
+	sb.append("        je_qn, ");
+	sb.append("        hs_bn, ");
+	sb.append("        je_bn, ");
+	sb.append("         hs_zj, ");
+	sb.append("        je_zj, ");
+	sb.append("        round(hs_zj* 100 / (case ");
+	sb.append("                when hs_bn = 0 then ");
+	sb.append("                 null ");
+	sb.append("                else ");
+	sb.append("                 hs_bn ");
+	sb.append("              end), ");
+	sb.append("              2) hs_bl, ");
+	sb.append("        round(je_zj * 100 / (case ");
+	sb.append("                when je_bn = 0 then ");
+	sb.append("                 null ");
+	sb.append("                else ");
+	sb.append("                 je_bn  ");
+	sb.append("              end), ");
+	sb.append("              2) je_bl ");
+	sb.append("   from (select ifnull(sum(DLSWDJ_JE), 0) je_bn, ");
+	sb.append("                ifnull(sum(DLSWDJ_HS), 0) hs_bn, ");
+	sb.append("                ifnull(sum(DLSWDJ_JE0),0) je_qn, ");
+	sb.append("                ifnull(sum(DLSWDJ_HS0), 0) hs_qn, ");
+	sb.append("                ifnull(sum(DLSWDJ_JE),0)-ifnull(sum(DLSWDJ_JE0),0) je_zj, ");
+	sb.append("                ifnull(sum(DLSWDJ_HS),0)-ifnull(sum(DLSWDJ_HS0),0) hs_zj ");
+	sb.append("           from zs_sdsb_jysrqk ");
+	sb.append("          where nd = ?) a ");
+	sb.append("  ");
+	
+	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString(),new Object[]{nd,nd,nd});
+	Map<String, Object> obj = new HashMap<String, Object>();
+	obj.put("data", ls);
+	return obj;
+	
+	}	
+}
