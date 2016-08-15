@@ -147,7 +147,7 @@ public class SWSDao extends BaseDao{
 	public Map<String,Object> swsxx(int id){
 		StringBuffer sb = new StringBuffer();
 		sb.append("select 	");	 
-		sb.append("		a.dwmc,c.mc as cs,	a.fddbr,a.dzhi,a.sjlzxsbwh,a.zcdz, ");
+		sb.append("		a.dwmc,a.cs_dm,c.mc as cs,	a.fddbr,a.dzhi,a.sjlzxsbwh,a.zcdz, ");
 		sb.append("		date_format(a.sglzxsbsj,'%Y-%m-%d') as sglzxsbsj,date_format(a.zjpzsj,'%Y-%m-%d')"
 				+ " as zjpzsj,a.yzbm,a.zjpzwh,a.czhen,a.dhua,a.szyx, ");
 		sb.append("		a.txyxming,a.xtyyx,a.xtyphone,a.JGZCH as zsbh,	a.zczj,a.jyfw,d.zrs, ");
