@@ -203,4 +203,34 @@ public class HfglController {
 			@RequestBody Object fptj) throws Exception{
 		return new ResponseEntity<>(hfglService.fpdylj(fptj),HttpStatus.OK);
 	}
+	/**
+	 * 上传管理查询
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/hyhf/scglcx", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> scglcx(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where) throws Exception  {
+		
+		return new ResponseEntity<>(hfglService.scglcx(pn, ps, where),HttpStatus.OK);
+		
+	}
+	/**
+	 * 发票打印累加
+	 * @param jlid
+	 * @param fptj
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/hyhf/scglcx/put", method = RequestMethod.PUT)
+	public ResponseEntity<?> scjlglcz(
+			@RequestBody Map<String,Object> fptj) throws Exception{
+		return new ResponseEntity<>(hfglService.scjlglcz(fptj),HttpStatus.OK);
+	}
 }
