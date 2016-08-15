@@ -135,6 +135,7 @@ public class YwglService {
 		o.put("SWSDZYJ", jg.get("dzyj"));
 		o.put("SWSWZ", jg.get("wangzhi"));
 		o.put("YWLX_DM", xy.get("YWLX_DM"));
+		Integer ywlx = Integer.parseInt((String) o.get("YWLX_DM"));
 		o.put("JTXM", yw.get("JTXM"));
 		o.put("ZBRQ", currentTime);
 		List<String> sssq = (List<String>) xy.get("SSSQ");
@@ -145,10 +146,10 @@ public class YwglService {
 		o.put("ZSFS_DM", yw.get("ZSFS_DM"));
 		o.put("ISWS", yw.get("ISWS"));
 		o.put("SB_DM", yw.get("SB_DM"));
-		//处理城市和地区
-		List<String> dq = (List<String>)yw.get("DQ");
-		o.put("CS_DM",yw.get(0));
-		o.put("QX_DM", yw.get(1));
+		// 处理城市和地区
+		List<Integer> dq = (List<Integer>) yw.get("DQ");
+		o.put("CS_DM", dq.get(0));
+		o.put("QX_DM", dq.get(1));
 		o.put("WTDWXZ_DM", yw.get("WTDWXZ_DM"));
 		o.put("WTDWNSRSBHDF", customer.get("NSRSBH"));
 		o.put("WTDWLXR", customer.get("LXR"));
@@ -156,15 +157,21 @@ public class YwglService {
 		o.put("WTDXLXDZ", customer.get("LXDZ"));
 		o.put("XYJE", xy.get("XYJE"));
 		o.put("CUSTOMER_ID", customer.get("ID"));
-		if (yw.get("TZVALUE1") != null) {
+		if (yw.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
 			o.put("TZVALUE1", yw.get("TZVALUE1"));
 		} else {
 			o.put("TZVALUE1", null);
 		}
-		if (yw.get("TJVALUE2") != null) {
+		if (yw.get("TJVALUE2") != null && ywlx != 1 && ywlx != 2 && ywlx != 7) {
 			o.put("TJVALUE2", yw.get("TJVALUE2"));
 		} else {
 			o.put("TJVALUE2", null);
+		}
+		// 判断是否异地
+		if ((Integer) jg.get("cs_dm") != (Integer) o.get("CS_DM")) {
+			o.put("IS_YD", "Y");
+		} else {
+			o.put("IS_YD", "N");
 		}
 
 		/* 判断是否有报备上报资质 */
@@ -189,7 +196,7 @@ public class YwglService {
 			bbhm.append(cal.getTimeInMillis());
 			bbhm.delete(21, 23);
 			bbhm.delete(10, 17);
-			
+
 			o.put("BBHM", bbhm);
 			o.put("YZM", yzm);
 			o.put("ZT", 3);
