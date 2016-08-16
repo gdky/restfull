@@ -203,6 +203,14 @@ public class AuthDao extends BaseJdbcDao {
 		
 	}
 	
+
+	public Integer delUsers(ArrayList<Object[]> batchValue) {
+		String sql = "delete from fw_users where id = ?";
+		int rs = this.jdbcTemplate.batchUpdate(sql, batchValue).length;
+		return rs;
+		
+	}
+	
 	public class UserRowMapper implements RowMapper<Map<String,Object>> {  
 		  
         @Override  
@@ -224,5 +232,6 @@ public class AuthDao extends BaseJdbcDao {
         }  
           
     }
+
 
 }

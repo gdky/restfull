@@ -182,4 +182,15 @@ public class AuthService {
 	public void addRoleUser(int role, Integer userId) {
 		authDao.addRoleUser(role,userId);
 	}
+
+	public int delUsers(List<String> userIds) {
+		ArrayList<Object[]> batchValue = new ArrayList<Object[]>();
+		for (String userId : userIds) {
+			Long id = HashIdUtil.decode(userId);
+			Object[] obj = new Object[] { id };
+			batchValue.add(obj);
+		}
+		int effectRows = authDao.delUsers(batchValue);
+		return effectRows;
+	}
 }
