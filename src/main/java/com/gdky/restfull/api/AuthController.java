@@ -27,6 +27,7 @@ import com.gdky.restfull.entity.AuthResponse;
 import com.gdky.restfull.entity.Privileges;
 import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.entity.Role;
+import com.gdky.restfull.entity.User;
 import com.gdky.restfull.security.CustomUserDetails;
 import com.gdky.restfull.security.TokenUtils;
 import com.gdky.restfull.service.AccountService;
@@ -137,6 +138,20 @@ public class AuthController {
 		Map<String,Object> rs = authService.getUsers(page, pageSize, where);
 		
 		return ResponseEntity.ok(rs);
+	}
+	/*
+	 * 添加新用户
+	 * 用户信息中需带有roleId属性，标识用户所属角色
+	 * 用户信息中需带有jgId属性，标识用户所属事务所，如非事务所用户，jgId=null
+	 */
+	@RequestMapping(value="/users",method=RequestMethod.POST)
+	public ResponseEntity<?> addUsers(
+			@RequestBody Map<String,Object> user){
+		int role = (Integer)user.get("roleId");
+		Integer userId = authService.addUsers(user);
+		authService.addRoleUser(role,userId);
+		
+		return ResponseEntity.ok(ResponseMessage.success("添加成功"));
 	}
 	
 	
