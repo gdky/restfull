@@ -31,6 +31,15 @@ public class SWSCXController {
 		return new ResponseEntity<>(swsService.swscx(pn, ps, where),HttpStatus.OK);
 
 	}
+	@RequestMapping(value = "/jgs/swsslspcx", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> swsslspcx(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where)  {
+		
+		return new ResponseEntity<>(swsService.swsslspcx(pn, ps, where),HttpStatus.OK);
+		
+	}
 
 	@RequestMapping(value="/swsxx/{swsxqTab:^[A-Za-z]+$}/{swjgId}", method = { RequestMethod.GET} )
 	public ResponseEntity<Map<String, Object>> swsxx(

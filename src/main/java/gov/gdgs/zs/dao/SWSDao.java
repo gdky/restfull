@@ -1,11 +1,13 @@
 package gov.gdgs.zs.dao;
 
 import gov.gdgs.zs.configuration.Config;
+import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -283,6 +285,39 @@ public class SWSDao extends BaseDao{
 		sb.append("		order by f.nd desc ");
 		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 	}
-
+	/**
+	 * 事务所设立审批查询
+	 * @param pn
+	 * @param ps
+	 * @param qury
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,Object> swsslspcx(int pn,int ps,Map<String, Object> qury) {
+		Condition condition = new Condition();
+		condition.add("b.dwmc", Condition.FUZZY, qury.get("dwmc"));
+		if(qury.containsKey("sbsj")){
+			String sbsj = new Common().getTime2MysqlDateTime((String)qury.get("sbsj")).substring(0,10);
+			condition.add("b.SBCLSJ", Condition.GREATER_EQUAL, sbsj);
+		}
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', b.dwmc,c.NAMES ");
+		sb.append(" as lxr,d.MC as jgzt,date_format(b.SBCLSJ,'%Y-%m-%d') as sbclsj from zs_jg b,fw_users c,dm_jgzt d,(select @rownum:=?) zs_ry "+condition.getSql()+" and b.jgzt_dm =5");
+		sb.append(" and c.JG_ID=b.id and d.ID=b.jgzt_dm LIMIT ?, ?"); 
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		ob.put("page", meta);
+		return ob;
+	}
 	
 }
