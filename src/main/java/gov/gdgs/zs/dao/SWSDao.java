@@ -319,5 +319,8 @@ public class SWSDao extends BaseDao{
 		ob.put("page", meta);
 		return ob;
 	}
-	
+	public Object insertjg(String dwmc,Object cs){
+		String sql ="insert into zs_jg (DWMC,CS_DM,SBCLSJ) values(?,?,sysdate())";
+		return this.insertAndGetKeyByJdbc(sql,new Object[]{dwmc,cs},new String[] {"ID"});
+	}
 }
