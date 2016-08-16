@@ -227,6 +227,7 @@ public class AuthDao extends BaseJdbcDao {
         	map.put("credentialsExpired",rs.getInt("credentials_expired"));
         	map.put("idcard",rs.getString("idcard"));
         	map.put("phone",rs.getString("phone"));
+        	map.put("createTime",rs.getDate("create_time"));
             
             return map;  
         }  
