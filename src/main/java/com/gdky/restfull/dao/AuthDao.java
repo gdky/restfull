@@ -31,6 +31,12 @@ public class AuthDao extends BaseJdbcDao {
 				new BeanPropertyRowMapper<User>(User.class));
 		return ls;
 	}
+	public List<User> getUserByUname(String uname) {
+		String sql = "select * from fw_users where uname = ?";
+		List<User> ls = this.jdbcTemplate.query(sql, new Object[] { uname },
+				new BeanPropertyRowMapper<User>(User.class));
+		return ls;
+	}
 
 	public List<Role> getRolesByUser(String userName) {
 		StringBuffer sb = new StringBuffer();
@@ -172,6 +178,30 @@ public class AuthDao extends BaseJdbcDao {
 		return obj;
 	}
 	
+	public Integer addUser(User u) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into fw_users ");
+		sb.append(" (version,username,uname,password,password_hint,email,website,");
+		sb.append(" address,city,province,country,postal_code,");
+		sb.append(" account_enabled,account_expired,account_locked,CREDENTIALS_EXPIRED,");
+		sb.append(" JG_ID,IDCARD,NAMES,PHONE,CREATE_TIME) ");
+		sb.append(" values(?,?,?,?,?,?,?,  ?,?,?,?,?  ?,?,?,?,  ?,?,?,?,?) ");
+		Object[] param = new Object[]{
+				0,u.getUsername(),u.getUname(),u.getPassword(),u.getPasswordHint(),u.getEmail(),null,null,
+				null,null,null,null,null,
+				1,0,0,0,
+				u.getJgId(),u.getIdcard(),u.getNames(),u.getPhone(),u.getCreateTime()
+		};
+		Number userId = this.insertAndGetKeyByJdbc(sb.toString(), param, new String[] { "id" });
+		return userId.intValue();
+	}
+
+	public void addRoleUser(int role, Integer userId) {
+		String sql = "insert into fw_users (user_id,role_id) values(?,?)";
+		this.jdbcTemplate.update(sql, new Object[]{userId,role});
+		
+	}
+	
 	public class UserRowMapper implements RowMapper<Map<String,Object>> {  
 		  
         @Override  
@@ -186,11 +216,12 @@ public class AuthDao extends BaseJdbcDao {
         	map.put("accountExpired",rs.getInt("account_expired"));
         	map.put("accountLocked",rs.getInt("account_locked"));
         	map.put("credentialsExpired",rs.getInt("credentials_expired"));
+        	map.put("idcard",rs.getString("idcard"));
+        	map.put("phone",rs.getString("phone"));
             
             return map;  
         }  
           
     }
-	
 
 }

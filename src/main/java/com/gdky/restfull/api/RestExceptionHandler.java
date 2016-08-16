@@ -28,6 +28,7 @@ import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.exception.InvalidRequestException;
 import com.gdky.restfull.exception.ResourceAlreadyExistsExcepiton;
 import com.gdky.restfull.exception.ResourceNotFoundException;
+import com.gdky.restfull.exception.UserException;
 import com.gdky.restfull.exception.YwbbException;
 
 /**
@@ -167,6 +168,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	@ResponseBody
 	public ResponseEntity<?> handleYwbbExcepiton(
 			YwbbException ex) {
+
+		log.error(ex.getMessage());
+		String exMessage = ex.getMessage();
+
+		return new ResponseEntity<>(new ResponseMessage(
+				ResponseMessage.Type.warning, exMessage),
+				HttpStatus.FORBIDDEN);
+	}
+	
+	/*
+	 * 处理新增用户账户的异常 
+	 */
+	@ExceptionHandler(value = { UserException.class })
+	@ResponseBody
+	public ResponseEntity<?> handleUserExcepiton(
+			UserException ex) {
 
 		log.error(ex.getMessage());
 		String exMessage = ex.getMessage();
