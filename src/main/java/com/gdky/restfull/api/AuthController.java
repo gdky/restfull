@@ -4,6 +4,8 @@ package com.gdky.restfull.api;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.ws.soap.AddressingFeature.Responses;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -139,19 +141,32 @@ public class AuthController {
 		
 		return ResponseEntity.ok(rs);
 	}
+	
 	/*
 	 * 添加新用户
 	 * 用户信息中需带有roleId属性，标识用户所属角色
 	 * 用户信息中需带有jgId属性，标识用户所属事务所，如非事务所用户，jgId=null
 	 */
 	@RequestMapping(value="/users",method=RequestMethod.POST)
-	public ResponseEntity<?> addUsers(
+	public ResponseEntity<?> addUser(
 			@RequestBody Map<String,Object> user){
 		int role = (Integer)user.get("roleId");
 		Integer userId = authService.addUsers(user);
 		authService.addRoleUser(role,userId);
 		
 		return ResponseEntity.ok(ResponseMessage.success("添加成功"));
+	}
+	
+	/**
+	 * 删除选中的用户
+	 * @param RequestBody List<String> [ID1,ID2,...] 
+	 * @method DELETE
+	 */
+	@RequestMapping(value="/users",method=RequestMethod.DELETE)
+	public ResponseEntity<?> delUsers(@RequestBody List<String> userIds){
+		int effectRows = authService.delUsers(userIds);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "404", "成功删除了 "+effectRows+" 条记录。");
+		return  ResponseEntity.ok(rm);
 	}
 	
 	

@@ -1,5 +1,6 @@
 package com.gdky.restfull.dao;
 
+import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
 import java.sql.ResultSet;
@@ -185,9 +186,9 @@ public class AuthDao extends BaseJdbcDao {
 		sb.append(" address,city,province,country,postal_code,");
 		sb.append(" account_enabled,account_expired,account_locked,CREDENTIALS_EXPIRED,");
 		sb.append(" JG_ID,IDCARD,NAMES,PHONE,CREATE_TIME) ");
-		sb.append(" values(?,?,?,?,?,?,?,  ?,?,?,?,?  ?,?,?,?,  ?,?,?,?,?) ");
+		sb.append(" values(?,?,?,?,?,?,?,  ?,?,?,?,?,  ?,?,?,?,  ?,?,?,?,?) ");
 		Object[] param = new Object[]{
-				0,u.getUsername(),u.getUname(),u.getPassword(),u.getPasswordHint(),u.getEmail(),null,null,
+				0,u.getUsername(),u.getUname(),u.getPassword(),u.getPasswordHint(),u.getEmail(),null,
 				null,null,null,null,null,
 				1,0,0,0,
 				u.getJgId(),u.getIdcard(),u.getNames(),u.getPhone(),u.getCreateTime()
@@ -197,8 +198,16 @@ public class AuthDao extends BaseJdbcDao {
 	}
 
 	public void addRoleUser(int role, Integer userId) {
-		String sql = "insert into fw_users (user_id,role_id) values(?,?)";
+		String sql = "insert into fw_user_role (user_id,role_id) values(?,?)";
 		this.jdbcTemplate.update(sql, new Object[]{userId,role});
+		
+	}
+	
+
+	public Integer delUsers(ArrayList<Object[]> batchValue) {
+		String sql = "delete from fw_users where id = ?";
+		int rs = this.jdbcTemplate.batchUpdate(sql, batchValue).length;
+		return rs;
 		
 	}
 	
@@ -218,10 +227,12 @@ public class AuthDao extends BaseJdbcDao {
         	map.put("credentialsExpired",rs.getInt("credentials_expired"));
         	map.put("idcard",rs.getString("idcard"));
         	map.put("phone",rs.getString("phone"));
+        	map.put("createTime",rs.getDate("create_time"));
             
             return map;  
         }  
           
     }
+
 
 }
