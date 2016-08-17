@@ -558,7 +558,7 @@ public class HfglDao extends BaseDao{
 	 */
 	public Map<String,Object> scglcx(int pn,int ps,Map<String, Object> qury) throws Exception{
 		Condition condition = new Condition();
-		condition.add("a.nd", Condition.EQUAL, qury.get("nd"));
+		condition.add("a.SCRQ", Condition.EQUAL, qury.get("nd"));
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
 		params.add((pn-1)*ps);
