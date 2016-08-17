@@ -331,10 +331,10 @@ public class SWSDao extends BaseDao{
 			}
 		}
 		if(is){
-			return this.insertAndGetKeyByJdbc("insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,PARENTJGID,SBCLSJ) values(?,?,5,5,0,sysdate())",
+			return this.insertAndGetKeyByJdbc("insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,PARENTJGID,SBCLSJ,YXBZ) values(?,?,5,5,0,sysdate(),0)",
 					new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
 		}
-		String sql ="insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,SBCLSJ) values(?,?,5,5,sysdate())";
+		String sql ="insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,SBCLSJ,YXBZ) values(?,?,5,5,sysdate(),0)";
 		return this.insertAndGetKeyByJdbc(sql,new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
 	}
 }
