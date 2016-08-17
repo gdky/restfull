@@ -140,7 +140,7 @@ public class AuthService {
 		User u = new User();
 		String password1 = (String) obj.get("password1");
 		String password2 = (String) obj.get("password2");
-		String userName = (String) obj.get("userName");//用户名
+		String username = (String) obj.get("userName");//用户名
 		String names = (String) obj.get("names");//姓名
 		String uname = (String) obj.get("uname");//登录名
 		String idcard = (String) obj.get("idcard");
@@ -150,10 +150,10 @@ public class AuthService {
 				|| password2.isEmpty()) {
 			throw new UserException("未输入密码");
 		}
-		if (password1 != password2) {
+		if (!password1.equals(password2) ) {
 			throw new UserException("两次输入的密码必须一致");
 		}
-		if (authDao.getUser(userName).size() > 0) {
+		if (authDao.getUser(username).size() > 0) {
 			throw new UserException("用户名已存在，重新输入用户名");
 		}
 		if (authDao.getUserByUname(uname).size() > 0) {
@@ -170,8 +170,8 @@ public class AuthService {
 		u.setPassword(encoder.encodePassword(password1, null));
 		u.setJgId((Integer) obj.get("jgId"));
 		u.setUname(uname);
-		u.setUsername(userName);
-		u.setNames(names);
+		u.setUsername(username);
+		u.setNames(uname);
 		u.setPhone(phone);
 		u.setIdcard(idcard);
 		Integer userId = authDao.addUser(u);
@@ -181,5 +181,16 @@ public class AuthService {
 
 	public void addRoleUser(int role, Integer userId) {
 		authDao.addRoleUser(role,userId);
+	}
+
+	public int delUsers(List<String> userIds) {
+		ArrayList<Object[]> batchValue = new ArrayList<Object[]>();
+		for (String userId : userIds) {
+			Long id = HashIdUtil.decode(userId);
+			Object[] obj = new Object[] { id };
+			batchValue.add(obj);
+		}
+		int effectRows = authDao.delUsers(batchValue);
+		return effectRows;
 	}
 }
