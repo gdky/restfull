@@ -254,6 +254,8 @@ public class SPDao extends BaseDao{
 			return this.jdbcTemplate.queryForMap("select c.MC as zxlx,DATE_FORMAT(b.ZXRQ,'%Y-%m-%d') as ZXRQ,b.SWSYJ from zs_zyswszx b,dm_zyswszxyy c where b.ZYSWSZXYY_DM=c.ID and b.id=?",new Object[]{sjid});
 		case "zyzjsp"://执业转籍审批详细信息
 			return this.jdbcTemplate.queryForMap("select ZJYY,ZJYYRQ,DRS,XJGMC,XJGDH from zs_zyswszj where id = ?",new Object[]{sjid});
+		case "zyzfzy"://执业转非执业审批详细信息
+			return this.jdbcTemplate.queryForMap("select FZYSQ,XDWYJ,DATE_FORMAT(TBRQ,'%Y-%m-%d') as TBRQ from zs_zyswszfzy where id = ?",new Object[]{sjid});
 		case "fzyba"://非执业备案审批详细信息
 			sb.append("select b.ID,c.XMING,d.MC as XB,c.SFZH,c.TXDZ,c.SRI,c.YZBM,c.DHHM,c.BYYX,c.YDDH,e.MC as CS,g.MC as ZZMM,c.BYSJ,c.XPIAN,");
 			sb.append("		b.ZYZGZSBH,DATE_FORMAT(b.ZGZSQFRQ,'%Y-%m-%d') as ZGZSQFRQ,b.FZYHYBH, h.MC as ZW,b.ZZDW,DATE_FORMAT(b.RHSJ,'%Y-%m-%d') AS RHSJ,i.mc as XL");
