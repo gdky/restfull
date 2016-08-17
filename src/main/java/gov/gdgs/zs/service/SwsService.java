@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.exception.UserException;
 
 @Service
 public class SwsService {
@@ -81,5 +82,11 @@ public class SwsService {
 		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
 		return this.swsDao.swsxx((int)hashids.decode(jgid)[0]);
 	}
-
+	public Object insertjg(Map<String, Object> jgtj){
+		Object obj = swsDao.insertjg(jgtj);
+		if(obj==null){
+			throw new UserException("单位名称重复");
+		}
+		return obj;
+	}
 }

@@ -306,7 +306,8 @@ public class SWSDao extends BaseDao{
 		params.add(ps);
 		StringBuffer sb = new StringBuffer();
 		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', b.dwmc,c.NAMES ");
-		sb.append(" as lxr,d.MC as jgzt,date_format(b.SBCLSJ,'%Y-%m-%d') as sbclsj from zs_jg b,fw_users c,dm_jgzt d,(select @rownum:=?) zs_ry "+condition.getSql()+" and b.jgzt_dm =5");
+		sb.append(" as lxr,d.MC as jgzt,date_format(b.SBCLSJ,'%Y-%m-%d') as sbclsj from zs_jg b,fw_users c,dm_jgzt d,(select @rownum:=?) zs_ry "
+					+condition.getSql()+" and b.jgzt_dm =5");
 		sb.append(" and c.JG_ID=b.id and d.ID=b.jgzt_dm LIMIT ?, ?"); 
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
@@ -319,8 +320,21 @@ public class SWSDao extends BaseDao{
 		ob.put("page", meta);
 		return ob;
 	}
-	public Object insertjg(String dwmc,Object cs){
-		String sql ="insert into zs_jg (DWMC,CS_DM,SBCLSJ) values(?,?,sysdate())";
-		return this.insertAndGetKeyByJdbc(sql,new Object[]{dwmc,cs},new String[] {"ID"});
+	public Object insertjg(Map<String, Object> jgtj){
+		if(this.jdbcTemplate.queryForList("select id from zs_jg where dwmc=?",jgtj.get("dwmc")).size()!=0){
+			return null;
+		}
+		boolean is=false;
+		if(jgtj.containsKey("iswdfs")){
+			if(jgtj.get("iswdfs").toString().equals("true")){
+				is=true;
+			}
+		}
+		if(is){
+			return this.insertAndGetKeyByJdbc("insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,PARENTJGID,SBCLSJ) values(?,?,5,5,0,sysdate())",
+					new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
+		}
+		String sql ="insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,SBCLSJ) values(?,?,5,5,sysdate())";
+		return this.insertAndGetKeyByJdbc(sql,new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
 	}
 }

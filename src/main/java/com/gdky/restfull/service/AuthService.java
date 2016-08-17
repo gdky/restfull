@@ -140,9 +140,9 @@ public class AuthService {
 		User u = new User();
 		String password1 = (String) obj.get("password1");
 		String password2 = (String) obj.get("password2");
-		String userName = (String) obj.get("userName");
-		String names = (String) obj.get("names");
-		String uname = (String) obj.get("uname");
+		String userName = (String) obj.get("userName");//用户名
+		String names = (String) obj.get("names");//姓名
+		String uname = (String) obj.get("uname");//登录名
 		String idcard = (String) obj.get("idcard");
 		String phone = (String) obj.get("phone");
 
@@ -171,6 +171,7 @@ public class AuthService {
 		u.setJgId((Integer) obj.get("jgId"));
 		u.setUname(uname);
 		u.setUsername(userName);
+		u.setNames(names);
 		u.setPhone(phone);
 		u.setIdcard(idcard);
 		Integer userId = authDao.addUser(u);
