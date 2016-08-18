@@ -205,4 +205,14 @@ public class YwglService {
 		return null;
 	}
 
+	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
+		if(bbhm==null || bbhm.isEmpty()||yzm==null||yzm.isEmpty()){
+			throw new YwbbException("报备号码或者验证码不能为空");
+		}
+		bbhm=bbhm.trim();
+		yzm=yzm.trim();
+		Map<String,Object> rs = ywglDao.getYwbbByYzmAndBbhm(bbhm,yzm);
+		return rs;
+	}
+
 }
