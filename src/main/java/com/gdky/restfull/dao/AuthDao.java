@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -211,6 +213,30 @@ public class AuthDao extends BaseJdbcDao {
 		
 	}
 	
+	public Map<String, Object> getUserById(Long id) {
+		String sql = "select u.*,j.DWMC from fw_users u left join zs_jg j on u.JG_ID = j.ID where u.id = ? ";
+
+		Map<String,Object> rs = this.jdbcTemplate.query(sql,new Object[]{id},new ResultSetExtractor<Map<String,Object>>(){
+			public Map<String,Object> extractData(ResultSet rs) throws SQLException,DataAccessException {
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("id", HashIdUtil.encode(rs.getInt("ID")));
+				map.put("username",rs.getString("USERNAME"));
+	        	map.put("jgId",HashIdUtil.encode(rs.getInt("JG_ID")));
+	        	map.put("jgMc",rs.getString("DWMC"));
+	        	map.put("names",rs.getString("NAMES"));
+	        	map.put("uname",rs.getString("UNAME"));
+	        	map.put("accountEnabled",rs.getInt("ACCOUNT_ENABLED"));
+	        	map.put("accountExpired",rs.getInt("ACCOUNT_EXPIRED"));
+	        	map.put("accountLocked",rs.getInt("ACCOUNT_LOCKED"));
+	        	map.put("idcard",rs.getString("IDCARD"));
+	        	map.put("phone",rs.getString("PHONE"));
+	        	map.put("createTime",rs.getDate("CREATE_TIME"));
+				return map;
+			}
+		});
+		return rs;
+	}
+	
 	public class UserRowMapper implements RowMapper<Map<String,Object>> {  
 		  
         @Override  
@@ -233,6 +259,8 @@ public class AuthDao extends BaseJdbcDao {
         }  
           
     }
+
+	
 
 
 }

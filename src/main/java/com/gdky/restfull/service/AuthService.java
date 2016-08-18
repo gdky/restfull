@@ -193,4 +193,10 @@ public class AuthService {
 		int effectRows = authDao.delUsers(batchValue);
 		return effectRows;
 	}
+
+	public Map<String, Object> getUsersById(String hashid) {
+		Long Id = HashIdUtil.decode(hashid);
+		Map<String,Object> rs = authDao.getUserById(Id);
+		return rs;
+	}
 }
