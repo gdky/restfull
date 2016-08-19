@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.gdky.restfull.entity.Privileges;
 import com.gdky.restfull.entity.Role;
 import com.gdky.restfull.entity.User;
+import com.gdky.restfull.exception.ResourceNotFoundException;
 import com.gdky.restfull.utils.HashIdUtil;
 
 @Repository
@@ -217,11 +218,11 @@ public class AuthDao extends BaseJdbcDao {
 
 	public Map<String, Object> getUserById(Long id) {
 		String sql = "select u.*,j.DWMC from fw_users u left join zs_jg j on u.JG_ID = j.ID where u.id = ? ";
-		Map<String, Object> rs = this.jdbcTemplate.query(sql,
-				new Object[] { id },
-				new ResultSetExtractor<Map<String, Object>>() {
-					public Map<String, Object> extractData(ResultSet rs)
-							throws SQLException, DataAccessException {
+		List<Map<String, Object>> ls = this.jdbcTemplate.query(sql,
+				new Object[] { id }, new RowMapper<Map<String, Object>>() {
+					@Override
+					public Map<String, Object> mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
 						Map<String, Object> map = new HashMap<String, Object>();
 						map.put("id", HashIdUtil.encode(rs.getInt("ID")));
 						map.put("username", rs.getString("USERNAME"));
@@ -238,7 +239,11 @@ public class AuthDao extends BaseJdbcDao {
 						return map;
 					}
 				});
-		return rs;
+		if (ls.size() > 0) {
+			return ls.get(0);
+		} else {
+			throw new ResourceNotFoundException(null);
+		}
 	}
 
 	public class UserRowMapper implements RowMapper<Map<String, Object>> {

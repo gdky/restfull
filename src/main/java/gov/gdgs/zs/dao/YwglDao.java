@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
+import com.gdky.restfull.exception.YwbbException;
 
 @Repository
 public class YwglDao extends BaseJdbcDao {
@@ -161,13 +162,16 @@ public class YwglDao extends BaseJdbcDao {
 
 	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select y.*,z.mc as ywzt,l.mc as ywlx,hy.mc as hy,cs.mc as cs ");
-		sb.append(" from zs_ywbb y,dm_ywbb_zt z,dm_ywlx l,dm_hy hy,dm_cs cs ");
+		sb.append(" select y.*,z.mc as ywzt,l.mc as ywlx,hy.mc as hy,cs.mc as cs, ");
+		sb.append(" qx.mc as qx ");
+		sb.append(" from zs_ywbb y,dm_ywbb_zt z,dm_ywlx l,dm_hy hy,dm_cs cs,dm_cs qx ");
 		sb.append(" where bbhm=? and yzm = ? ");
 		sb.append(" and y.zt = z.id ");
 		sb.append(" and y.ywlx_dm = l.id ");
 		sb.append(" and y.hy_id = hy.id ");
 		sb.append(" and y.cs_dm = cs.id ");
+		sb.append(" and y.qx_dm = qx.id ");
+		sb.append(" and y.yxbz = 1 ");
 		List<Map<String, Object>> ls = jdbcTemplate.query(
 				sb.toString(),
 				new Object[]{bbhm,yzm},
@@ -216,17 +220,40 @@ public class YwglDao extends BaseJdbcDao {
 					map.put("zsfs", "广东省");
 				}
 				if(rs.getInt("SB_DM")==1){
-					map.put("sb_dm", "国税");
+					map.put("sb", "国税");
 				}else {
-					map.put("sb_dm", "地税");
+					map.put("sb", "地税");
 				}
-				
+				map.put("hy", rs.getString("hy"));
+				map.put("cs", rs.getString("cs"));
+				map.put("qx",rs.getString("qx"));
+				if(rs.getInt("WTDWXZ_DM")==0){
+					map.put("wtdwxz", "居民企业");
+				}else {
+					map.put("wtdwxz", "非居民企业税");
+				}
+				map.put("wtdwnsrsbhdf", rs.getString("WTDWNSRSBHDF"));
+				map.put("wtdwlxr", rs.getString("WTDWLXR"));
+				map.put("wtdwlxdh", rs.getString("WTDWLXDH"));
+				map.put("wtdxlxdz", rs.getString("WTDXLXDZ"));
+				map.put("fphm", rs.getString("FPHM"));
+				map.put("xyje", rs.getBigDecimal("XYJE"));
+				map.put("sjsqje", rs.getBigDecimal("SJSQJE"));
+				map.put("memo", rs.getString("MEMO"));
+				map.put("zgswjg", rs.getString("ZGSWJG"));
+				map.put("swsdh", rs.getString("SWSDH"));
+				map.put("swscz", rs.getString("SWSCZ"));
+				map.put("ywzt", rs.getString("ywzt"));
 				
 				return map;
 			}
 		});
+		if(ls.size()>0){
+			return ls.get(0);
+		}else{
+			return null;
+		}
 		
-		return ls.get(0);
 	}
 	
 
