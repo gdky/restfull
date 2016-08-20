@@ -250,8 +250,12 @@ public class SPDao extends BaseDao{
 			return this.jdbcTemplate.queryForMap("select * from zs_jghb a where a.id=? ",new Object[]{sjid});
 		case "zybgsp"://执业变更审批详细信息
 			return this.jdbcTemplate.queryForList("select MC,XZHI,JZHI from zs_zyswsbgxxb where bgspb_id = ?",new Object[]{sjid});
+		case "zyzxsp"://执业注销审批详细信息
+			return this.jdbcTemplate.queryForMap("select c.MC as zxlx,DATE_FORMAT(b.ZXRQ,'%Y-%m-%d') as ZXRQ,b.SWSYJ from zs_zyswszx b,dm_zyswszxyy c where b.ZYSWSZXYY_DM=c.ID and b.id=?",new Object[]{sjid});
 		case "zyzjsp"://执业转籍审批详细信息
 			return this.jdbcTemplate.queryForMap("select ZJYY,ZJYYRQ,DRS,XJGMC,XJGDH from zs_zyswszj where id = ?",new Object[]{sjid});
+		case "zyzfzy"://执业转非执业审批详细信息
+			return this.jdbcTemplate.queryForMap("select FZYSQ,XDWYJ,DATE_FORMAT(TBRQ,'%Y-%m-%d') as TBRQ from zs_zyswszfzy where id = ?",new Object[]{sjid});
 		case "fzyba"://非执业备案审批详细信息
 			sb.append("select b.ID,c.XMING,d.MC as XB,c.SFZH,c.TXDZ,c.SRI,c.YZBM,c.DHHM,c.BYYX,c.YDDH,e.MC as CS,g.MC as ZZMM,c.BYSJ,c.XPIAN,");
 			sb.append("		b.ZYZGZSBH,DATE_FORMAT(b.ZGZSQFRQ,'%Y-%m-%d') as ZGZSQFRQ,b.FZYHYBH, h.MC as ZW,b.ZZDW,DATE_FORMAT(b.RHSJ,'%Y-%m-%d') AS RHSJ,i.mc as XL");
@@ -309,9 +313,7 @@ public class SPDao extends BaseDao{
 						}
 					 break;
 				 case 4:
-					 this.jdbcTemplate.update("update zs_jgzx set SPZT='2',ZXRQ=sysdate() where id =?",
-							 new Object[]{mp.get("SJID")});
-					 this.jdbcTemplate.update("update zs_jg a,zs_jgzx b set a.JGZT_DM='9',a.yxbz='0' where b.id =? and a.id=b.jg_id",
+					 this.jdbcTemplate.update("update zs_jg a,zs_jgzx b set a.JGZT_DM='9',a.yxbz='0',b.SPZT='2',b.ZXRQ=sysdate() where b.id =? and a.id=b.jg_id",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 5:
@@ -332,6 +334,10 @@ public class SPDao extends BaseDao{
 					 break;
 				 case 8:
 					 this.jdbcTemplate.update("update zs_zyswszj a,zs_zysws b,zs_ryjbxx c set a.SPZT_DM='2',c.RYZT_DM='6',c.YXBZ='0',b.ZYZT_DM='6',b.RYSPGCZT_DM='1',b.YXBZ='0' where a.id =? and a.ZYSWS_ID=b.id and b.ry_id=c.id",
+							 new Object[]{mp.get("SJID")});
+					 break;
+				 case 10:
+					 this.jdbcTemplate.update("update zs_zyswszx a,zs_zysws b,zs_ryjbxx c set a.SPZT_DM='2',c.RYZT_DM='5',c.YXBZ='0',b.ZYZT_DM='5',b.RYSPGCZT_DM='1',b.YXBZ='0' where a.id =? and a.ZYSWS_ID=b.id and b.ry_id=c.id",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 20://select * from zs_splcbz where lcid='402881831be2e6af011be3c184d2003a' 审批步骤需改为2
@@ -362,12 +368,15 @@ public class SPDao extends BaseDao{
 							 new Object[]{spsq.get("spyj"),spsq.get("uname"),mp.get("SJID")});
 					 break;
 				 case 6:
-					 this.jdbcTemplate.update("update zs_zyswsbgsp set SPZT_DM='3',YJIAN=?,SPRQ=sysdate(),SPR=? where id =?",
+					 this.jdbcTemplate.update("update zs_zysws a,zs_zyswsbgsp b set a.RYSPGCZT_DM='1',b.SPZT_DM='3',b.YJIAN=?,b.SPRQ=sysdate(),b.SPR=? where b.id =? and b.ZYSWS_ID=a.id ",
 							 new Object[]{spsq.get("spyj"),spsq.get("uname"),mp.get("SJID")});
-					 this.jdbcTemplate.update("update zs_zysws a,zs_zyswsbgsp b set a.RYSPGCZT_DM='1'where b.id =? and b.ZYSWS_ID=a.id ",mp.get("SJID"));
 					 break;
 				 case 8:
-					 this.jdbcTemplate.update("update zs_zyswszj a,zs_zysws b,zs_ryjbxx c set a.SPZT_DM='3',c.RYZT_DM='1',c.YXBZ='1',b.ZYZT_DM='1',b.RYSPGCZT_DM='1',b.YXBZ='1' where a.id =? and a.ZYSWS_ID=b.id and b.ry_id=c.id",
+					 this.jdbcTemplate.update("update zs_zyswszj a,zs_zysws b set a.SPZT_DM='3',b.RYSPGCZT_DM='1' where a.id =? and a.ZYSWS_ID=b.id ",
+							 new Object[]{mp.get("SJID")});
+					 break;
+				 case 10:
+					 this.jdbcTemplate.update("update zs_zyswszx a,zs_zysws b set a.SPZT_DM='3',b.RYSPGCZT_DM='1' where a.id =? and a.ZYSWS_ID=b.id ",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 20:
@@ -488,7 +497,7 @@ public class SPDao extends BaseDao{
 			this.jdbcTemplate.update(sql3,new Object[]{rs2,rec.get("QZNY"),rec.get("XXXX"),rec.get("ZMR")});
 		}
 		String suid = new Common().newUUID();
-		this.jdbcTemplate.update("insert into zs_fzybasp (ID,FZYSWS_ID,SPZT_DM,SPSJ) values(?,?,'1',sysdate())",new Object[]{suid,rs2});
+		this.jdbcTemplate.update("insert into zs_fzybasp (ID,FZYSWS_ID,SPZT_DM,SPRQ) values(?,?,'1',sysdate())",new Object[]{suid,rs2});
 		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
 		spsq.put("sid", suid);
 		spsq.put("lclx", "402881831be2e6af011be3c184d2003a");
@@ -544,6 +553,50 @@ public class SPDao extends BaseDao{
 		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
 		spsq.put("sid", rs);
 		spsq.put("lclx", "402881831be2e6af011be3adc72c0011");
+		spsq.put("jgid", sqxm.get("jgid"));
+		swsSPqq(spsq);
+	}
+	
+	/**
+	 * 执业注销审批申请
+	 * @param sqxm
+	 * @throws Exception
+	 */
+	public void zyzxsq(Map<String, Object> sqxm) throws Exception{
+		String uuid = new Common().newUUID();
+		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+		String sql ="insert into zs_zyswszx (ID,ZYSWSZXYY_DM,ZXRQ,SWSYJ,ZYSWS_ID,SPZT_DM) values(?,?,?,?,?,'1')";
+		this.jdbcTemplate.update(sql, new Object[]{uuid,sqxm.get("ZYSWSZXYY_DM"),sqxm.get("ZXRQ"),sqxm.get("SWSYJ"),hashids.decode((String)sqxm.get("zyswsid"))[0]});
+		this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='9' where a.id=?",hashids.decode((String)sqxm.get("zyswsid"))[0]);
+		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
+		spsq.put("sid", uuid);
+		if(this.jdbcTemplate.queryForObject("select JGXZ_DM from zs_jg where id =?",new Object[]{sqxm.get("jgid")},int.class)!=3){
+			spsq.put("lclx", "402881831be2e6af011be3b6e94e0020");
+		}else{
+			spsq.put("lclx", "40288087228378910122838c66870012");
+		}
+		spsq.put("jgid", sqxm.get("jgid"));
+		swsSPqq(spsq);
+	}
+	
+	/**
+	 * 执业转非执业审批申请
+	 * @param sqxm
+	 * @throws Exception
+	 */
+	public void zyzfzysq(Map<String, Object> sqxm) throws Exception{
+		String uuid = new Common().newUUID();
+		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+		String sql ="insert into zs_zyswszfzy (ID,FZYSQ,XDWYJ,TBR,ZYSWS_ID,SPZT_DM,TBRQ) values(?,?,?,?,?,'1',sysdate())";
+		this.jdbcTemplate.update(sql, new Object[]{uuid,sqxm.get("FZYSQ"),sqxm.get("XDWYJ"),sqxm.get("uid"),hashids.decode((String)sqxm.get("zyswsid"))[0]});
+		this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='8' where a.id=?",hashids.decode((String)sqxm.get("zyswsid"))[0]);
+		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
+		spsq.put("sid", uuid);
+		if(this.jdbcTemplate.queryForObject("select JGXZ_DM from zs_jg where id =?",new Object[]{sqxm.get("jgid")},int.class)!=3){
+			spsq.put("lclx", "402881831be2e6af011be3b2d1640019");
+		}else{
+			spsq.put("lclx", "40288087228378910122838b46de000e");
+		}
 		spsq.put("jgid", sqxm.get("jgid"));
 		swsSPqq(spsq);
 	}

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.exception.UserException;
 
 @Service
 public class SwsService {
@@ -33,6 +34,21 @@ public class SwsService {
 			}
 		}
 		return swsDao.swscx(pn, ps, map);
+	}
+	public Map<String, Object> swsslspcx(int pn, int ps, String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return swsDao.swsslspcx(pn, ps, map);
 	}
 	
 	public Map<String, Object> swsxx(String xqTab,String gid) {
@@ -66,5 +82,11 @@ public class SwsService {
 		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
 		return this.swsDao.swsxx((int)hashids.decode(jgid)[0]);
 	}
-
+	public Object insertjg(Map<String, Object> jgtj){
+		Object obj = swsDao.insertjg(jgtj);
+		if(obj==null){
+			throw new UserException("单位名称重复");
+		}
+		return obj;
+	}
 }
