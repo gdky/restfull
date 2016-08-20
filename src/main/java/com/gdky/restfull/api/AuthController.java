@@ -176,6 +176,29 @@ public class AuthController {
 		return ResponseEntity.ok(ResponseMessage.success("添加成功"));
 	}
 	
+	/*
+	 * 修改用户信息
+	 * 用户信息中需带有roleId属性，标识用户所属角色
+	 * 用户信息中需带有jgId属性，标识用户所属事务所，如非事务所用户，jgId=null
+	 */
+	@RequestMapping(value="/users/{id}",method=RequestMethod.PUT)
+	public ResponseEntity<?> updateUser(
+			@PathVariable String id,
+			@RequestBody Map<String,Object> user){
+		int role = Integer.parseInt((String)user.get("roleId"));
+		if(user.get("jgId")!=null){
+			String hashId = (String)user.get("jgId");
+			Long jgId = HashIdUtil.decode(hashId);
+			user.put("jgId", jgId.intValue());	
+		}
+		user.put("id",id);
+		Integer userId = authService.updateUsers(user);
+		authService.delRoleUser(userId);
+		authService.addRoleUser(role, userId);
+		
+		return ResponseEntity.ok(ResponseMessage.success("添加成功"));
+	}
+	
 	/**
 	 * 删除选中的用户
 	 * @param RequestBody List<String> [ID1,ID2,...] 

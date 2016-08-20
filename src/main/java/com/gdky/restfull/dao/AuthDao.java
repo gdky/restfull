@@ -203,10 +203,28 @@ public class AuthDao extends BaseJdbcDao {
 		return userId.intValue();
 	}
 
+	public void updateUser(User u) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update fw_users ");
+		sb.append(" set username =? ,uname=?,jg_id=?,idcard=?,names=?,phone=?,account_enabled=?,account_expired=?,account_locked=?");
+		sb.append(" where id = ? ");
+		this.jdbcTemplate.update(
+				sb.toString(),
+				new Object[] { u.getUsername(), u.getUname(), u.getJgId(),
+						u.getIdcard(), u.getNames(), u.getPhone(),
+						u.getAccountEnabled(), u.getAccountExpired(),
+						u.getAccountLocked(),u.getId() });
+	}
+
 	public void addRoleUser(int role, Integer userId) {
 		String sql = "insert into fw_user_role (user_id,role_id) values(?,?)";
 		this.jdbcTemplate.update(sql, new Object[] { userId, role });
 
+	}
+
+	public void delRoleUser(Integer userId) {
+		String sql = "delete from fw_user_role where user_id =?";
+		this.jdbcTemplate.update(sql, new Object[] { userId });
 	}
 
 	public Integer delUsers(ArrayList<Object[]> batchValue) {
@@ -217,7 +235,7 @@ public class AuthDao extends BaseJdbcDao {
 	}
 
 	public Map<String, Object> getUserById(Long id) {
-		String sql = "select u.*,j.DWMC from fw_users u left join zs_jg j on u.JG_ID = j.ID where u.id = ? ";
+		String sql = "select u.*,j.DWMC,ur.role_id from (fw_users u,fw_user_role ur) left join zs_jg j on u.JG_ID = j.ID where u.id = ur.user_id and u.id = ? ";
 		List<Map<String, Object>> ls = this.jdbcTemplate.query(sql,
 				new Object[] { id }, new RowMapper<Map<String, Object>>() {
 					@Override
@@ -236,6 +254,7 @@ public class AuthDao extends BaseJdbcDao {
 						map.put("idcard", rs.getString("IDCARD"));
 						map.put("phone", rs.getString("PHONE"));
 						map.put("createTime", rs.getDate("CREATE_TIME"));
+						map.put("roleId", String.valueOf(rs.getInt("role_id")));
 						return map;
 					}
 				});
@@ -269,5 +288,6 @@ public class AuthDao extends BaseJdbcDao {
 		}
 
 	}
+
 
 }
