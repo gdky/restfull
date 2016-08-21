@@ -203,19 +203,17 @@ public class AuthService {
 	public Integer updateUsers(Map<String, Object> obj) {
 		User u = new User();
 		Long userId = HashIdUtil.decode((String)obj.get("id"));
-		String username = (String) obj.get("userName");//用户名
-		String names = (String) obj.get("names");//姓名
+		String names = (String) obj.get("names");
 		String uname = (String) obj.get("uname");//登录名
 		String idcard = (String) obj.get("idcard");
 		String phone = (String) obj.get("phone");
+		Integer unameChange = (Integer) obj.get("unameChange");
 		Integer accountEnabled = (Integer) obj.get("accountEnabled");
 		Integer accountExpired = (Integer) obj.get("accountExpired");
 		Integer accountLocked = (Integer) obj.get("accountLocked");
 
-		if (authDao.getUser(username).size() > 0) {
-			throw new UserException("用户名已存在，重新输入用户名");
-		}
-		if (authDao.getUserByUname(uname).size() > 0) {
+
+		if ( unameChange!= null && authDao.getUserByUname(uname).size() > 0) {
 			throw new UserException("登录名已存在，重新输入登录名");
 		}
 		if (names == null || names.isEmpty()) {
@@ -226,8 +224,7 @@ public class AuthService {
 		}
 		u.setJgId((Integer) obj.get("jgId"));
 		u.setUname(uname);
-		u.setUsername(username);
-		u.setNames(uname);
+		u.setNames(names);
 		u.setPhone(phone);
 		u.setIdcard(idcard);
 		u.setAccountEnabled(accountEnabled);
@@ -242,5 +239,13 @@ public class AuthService {
 
 	public void delRoleUser(Integer userId) {
 		authDao.delRoleUser(userId);
+	}
+
+	public void resetPass(String userId,Map<String, Object> newPass) {
+		Long id = HashIdUtil.decode(userId);
+		String password = (String) newPass.get("password");
+		ShaPasswordEncoder encoder = new ShaPasswordEncoder();
+		password = encoder.encodePassword(password, null);
+		authDao.resetPass(id.intValue(),password);
 	}
 }

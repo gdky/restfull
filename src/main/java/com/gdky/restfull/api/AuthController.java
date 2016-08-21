@@ -207,10 +207,21 @@ public class AuthController {
 	@RequestMapping(value="/users",method=RequestMethod.DELETE)
 	public ResponseEntity<?> delUsers(@RequestBody List<String> userIds){
 		int effectRows = authService.delUsers(userIds);
-		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "404", "成功删除了 "+effectRows+" 条记录。");
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "200", "成功删除了 "+effectRows+" 条记录。");
 		return  ResponseEntity.ok(rm);
 	}
 	
+	/**
+	 * 重置密码
+	 * @param newPass
+	 * @return
+	 */
+	@RequestMapping(value="/password/{userId}",method=RequestMethod.PUT)
+	public ResponseEntity<?> resetPass(@RequestBody Map<String,Object> newPass,@PathVariable String userId){
+		authService.resetPass(userId,newPass);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "200", "重置密码成功");
+		return  ResponseEntity.ok(rm);
+	}
 	
 	
 	

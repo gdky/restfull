@@ -206,11 +206,11 @@ public class AuthDao extends BaseJdbcDao {
 	public void updateUser(User u) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" update fw_users ");
-		sb.append(" set username =? ,uname=?,jg_id=?,idcard=?,names=?,phone=?,account_enabled=?,account_expired=?,account_locked=?");
+		sb.append(" set uname=?,jg_id=?,idcard=?,names=?,phone=?,account_enabled=?,account_expired=?,account_locked=?");
 		sb.append(" where id = ? ");
 		this.jdbcTemplate.update(
 				sb.toString(),
-				new Object[] { u.getUsername(), u.getUname(), u.getJgId(),
+				new Object[] { u.getUname(), u.getJgId(),
 						u.getIdcard(), u.getNames(), u.getPhone(),
 						u.getAccountEnabled(), u.getAccountExpired(),
 						u.getAccountLocked(),u.getId() });
@@ -264,6 +264,16 @@ public class AuthDao extends BaseJdbcDao {
 			throw new ResourceNotFoundException(null);
 		}
 	}
+	
+	public void resetPass(Integer userId, String password) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update fw_users ");
+		sb.append(" set password=? ");
+		sb.append(" where id = ? ");
+		this.jdbcTemplate.update(
+				sb.toString(),
+				new Object[] {password,userId});
+	}
 
 	public class UserRowMapper implements RowMapper<Map<String, Object>> {
 
@@ -288,6 +298,8 @@ public class AuthDao extends BaseJdbcDao {
 		}
 
 	}
+
+	
 
 
 }
