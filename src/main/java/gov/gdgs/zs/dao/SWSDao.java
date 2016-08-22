@@ -105,6 +105,7 @@ public class SWSDao extends BaseDao{
 				link.put("herf_czrylb", url+"/czrylb/"+id);
 				link.put("herf_swsbgxx", url+"/swsbgxx/"+id);
 				link.put("herf_njjl", url+"/njjl/"+id);
+				map.put("id", id);
 				map.put("key", rs.getObject("key"));
 				map.put("xh", rs.getObject("key"));
 				map.put("_links", link);

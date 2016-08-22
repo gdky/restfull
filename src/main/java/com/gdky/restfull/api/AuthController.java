@@ -34,6 +34,7 @@ import com.gdky.restfull.security.CustomUserDetails;
 import com.gdky.restfull.security.TokenUtils;
 import com.gdky.restfull.service.AccountService;
 import com.gdky.restfull.service.AuthService;
+import com.gdky.restfull.utils.HashIdUtil;
 
 @RestController
 @RequestMapping(value = Constants.URI_API_PREFIX)
@@ -132,6 +133,9 @@ public class AuthController {
 		}		
 		return ResponseEntity.ok(null);
 	}
+	/*
+	 * 获取用户列表
+	 */
 	@RequestMapping(value="/users",method=RequestMethod.GET)
 	public ResponseEntity<?> getUsers(
 			@RequestParam(value = "page", required = true) int page,
@@ -143,6 +147,16 @@ public class AuthController {
 	}
 	
 	/*
+	 * 获取用户明细
+	 */
+	@RequestMapping(value="/users/{hashid}",method=RequestMethod.GET)
+	public ResponseEntity<?> getUsers(
+			@PathVariable String hashid){
+		Map<String,Object> rs = authService.getUsersById(hashid);		
+		return ResponseEntity.ok(rs);
+	}
+	
+	/*
 	 * 添加新用户
 	 * 用户信息中需带有roleId属性，标识用户所属角色
 	 * 用户信息中需带有jgId属性，标识用户所属事务所，如非事务所用户，jgId=null
@@ -150,9 +164,37 @@ public class AuthController {
 	@RequestMapping(value="/users",method=RequestMethod.POST)
 	public ResponseEntity<?> addUser(
 			@RequestBody Map<String,Object> user){
-		int role = (Integer)user.get("roleId");
+		int role = Integer.parseInt((String)user.get("roleId"));
+		if(user.get("jgId")!=null){
+			String hashId = (String)user.get("jgId");
+			Long jgId = HashIdUtil.decode(hashId);
+			user.put("jgId", jgId.intValue());	
+		}
 		Integer userId = authService.addUsers(user);
 		authService.addRoleUser(role,userId);
+		
+		return ResponseEntity.ok(ResponseMessage.success("添加成功"));
+	}
+	
+	/*
+	 * 修改用户信息
+	 * 用户信息中需带有roleId属性，标识用户所属角色
+	 * 用户信息中需带有jgId属性，标识用户所属事务所，如非事务所用户，jgId=null
+	 */
+	@RequestMapping(value="/users/{id}",method=RequestMethod.PUT)
+	public ResponseEntity<?> updateUser(
+			@PathVariable String id,
+			@RequestBody Map<String,Object> user){
+		int role = Integer.parseInt((String)user.get("roleId"));
+		if(user.get("jgId")!=null){
+			String hashId = (String)user.get("jgId");
+			Long jgId = HashIdUtil.decode(hashId);
+			user.put("jgId", jgId.intValue());	
+		}
+		user.put("id",id);
+		Integer userId = authService.updateUsers(user);
+		authService.delRoleUser(userId);
+		authService.addRoleUser(role, userId);
 		
 		return ResponseEntity.ok(ResponseMessage.success("添加成功"));
 	}
@@ -165,10 +207,21 @@ public class AuthController {
 	@RequestMapping(value="/users",method=RequestMethod.DELETE)
 	public ResponseEntity<?> delUsers(@RequestBody List<String> userIds){
 		int effectRows = authService.delUsers(userIds);
-		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "404", "成功删除了 "+effectRows+" 条记录。");
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "200", "成功删除了 "+effectRows+" 条记录。");
 		return  ResponseEntity.ok(rm);
 	}
 	
+	/**
+	 * 重置密码
+	 * @param newPass
+	 * @return
+	 */
+	@RequestMapping(value="/password/{userId}",method=RequestMethod.PUT)
+	public ResponseEntity<?> resetPass(@RequestBody Map<String,Object> newPass,@PathVariable String userId){
+		authService.resetPass(userId,newPass);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "200", "重置密码成功");
+		return  ResponseEntity.ok(rm);
+	}
 	
 	
 	

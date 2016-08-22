@@ -193,4 +193,59 @@ public class AuthService {
 		int effectRows = authDao.delUsers(batchValue);
 		return effectRows;
 	}
+
+	public Map<String, Object> getUsersById(String hashid) {
+		Long Id = HashIdUtil.decode(hashid);
+		Map<String,Object> rs = authDao.getUserById(Id);
+		return rs;
+	}
+
+	public Integer updateUsers(Map<String, Object> obj) {
+		User u = new User();
+		Long userId = HashIdUtil.decode((String)obj.get("id"));
+		String names = (String) obj.get("names");
+		String uname = (String) obj.get("uname");//登录名
+		String idcard = (String) obj.get("idcard");
+		String phone = (String) obj.get("phone");
+		Integer unameChange = (Integer) obj.get("unameChange");
+		Integer accountEnabled = (Integer) obj.get("accountEnabled");
+		Integer accountExpired = (Integer) obj.get("accountExpired");
+		Integer accountLocked = (Integer) obj.get("accountLocked");
+
+
+		if ( unameChange!= null && authDao.getUserByUname(uname).size() > 0) {
+			throw new UserException("登录名已存在，重新输入登录名");
+		}
+		if (names == null || names.isEmpty()) {
+			throw new UserException("未输入账户描述信息");
+		}
+		if (phone == null || phone.isEmpty()) {
+			throw new UserException("未输入联系电话");
+		}
+		u.setJgId((Integer) obj.get("jgId"));
+		u.setUname(uname);
+		u.setNames(names);
+		u.setPhone(phone);
+		u.setIdcard(idcard);
+		u.setAccountEnabled(accountEnabled);
+		u.setAccountExpired(accountExpired);
+		u.setAccountLocked(accountLocked);
+		u.setId(userId.intValue());
+		
+		authDao.updateUser(u);
+
+		return userId.intValue();
+	}
+
+	public void delRoleUser(Integer userId) {
+		authDao.delRoleUser(userId);
+	}
+
+	public void resetPass(String userId,Map<String, Object> newPass) {
+		Long id = HashIdUtil.decode(userId);
+		String password = (String) newPass.get("password");
+		ShaPasswordEncoder encoder = new ShaPasswordEncoder();
+		password = encoder.encodePassword(password, null);
+		authDao.resetPass(id.intValue(),password);
+	}
 }

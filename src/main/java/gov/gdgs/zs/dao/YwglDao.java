@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
+import com.gdky.restfull.exception.YwbbException;
 
 @Repository
 public class YwglDao extends BaseJdbcDao {
@@ -157,6 +158,102 @@ public class YwglDao extends BaseJdbcDao {
 		String sql = "select id from zs_ywbb where xyh = ?";
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql,new Object[]{xyh});
 		return ls.size();
+	}
+
+	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select y.*,z.mc as ywzt,l.mc as ywlx,hy.mc as hy,cs.mc as cs, ");
+		sb.append(" qx.mc as qx ");
+		sb.append(" from zs_ywbb y,dm_ywbb_zt z,dm_ywlx l,dm_hy hy,dm_cs cs,dm_cs qx ");
+		sb.append(" where bbhm=? and yzm = ? ");
+		sb.append(" and y.zt = z.id ");
+		sb.append(" and y.ywlx_dm = l.id ");
+		sb.append(" and y.hy_id = hy.id ");
+		sb.append(" and y.cs_dm = cs.id ");
+		sb.append(" and y.qx_dm = qx.id ");
+		sb.append(" and y.yxbz = 1 ");
+		List<Map<String, Object>> ls = jdbcTemplate.query(
+				sb.toString(),
+				new Object[]{bbhm,yzm},
+				new RowMapper<Map<String,Object>>(){
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("bbhm", rs.getObject("bbhm"));
+				map.put("bbrq", rs.getDate("bbrq"));
+				map.put("bgwh", rs.getString("bgwh"));
+				map.put("zbrq", rs.getDate("zbrq"));
+				map.put("yzm", rs.getString("yzm"));
+				map.put("sfje", rs.getBigDecimal("sfje"));
+				map.put("swsmc", rs.getString("swsmc"));
+				map.put("swsswdjzh", rs.getString("swsswdjzh"));
+				map.put("wtdw", rs.getString("wtdw"));
+				map.put("wtdwnsrsbh", rs.getString("wtdwnsrsbh"));
+				map.put("xyh", rs.getString("xyh"));
+				map.put("yjfh", rs.getString("yjfh"));
+				map.put("rjfh", rs.getString("rjfh"));
+				map.put("sjfh", rs.getString("sjfh"));
+				map.put("qzsws", rs.getString("qzsws"));
+				map.put("txdz", rs.getString("txdz"));
+				map.put("swsdzyj", rs.getString("swsdzyj"));
+				map.put("swswz", rs.getString("swswz"));
+				map.put("ywlx", rs.getString("ywlx"));
+				map.put("jtxm", rs.getString("jtxm"));
+				map.put("tzvalue1", rs.getBigDecimal("tzvalue1"));
+				map.put("tjvalue2", rs.getBigDecimal("tjvalue2"));
+				map.put("sstarttime", rs.getDate("sstarttime"));
+				map.put("sendtime", rs.getDate("sendtime"));
+				if(rs.getInt("nsrxz")==0){
+					map.put("nsrxz", "一般纳税人");
+				}else if (rs.getInt("nsrxz") ==1){
+					map.put("nsrxz", "小规模纳税人");
+				}else{
+					map.put("nsrxz", "非增值税纳税人");
+				}
+				if(rs.getInt("zsfs_dm")==0){
+					map.put("zsfs", "查账征收");
+				}else {
+					map.put("zsfs", "核定征收");
+				}
+				if(rs.getString("ISWS").equals("Y")){
+					map.put("zsfs", "外省");
+				}else {
+					map.put("zsfs", "广东省");
+				}
+				if(rs.getInt("SB_DM")==1){
+					map.put("sb", "国税");
+				}else {
+					map.put("sb", "地税");
+				}
+				map.put("hy", rs.getString("hy"));
+				map.put("cs", rs.getString("cs"));
+				map.put("qx",rs.getString("qx"));
+				if(rs.getInt("WTDWXZ_DM")==0){
+					map.put("wtdwxz", "居民企业");
+				}else {
+					map.put("wtdwxz", "非居民企业税");
+				}
+				map.put("wtdwnsrsbhdf", rs.getString("WTDWNSRSBHDF"));
+				map.put("wtdwlxr", rs.getString("WTDWLXR"));
+				map.put("wtdwlxdh", rs.getString("WTDWLXDH"));
+				map.put("wtdxlxdz", rs.getString("WTDXLXDZ"));
+				map.put("fphm", rs.getString("FPHM"));
+				map.put("xyje", rs.getBigDecimal("XYJE"));
+				map.put("sjsqje", rs.getBigDecimal("SJSQJE"));
+				map.put("memo", rs.getString("MEMO"));
+				map.put("zgswjg", rs.getString("ZGSWJG"));
+				map.put("swsdh", rs.getString("SWSDH"));
+				map.put("swscz", rs.getString("SWSCZ"));
+				map.put("ywzt", rs.getString("ywzt"));
+				
+				return map;
+			}
+		});
+		if(ls.size()>0){
+			return ls.get(0);
+		}else{
+			return null;
+		}
+		
 	}
 	
 
