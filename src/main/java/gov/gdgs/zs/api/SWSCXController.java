@@ -65,7 +65,7 @@ public class SWSCXController {
 	
 	@RequestMapping(value = "/jggl/swsslsp", method = RequestMethod.POST)
 	public ResponseEntity<?> upLoadJFSC(@RequestBody Map<String, Object> jgtj,HttpServletRequest request) throws Exception{
-		jgtj.put("jgId", swsService.insertjg(jgtj));
+		jgtj.put("jgId", ((Number)swsService.insertjg(jgtj)).intValue());
 		//外省主所在本省设立分所机构表PARENTJGID为0；外省事务所在本省办理业务用户设立角色为113
 		boolean is=false;
 		if(jgtj.containsKey("iswdzc")){
@@ -78,6 +78,6 @@ public class SWSCXController {
 		}else{
 			authService.addRoleUser(4,authService.addUsers(jgtj));
 		}
-		return new ResponseEntity<>(ResponseMessage.success("添加成功"),HttpStatus.CREATED);
+		return new ResponseEntity<>(true,HttpStatus.CREATED);
 	}
 }

@@ -142,4 +142,21 @@ public class SPController {
 			@PathVariable(value = "lcbz") int lcbz) throws Exception{
 		return new ResponseEntity<>(spPservice.sjbhyj(spid,lcbz),HttpStatus.OK);
 	}
+	
+	/**
+	 * 历史审批记录查询
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/spapi/lsspjlcx", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> splsjlcx(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where)  {
+		
+		return new ResponseEntity<>(spPservice.splsjlcx(pn, ps, where),HttpStatus.OK);
+
+	}
 }
