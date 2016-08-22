@@ -1,5 +1,4 @@
 package gov.gdgs.zs.service;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,15 +6,15 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
-import  gov.gdgs.zs.dao.AddswsnjDao;
+import  gov.gdgs.zs.dao.AddzyswsnjDao;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
-public class AddswsnjService {
-	//事务所年检表
+public class AddzyswsnjService {
+	//执业税务师年检表增加
 	@Resource
-	private AddswsnjDao addswsnjdao;
-			public Map<String, Object> getswsnjb(int page, int pageSize,int Jgid, String where) {
+	private AddzyswsnjDao addzyswsnjdao;
+			public Map<String, Object> getzyswsnjb(int page, int pageSize,int Jgid, String where) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				if (where != null) {
 					try {
@@ -27,7 +26,9 @@ public class AddswsnjService {
 					} catch (Exception e) {
 					}
 				}		
-				Map<String, Object> rs =addswsnjdao.getswsnjb(page, pageSize,Jgid, map);
+				Map<String, Object> rs =addzyswsnjdao.getZyswsnjb(page, pageSize,Jgid, map);
 				return rs;
 			}
 }
+
+

@@ -72,7 +72,7 @@ public class JDJCDao extends BaseDao{
 			sb.append(" from "+Config.PROJECT_SCHEMA+"zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d,(SELECT @rownum:=?) temp");
 			sb.append(condition.getSql());//相当元 where x.xx like '%%'
 			sb.append(" and a.ZSJG_ID=b.ID and  a.SWS_ID=d.ID and c.ID=d.RY_ID   order by a.ND desc) as t");
-			sb.append("    LIMIT ?, ? ");
+			sb.append("    LIMIT  ?, ? ");
 			// 装嵌传值数组
 			int startIndex = pageSize * (page - 1);
 			ArrayList<Object> params = condition.getParams();

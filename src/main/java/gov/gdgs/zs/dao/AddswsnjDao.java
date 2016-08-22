@@ -30,11 +30,13 @@ public class AddswsnjDao extends BaseDao{
 				+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
 		sb.append("	 FROM  zs_jg_njb a,zs_jg c,dm_jgxz d");
 		sb.append("		"+condition.getSql()+" ");
-		sb.append("	and a.ZSJG_ID = c.ID and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
-		//sb.append("	and a.ZSJG_ID = 'jgid' and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
+		//sb.append("	and a.ZSJG_ID = c.ID and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
+		sb.append("	and a.ZSJG_ID = ? and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
 		sb.append("	group by a.zsjg_id,nd order by a.ND desc");
 		sb.append("	 ) as v ,(SELECT @rownum:=?) zs_jg");
-		sb.append("		LIMIT ?,? ");
+		//sb.append("	 ) as v ");
+		//sb.append("	 ) as v");
+		sb.append("		LIMIT ? ,?");
 		//ArrayList<Object> params = condition.getParams();
 		//params.add((page-1)*pageSize);
 		//params.add((page-1)*pageSize);
@@ -43,10 +45,16 @@ public class AddswsnjDao extends BaseDao{
 		// 装嵌传值数组
 				int startIndex = pageSize * (page - 1);
 				ArrayList<Object> params = condition.getParams();
-				params.add(0, pageSize * (page - 1));
-				params.add(Jgid);	
-				params.add(startIndex);
+				
+				params.add(Jgid);
+				params.add( pageSize * (page - 1));
+		        params.add(startIndex);
 				params.add(pageSize);
+				
+//				params.add(0, pageSize * (page - 1));
+//		        params.add(Jgid);	
+//				params.add(startIndex);
+//				params.add(pageSize);
 
 				// 获取符合条件的记录
 				List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
@@ -56,10 +64,11 @@ public class AddswsnjDao extends BaseDao{
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();
 		ob.put("data", ls);
+		ob.put("total",total);
 		Map<String, Object> meta = new HashMap<>();
 		meta.put("pageNum", page);
 		meta.put("pageSize", pageSize);
-		meta.put("pageTotal",total);
+		//meta.put("pageTotal",total);
 		meta.put("pageAll",(total + pageSize - 1) / pageSize);
 		ob.put("page", meta);
 		
