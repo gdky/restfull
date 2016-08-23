@@ -196,6 +196,7 @@ public class YwglDao extends BaseJdbcDao {
 				map.put("txdz", rs.getString("txdz"));
 				map.put("swsdzyj", rs.getString("swsdzyj"));
 				map.put("swswz", rs.getString("swswz"));
+				map.put("ywlx_dm",rs.getInt("ywlx_dm"));
 				map.put("ywlx", rs.getString("ywlx"));
 				map.put("jtxm", rs.getString("jtxm"));
 				map.put("tzvalue1", rs.getBigDecimal("tzvalue1"));
