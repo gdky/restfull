@@ -1,11 +1,13 @@
 package gov.gdgs.zs.dao;
 
 import gov.gdgs.zs.configuration.Config;
+import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,24 +42,17 @@ public class SWSDao extends BaseDao{
 		StringBuffer sb = new StringBuffer();
 		sb.append("		SELECT 	SQL_CALC_FOUND_ROWS	 ");
 		sb.append("		@rownum:=@rownum+1 AS 'key',");
-		sb.append("		a.id,	");
-		sb.append("		a.dwmc,		 ");
-		sb.append("		a.zczj,		 ");
-		sb.append("		a.fddbr,	 ");
-		sb.append("		a.JGZCH as zsbh,	 ");
-		sb.append("		d.mc AS swsxz,		"); 
-		sb.append("		c.mc AS cs,		");
-		sb.append("		b.zrs,		 ");
-		sb.append("		b.zyrs,");
+		sb.append("		a.id,	a.dwmc,a.zczj,");
+		sb.append("		a.fddbr,a.JGZCH as zsbh,");
+		sb.append("		d.mc AS swsxz,c.mc AS cs,");
+		sb.append("		(select count(id) from zs_zysws where jg_id=a.id and ZYZT_DM=1) as zyrs,");
+		sb.append("		(select count(id) from zs_zysws where jg_id=a.id)+");
+		sb.append("(select count(id) from zs_cyry where jg_id=a.id and CYRYZT_DM=1) as zrs,");
 		sb.append("		DATE_FORMAT(a.swszsclsj,'%Y-%m-%d') AS clsj");
-		sb.append("		FROM		 ");
-		sb.append("		zs_jg a,	zs_jg_njb b,dm_cs c,	"); 	 
-		sb.append("		dm_jgxz d,(SELECT @rownum:=?) zs_jg");
-		sb.append("		"+condition.getSql()+" ");
+		sb.append("		FROM	zs_jg a,	dm_cs c,dm_jgxz d,(SELECT @rownum:=?) zs_jg ");
+		sb.append(condition.getSql());
 		sb.append("		and a.jgxz_dm = d.id ");
 		sb.append("		AND a.cs_dm = c.id ");
-		sb.append("		AND a.id = b.ZSJG_ID ");
-		sb.append("		AND b.YXBZ = '1'");
 		sb.append("		AND a.YXBZ = '1'");
 		if(qury.containsKey("sorder")){
 			Boolean asc = qury.get("sorder").toString().equals("ascend");
@@ -110,6 +105,7 @@ public class SWSDao extends BaseDao{
 				link.put("herf_czrylb", url+"/czrylb/"+id);
 				link.put("herf_swsbgxx", url+"/swsbgxx/"+id);
 				link.put("herf_njjl", url+"/njjl/"+id);
+				map.put("id", id);
 				map.put("key", rs.getObject("key"));
 				map.put("xh", rs.getObject("key"));
 				map.put("_links", link);
@@ -146,23 +142,23 @@ public class SWSDao extends BaseDao{
 	 */
 	public Map<String,Object> swsxx(int id){
 		StringBuffer sb = new StringBuffer();
-		sb.append("select 	");	 
-		sb.append("		a.dwmc,a.cs_dm,c.mc as cs,	a.fddbr,a.dzhi,a.sjlzxsbwh,a.zcdz, ");
-		sb.append("		date_format(a.sglzxsbsj,'%Y-%m-%d') as sglzxsbsj,date_format(a.zjpzsj,'%Y-%m-%d')"
-				+ " as zjpzsj,a.yzbm,a.zjpzwh,a.czhen,a.dhua,a.szyx, ");
-		sb.append("		a.txyxming,a.xtyyx,a.xtyphone,a.JGZCH as zsbh,	a.zczj,a.jyfw,d.zrs, ");
+		sb.append("		select a.dwmc,c.mc as cs,	a.fddbr,a.dzhi,a.sjlzxsbwh,a.zcdz, ");
+		sb.append("		date_format(a.sglzxsbsj,'%Y-%m-%d') as sglzxsbsj,date_format(a.zjpzsj,'%Y-%m-%d')");
+		sb.append("		as zjpzsj,a.yzbm,a.zjpzwh,a.czhen,a.dhua,a.szyx, ");
+		sb.append("		a.txyxming,a.xtyyx,a.xtyphone,a.JGZCH as zsbh,	a.zczj,a.jyfw,");
+		sb.append("		(select count(id) from zs_zysws where jg_id=a.id)+");
+		sb.append("		(select count(id) from zs_cyry where jg_id=a.id and CYRYZT_DM=1) as zrs, ");
 		sb.append("		b.mc as swsxz,a.szphone,a.gsyhmcbh,a.dzyj,a.yhdw,date_format(a.yhsj,'%Y-%m-%d') as yhsj, ");
-		sb.append("		a.gzbh,a.gzdw,a.gzry,date_format(a.gzsj,'%Y-%m-%d') as gzsj,a.yzbh,a.yzdw,a.yzry,date_format(a.yzsj,'%Y-%m-%d') as yzsj, ");
+		sb.append("		a.gzbh,a.gzdw,a.gzry,date_format(a.gzsj,'%Y-%m-%d') as gzsj,a.yzbh,a.yzdw,");
+		sb.append("		a.yzry,date_format(a.yzsj,'%Y-%m-%d') as yzsj, ");
 		sb.append("		a.tthybh,date_format(a.rhsj,'%Y-%m-%d') as rhsj,a.khh,a.khhzh,a.fj,a.swdjhm,a.jbqk, ");
-		sb.append("		a.glzd,a.gddh,a.bgcszczm,a.yyzzhm,DATE_FORMAT(a.swszsclsj,'%Y-%m-%d') AS clsj,a.jgdmzh,a.wangzhi,a.CS_DM as csdm,a.JGXZ_DM as jgxzdm	from		 ");
-		sb.append("		 zs_jg a,	dm_jgxz b,dm_cs c,	 zs_jg_njb d ");
-		sb.append("		WHERE		 a.JGXZ_DM = b.ID  ");
-		sb.append("		AND a.CS_DM = c.ID  ");
-		sb.append("		AND a.ID = d.ZSJG_ID  ");
-		sb.append("		and a.YXBZ = 1 ");
-		sb.append("		and d.YXBZ = 1 ");
-		sb.append("		and a.id = ?");
-		String sql = "SELECT @rownum:=@rownum+1 AS 'key',b.* FROM zs_jg a,zs_nbjgsz b,(SELECT @rownum:=0) zs_jg WHERE a.id = b.jg_id AND a.id = ?";
+		sb.append("		a.glzd,a.gddh,a.bgcszczm,a.yyzzhm,DATE_FORMAT(a.swszsclsj,'%Y-%m-%d') AS clsj,");
+		sb.append("		a.jgdmzh,a.wangzhi,a.CS_DM as csdm,a.JGXZ_DM as jgxzdm from		"); 
+		sb.append("		 zs_jg a,dm_jgxz b,dm_cs c ");
+		sb.append("		WHERE	a.JGXZ_DM = b.ID  ");
+		sb.append("		AND a.CS_DM = c.ID   ");
+		sb.append("		and a.YXBZ = 1	and a.id =?");
+		String sql = "SELECT @rownum:=@rownum+1 AS 'key',b.* FROM zs_nbjgsz b,(SELECT @rownum:=0) zs_jg WHERE  b.jg_id=? ";
 		List<Map<String, Object>> tl = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 		Map<String,Object> ll =tl.get(0);
 		ll.put("nbjgsz", this.jdbcTemplate.queryForList(sql,new Object[]{id}));
@@ -176,18 +172,13 @@ public class SWSDao extends BaseDao{
 	public List<Map<String,Object>> zyryxx(int id){
 		StringBuffer sb = new StringBuffer();
 		sb.append("		select @rownum:=@rownum+1 as 'key',@rownum AS xh,c.xming, ");
-		sb.append("		case a.czr_dm when 1 then \"是\"  when 2 then \"否\" else null end as czr,");
-		sb.append("		case a.fqr_dm when 1 then \"是\"  when 2 then \"否\" else null end as fqr,");
-		sb.append("	 case a.sz_dm when 1 then \"是\"  when 2 then \"否\" else null end as sz ");
-		sb.append("		from ");
-		sb.append("	zs_zysws a,zs_jg b ,");
-		sb.append("		zs_ryjbxx c,(select @rownum:=0) zs_jg ");
-		sb.append("		where");
-		sb.append("		 b.id =?");
-		sb.append("		and b.id=a.jg_id");
-		sb.append("		 and a.ry_id = c.id");
-		sb.append("		 and c.yxbz = '1'");
-		sb.append("		 and c.rysf_dm = '1'");
+		sb.append("	case a.czr_dm when 1 then '是'  when 2 then '否' else null end as czr,");
+		sb.append("	case a.fqr_dm when 1 then '是'  when 2 then '否' else null end as fqr,");
+		sb.append("	case a.sz_dm when 1 then '是'  when 2 then '否' else null end as sz ");
+		sb.append("	from zs_zysws a,zs_ryjbxx c,(select @rownum:=0) zs_jg ");
+		sb.append("	where a.jg_id=?");
+		sb.append("	 and a.ry_id = c.id");
+		sb.append("	 and a.ZYZT_DM=1");
 		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 	}
 	/**
@@ -198,21 +189,15 @@ public class SWSDao extends BaseDao{
 	public List<Map<String,Object>> cyryxx(int id){
 		StringBuffer sb = new StringBuffer();
 		sb.append("		select @rownum:=@rownum+1 as 'key', c.xming, ");
-		sb.append("		 d.mc as xl, ");
-		sb.append("		c.sfzh,");
-		sb.append("		e.mc as zc");
-		sb.append("		from zs_cyry a,");
-		sb.append("		zs_jg b");
-		sb.append("		,zs_ryjbxx c,");
-		sb.append("		dm_xl d,");
-		sb.append("		dm_zw e,(select @rownum:=0) zs_jg");
-		sb.append("		where b.id =?");
-		sb.append("		and b.id=a.jg_id ");
-		sb.append("		and a.ry_id = c.id ");
-		sb.append("		and c.xl_dm = d.id ");
+		sb.append("			 d.mc as xl, c.sfzh,");
+		sb.append("			e.mc as zc from zs_cyry a,");
+		sb.append("			zs_ryjbxx c,dm_xl d,");
+		sb.append("			dm_zw e,(select @rownum:=0) zs_jg");
+		sb.append("			where a.jg_id=? ");
+		sb.append("			and a.ry_id = c.id ");
+		sb.append("			and c.xl_dm = d.id ");
 		sb.append("			and a.zw_dm = e.id");
-		sb.append("		 and c.yxbz = '1'");
-		sb.append("		 and c.rysf_dm = '3'");
+		sb.append("			and a.CYRYZT_DM=1");
 		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 	}
 	/**
@@ -283,6 +268,57 @@ public class SWSDao extends BaseDao{
 		sb.append("		order by f.nd desc ");
 		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 	}
-
+	/**
+	 * 事务所设立审批查询
+	 * @param pn
+	 * @param ps
+	 * @param qury
+	 * @return
+	 * @throws Exception
+	 */
+	public Map<String,Object> swsslspcx(int pn,int ps,Map<String, Object> qury) {
+		Condition condition = new Condition();
+		condition.add("b.dwmc", Condition.FUZZY, qury.get("dwmc"));
+		if(qury.containsKey("sbsj")){
+			String sbsj = new Common().getTime2MysqlDateTime((String)qury.get("sbsj")).substring(0,10);
+			condition.add("b.SBCLSJ", Condition.GREATER_EQUAL, sbsj);
+		}
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', b.dwmc,c.NAMES ");
+		sb.append(" as lxr,d.MC as jgzt,date_format(b.SBCLSJ,'%Y-%m-%d') as sbclsj from zs_jg b,fw_users c,dm_jgzt d,(select @rownum:=?) zs_ry "
+					+condition.getSql()+" and b.jgzt_dm =5");
+		sb.append(" and c.JG_ID=b.id and d.ID=b.jgzt_dm LIMIT ?, ?"); 
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		ob.put("page", meta);
+		return ob;
+	}
 	
+	public Object insertjg(Map<String, Object> jgtj){
+		if(this.jdbcTemplate.queryForList("select id from zs_jg where dwmc=? ",jgtj.get("dwmc")).size()!=0){
+			return null;
+		}
+		boolean is=false;
+		if(jgtj.containsKey("iswdfs")){
+			if(jgtj.get("iswdfs").toString().equals("true")){
+				is=true;
+			}
+		}
+		if(is){
+			return this.insertAndGetKeyByJdbc("insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,PARENTJGID,SBCLSJ,YXBZ) values(?,?,5,5,0,sysdate(),0)",
+					new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
+		}
+		String sql ="insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,SBCLSJ,YXBZ) values(?,?,5,5,sysdate(),0)";
+		return this.insertAndGetKeyByJdbc(sql,new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
+	}
 }

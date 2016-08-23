@@ -352,7 +352,6 @@ public class HfglDao extends BaseDao{
         rs.put("success", i);
         rs.put("fail", j);
         rs.put("fls", fls);
-        stream.close();
         return rs;
     } 
 	/**
@@ -527,15 +526,14 @@ public class HfglDao extends BaseDao{
             	fls.add(params.get(1)+""+"   "+sfzh+"（该年度缴费记录已存在，请使用修改操作修改）");
             	continue;
     		}
-            String sql="insert into zs_hyhffzyjfb (ID,ND,RY_ID,JE,BZ,LRR,LRRQ,YXBZ) values(?,?,?,?,?,?,sysdate(),1)";
-    		this.jdbcTemplate.update(sql,new Object[]{new Common().newUUID(),nd,ls.get(0).get("ry_id"),params.get(3)+"",params.get(4)+"",uname});
+            String sql="insert into zs_hyhffzyjfb (ID,ND,RY_ID,JE,BZ,LRR,SCJLID,LRRQ,YXBZ) values(?,?,?,?,?,?,?,sysdate(),1)";
+    		this.jdbcTemplate.update(sql,new Object[]{new Common().newUUID(),nd,ls.get(0).get("ry_id"),params.get(3)+"",params.get(4)+"",uname,uuid2});
     		i+=1;
         }
         this.jdbcTemplate.update("insert into zs_hyhfscjlb (ID,SUCESS,FAIL,SCRQ,SCR,YXBZ) values(?,?,?,sysdate(),?,3)",new Object[]{uuid2,i,j,uname});
         rs.put("success", i);
         rs.put("fail", j);
         rs.put("fls", fls);
-        stream.close();
         return rs;
     }
 	/**
@@ -551,7 +549,7 @@ public class HfglDao extends BaseDao{
 	return true;
 	}
 	/**
-	 * 发票打印查询
+	 * 上传管理查询
 	 * @param pn
 	 * @param ps
 	 * @param qury
@@ -560,15 +558,15 @@ public class HfglDao extends BaseDao{
 	 */
 	public Map<String,Object> scglcx(int pn,int ps,Map<String, Object> qury) throws Exception{
 		Condition condition = new Condition();
-		condition.add("a.nd", Condition.EQUAL, qury.get("nd"));
+		condition.add("a.SCRQ", Condition.EQUAL, qury.get("nd"));
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
 		params.add((pn-1)*ps);
 		params.add(ps);
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.*,"); 
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.*,date_format(a.SCRQ,'%Y-%m-%d') as scrq,"); 
 		sb.append("		case a.YXBZ when 0 then '已撤销' when 1 then '有效' when 2 then '已撤销'"); 
-		sb.append("		when 3 then '有效' else null end as jlzt from zs_hyhfscjlb a,(select @rownum:=?) zs_ry "+condition.getSql()+" LIMIT ?, ?"); 
+		sb.append("		when 3 then '有效' else null end as jlzt from zs_hyhfscjlb a,(select @rownum:=?) zs_ry "+condition.getSql()+" order by a.SCRQ desc LIMIT ?, ?"); 
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();
@@ -579,5 +577,30 @@ public class HfglDao extends BaseDao{
 		meta.put("pageTotal",total);
 		ob.put("page", meta);
 		return ob;
+	}
+	/**
+	 * 上传记录管理操作
+	 * @param jlid
+	 * @param name
+	 * @return
+	 */
+	public boolean scjlglcz(Map<String,Object> qury){
+		int lx = (int)qury.get("lx");
+		if(lx==0||lx==1){
+			this.jdbcTemplate.update("update zs_hyhfjnqk a,zs_hyhfscjlb b"
+					+ " set b.YXBZ=?,a.YXBZ=? where b.id=?"
+					+ " and a.SCJLID=b.id",
+					new Object[]{lx,qury.get("bj"),qury.get("jlid")});
+			if(this.jdbcTemplate.queryForList("select id from zs_hyhfjfryls where SCJLID=?",qury.get("jlid")).size()!=0){
+				this.jdbcTemplate.update("update zs_hyhfjfryls d set d.YXBZ=? where d.SCJLID=?",
+						new Object[]{qury.get("bj"),qury.get("jlid")});
+			}
+		}else{
+			this.jdbcTemplate.update("update zs_hyhfscjlb b,zs_hyhffzyjfb c"
+					+ " set b.YXBZ=?,c.YXBZ=? where b.id=?"
+					+ " and c.SCJLID=b.id ",
+					new Object[]{lx,qury.get("bj"),qury.get("jlid")});
+		}
+	return true;
 	}
 }

@@ -50,6 +50,21 @@ public class HfglService {
 		}
 		return hfglDao.fpdy(pn, ps, map);
 	}
+	public Map<String, Object> scglcx(int pn, int ps, String where) throws Exception {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return hfglDao.scglcx(pn, ps, map);
+	}
 	public Map<String, Object> fzyhfjn(int pn, int ps, String where) throws Exception {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		if (where != null) {
@@ -105,6 +120,9 @@ public class HfglService {
 	}
 	public Object fpdylj(Object fptj) throws Exception {
 		return hfglDao.fpdylj(fptj);
+	}
+	public Object scjlglcz(Map<String, Object> fptj) throws Exception {
+		return hfglDao.scjlglcz(fptj);
 	}
 
 }
