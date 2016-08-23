@@ -299,6 +299,11 @@ public class AuthDao extends BaseJdbcDao {
 
 	}
 
+	public void updatePass(String password1, Integer userId) {
+		String sql = "update fw_users set password = ? where id = ? ";
+		this.jdbcTemplate.update(sql,new Object[]{password1,userId});		
+	}
+
 	
 
 

@@ -4,6 +4,7 @@ package com.gdky.restfull.api;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.soap.AddressingFeature.Responses;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -220,6 +221,19 @@ public class AuthController {
 	public ResponseEntity<?> resetPass(@RequestBody Map<String,Object> newPass,@PathVariable String userId){
 		authService.resetPass(userId,newPass);
 		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "200", "重置密码成功");
+		return  ResponseEntity.ok(rm);
+	}
+	
+	/**
+	 * 用户修改密码
+	 * @param passGroup
+	 * @return
+	 */
+	@RequestMapping(value="/password",method=RequestMethod.PUT)
+	public ResponseEntity<?> updatePass(@RequestBody Map<String,Object> passGroup,HttpServletRequest request){
+		User user =  accountService.getUserFromHeaderToken(request);
+		authService.updatePass(user,passGroup);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success, "200", "修改密码成功");
 		return  ResponseEntity.ok(rm);
 	}
 	
