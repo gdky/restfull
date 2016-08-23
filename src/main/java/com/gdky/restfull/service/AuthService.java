@@ -243,7 +243,7 @@ public class AuthService {
 
 	public void resetPass(String userId,Map<String, Object> newPass) {
 		Long id = HashIdUtil.decode(userId);
-		String password = (String) newPass.get("password");
+		String password = (String) newPass.get("password1");
 		ShaPasswordEncoder encoder = new ShaPasswordEncoder();
 		password = encoder.encodePassword(password, null);
 		authDao.resetPass(id.intValue(),password);
