@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ public class AddswsnjController {
 	AccountService accountService;
 	@Resource 
 	private AddswsnjService addswsnjService;
+	
 @RequestMapping(value = "/add/swsnj", method = RequestMethod.GET) 
 	public  ResponseEntity<Map<String,Object>> getSwsnjb( 
 			
@@ -37,9 +39,18 @@ public class AddswsnjController {
 			@RequestParam(value="where", required=false) String where,HttpServletRequest request)
 			throws Exception{ 
 	User user =  accountService.getUserFromHeaderToken(request);
-		Map<String,Object> obj = addswsnjService.getswsnjb(page, pageSize, user.getId(), where);
+		Map<String,Object> obj = addswsnjService.getswsnjb(page, pageSize, user.getJgId(), where);
 				
 		return new ResponseEntity<>(obj,HttpStatus.OK); 
 	}
+
+   @RequestMapping(value = "/add/swsnj/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Map<String, Object>> getSwsnjById(
+		@PathVariable("id") String id) {
+
+	Map<String, Object> obj = addswsnjService.getSwsnjById(id);
+	return new ResponseEntity<>(obj, HttpStatus.OK);
+}
+
 
 }

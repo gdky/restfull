@@ -5,6 +5,7 @@
 package gov.gdgs.zs.api;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.AddzyswsnjService;
+
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,6 +40,12 @@ public class AddzyswsnjController {
 				
 		return new ResponseEntity<>(obj,HttpStatus.OK); 
 	}
+@RequestMapping(value = "/add/zyswsnj/{id}", method = RequestMethod.GET)
+public ResponseEntity<Map<String, Object>> getZyswsnjById(
+	@PathVariable("id") String id) {
 
+Map<String, Object> obj = addzyswsnjService.getzyswsnjbById(id);
+return new ResponseEntity<>(obj, HttpStatus.OK);
+}
 }
 

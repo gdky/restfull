@@ -56,6 +56,17 @@ public class AddzyswsnjDao extends BaseDao {
 
 			return obj;
 		}
-	
+    public Map<String, Object> getzyswsnjbById(String id) {
+		String sql = "select a.id,a.ND,c.XMING,"
+				+ "b.dwmc, CASE a.ZTDM WHEN 0 THEN '退回' "
+				+ "WHEN 1 THEN '保存' "
+				+ "WHEN 2 THEN '自检'"
+				+ " WHEN 3 THEN '年检'"
+				+ " ELSE NULL END AS ZTDM"
+				+ "from zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d"
+				+ "where a.SWS_ID=d.ID and c.ID=d.RY_ID and a.id=? ";
+		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
+		return rs;
+	}
 	
 }
