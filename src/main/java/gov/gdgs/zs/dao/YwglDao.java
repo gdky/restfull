@@ -47,7 +47,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append("            t.bbrq, ");
 		sb.append("            t.yzm ");
 		sb.append("    FROM ");
-		sb.append("        zs_ywbb_old t, dm_cs ds, dm_ywlx dl, ");
+		sb.append("        zs_ywbb t, dm_cs ds, dm_ywlx dl, ");
 		// <=== 查询条件集合
 		sb.append(" ( "
 				+ condition.getSelectSql(Config.PROJECT_SCHEMA

@@ -38,10 +38,10 @@ public class YwglController {
 	@RequestMapping(value = "/ywbb", method = RequestMethod.GET)
 	public  ResponseEntity<Map<String,Object>> getYwbb(
 			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
 			@RequestParam(value="where", required=false) String where){ 
 
-		Map<String,Object> obj = ywglService.getYwbb(page,pageSize,where);
+		Map<String,Object> obj = ywglService.getYwbb(page,pagesize,where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
