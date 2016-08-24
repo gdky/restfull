@@ -10,17 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hashids.Hashids;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
-import com.gdky.restfull.exception.YwbbException;
+import com.gdky.restfull.utils.HashIdUtil;
 
 @Repository
 public class YwglDao extends BaseJdbcDao {
 
-	public Map<String, Object> getYwbb(int page, int pageSize,
+	public Map<String, Object> getYwbb(int page, int pagesize,
 			Map<String, Object> where) {
 
 		// 子查询，用于拼接查询条件和返回起止区间
@@ -31,42 +30,31 @@ public class YwglDao extends BaseJdbcDao {
 		condition.add("bbrq", "FUZZY", where.get("bbrq"));
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("SELECT  ");
-		sb.append("    @rownum:=@rownum + 1 AS 'key', v . * ");
-		sb.append("FROM ");
-		sb.append("    (SELECT  ");
-		sb.append("        t.id, ");
-		sb.append("        t.nd, ");
-		sb.append("            t.swsmc, ");
-		sb.append("            ds.MC AS cs, ");
-		sb.append("            dl.MC AS ywlx, ");
-		sb.append("            t.bgwh, ");
-		sb.append("            t.xyje, ");
-		sb.append("            t.sjsqje, ");
-		sb.append("            t.bbhm, ");
-		sb.append("            t.bbrq, ");
-		sb.append("            t.yzm ");
-		sb.append("    FROM ");
-		sb.append("        zs_ywbb t, dm_cs ds, dm_ywlx dl, ");
+		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
+		sb.append(" FROM zs_ywbb Y,dm_ywbb_zt z,dm_ywlx l,dm_hy hy,dm_cs cs,dm_cs qx,  ");
+		
 		// <=== 查询条件集合
 		sb.append(" ( "
-				+ condition.getSelectSql(Config.PROJECT_SCHEMA
-						+ "zs_ywbb_old", "id"));
+				+ condition.getSelectSql("zs_ywbb", "id"));
 		sb.append("    ORDER BY bbrq DESC ");
 		sb.append("    LIMIT ? , ?) sub ");
 		// ===> 插入查询条件集合结束
-		sb.append("    WHERE ");
-		sb.append("        t.CS_DM = ds.ID AND t.YWLX_DM = dl.ID ");
-		sb.append("            AND sub.id = t.id) v, ");
-		sb.append("    (SELECT @rownum:=?) tmp ");
-		sb.append(" ");
+		
+		sb.append(" WHERE y.zt = z.id  ");
+		sb.append(" AND y.ywlx_dm = l.id  ");
+		sb.append(" AND y.hy_id = hy.id  ");
+		sb.append(" AND y.cs_dm = cs.id  ");
+		sb.append(" AND y.qx_dm = qx.id  ");
+		sb.append(" AND y.yxbz = 1 ");
+		sb.append(" AND sub.id = y.id ");
+
 
 		// 装嵌传值数组
-		int startIndex = pageSize * (page - 1);
+		int startIndex = pagesize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
 		params.add(startIndex);
-		params.add(pageSize);
-		params.add(pageSize * (page - 1));
+		params.add(pagesize);
+
 
 		// 获取符合条件的记录
 		List<Map<String, Object>> ls = jdbcTemplate.query(
@@ -74,33 +62,31 @@ public class YwglDao extends BaseJdbcDao {
 				params.toArray(),
 				new RowMapper<Map<String,Object>>(){
 			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
-				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
 				Map<String,Object> map = new HashMap<String,Object>();
-				map.put("key", rs.getObject("key"));
-				map.put("id", hashids.encode(rs.getLong("id")));
+				map.put("id", HashIdUtil.encode(rs.getLong("id")));
 				map.put("nd", rs.getObject("nd"));
 				map.put("swsmc", rs.getObject("swsmc"));
 				map.put("cs", rs.getObject("cs"));
-				map.put("ywlx", rs.getObject("ywlx"));
+				map.put("ywlx", rs.getString("ywlx"));
 				map.put("bgwh", rs.getObject("bgwh"));
 				map.put("xyje", rs.getObject("xyje"));
 				map.put("sjsqje", rs.getObject("sjsqje"));
 				map.put("bbhm", rs.getObject("bbhm"));
-				map.put("bbrq", rs.getObject("bbrq"));
-				map.put("yzm", rs.getObject("yzm"));
+				map.put("bbrq", rs.getDate("bbrq"));
+				map.put("ywzt", rs.getString("ywzt"));
 				return map;
 			}
 		});
 
 		// 获取符合条件的记录数
-		String countSql = condition.getCountSql("id", "zs_ywbb_old");
+		String countSql = condition.getCountSql("id", "zs_ywbb");
 		int total = jdbcTemplate.queryForObject(countSql, condition.getParams()
 				.toArray(), Integer.class);
 		
 		Map<String, Object> obj = new HashMap<String, Object>();
 		obj.put("data", ls);
 		obj.put("total", total);
-		obj.put("pageSize", pageSize);
+		obj.put("pagesize", pagesize);
 		obj.put("current", page);
 
 		return obj;
