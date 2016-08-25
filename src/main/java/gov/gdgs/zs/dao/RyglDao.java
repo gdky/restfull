@@ -868,12 +868,12 @@ public class RyglDao extends BaseDao{
 	public Map<String,Object> zyglscdy(int pn,int ps,Map<String, Object> qury) {
 		final String url=Config.URL_PROJECT;
 		Condition condition = new Condition();
-		condition.add("d.xming", Condition.FUZZY, qury.get("xm"));
-		condition.add("c.DWMC", Condition.FUZZY, qury.get("yjg"));
-		condition.add("d.sfzh", Condition.FUZZY_LEFT, qury.get("sfzh"));
-		condition.add("d.CS_DM", Condition.EQUAL, qury.get("cs"));
-		condition.add("d.xb_DM", Condition.EQUAL, qury.get("xb"));
-		condition.add("b.ZYZSBH", Condition.EQUAL, qury.get("zczs"));
+		condition.add("b.xming", Condition.FUZZY, qury.get("xm"));
+		condition.add("c.DWMC", Condition.FUZZY, qury.get("dwmc"));
+		condition.add("b.sfzh", Condition.FUZZY_LEFT, qury.get("sfzh"));
+		condition.add("b.CS_DM", Condition.EQUAL, qury.get("cs"));
+		condition.add("b.xb_DM", Condition.EQUAL, qury.get("xb"));
+		condition.add("a.ZYZSBH", Condition.EQUAL, qury.get("zczs"));
 		StringBuffer sb = new StringBuffer();
 		sb.append("	select SQL_CALC_FOUND_ROWS ");
 		sb.append("		@rownum:=@rownum+1 as 'key',");
@@ -889,16 +889,16 @@ public class RyglDao extends BaseDao{
 			switch (qury.get("sfield").toString()) {
 			case "XMING":
 				if(asc){
-					sb.append("		    order by convert( d.xming USING gbk) COLLATE gbk_chinese_ci ");
+					sb.append("		    order by convert( b.xming USING gbk) COLLATE gbk_chinese_ci ");
 				}else{
-					sb.append("		    order by convert( d.xming USING gbk) COLLATE gbk_chinese_ci desc");
+					sb.append("		    order by convert( b.xming USING gbk) COLLATE gbk_chinese_ci desc");
 				}
 				break;
-			case "yjg":
+			case "xl":
 				if(asc){
-					sb.append("		    order by convert( c.DWMC USING gbk) COLLATE gbk_chinese_ci ");
+					sb.append("		    order by b.XL_DM ");
 				}else{
-					sb.append("		    order by convert( c.DWMC USING gbk) COLLATE gbk_chinese_ci desc");
+					sb.append("		    order by b.XL_DM desc");
 				}
 				break;
 			}
