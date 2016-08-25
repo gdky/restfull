@@ -15,7 +15,6 @@ import java.util.Map;
 import org.hashids.Hashids;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class SPDao extends BaseDao{

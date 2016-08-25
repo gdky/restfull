@@ -59,9 +59,9 @@ public class HfglController {
 	public ResponseEntity<Map<String, Object>> fpdy(
 			@RequestParam(value = "pagenum", required = true) int pn,
 			@RequestParam(value = "pagesize", required = true) int ps,
-			@RequestParam(value="where", required=false) String where) throws Exception  {
-		
-		return new ResponseEntity<>(hfglService.fpdy(pn, ps, where),HttpStatus.OK);
+			@RequestParam(value="where", required=false) String where,HttpServletRequest request) throws Exception  {
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(hfglService.fpdy(pn, ps, where, user.getNames()),HttpStatus.OK);
 		
 	}
 	
@@ -132,9 +132,10 @@ public class HfglController {
 	public ResponseEntity<Map<String, Object>> fzyhfjn(
 			@RequestParam(value = "pagenum", required = true) int pn,
 			@RequestParam(value = "pagesize", required = true) int ps,
-			@RequestParam(value="where", required=false) String where) throws Exception  {
-		
-		return new ResponseEntity<>(hfglService.fzyhfjn(pn, ps, where),HttpStatus.OK);
+			@RequestParam(value="where", required=false) String where
+			,HttpServletRequest request) throws Exception  {
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(hfglService.fzyhfjn(pn, ps, where,user.getNames()),HttpStatus.OK);
 		
 	}
 	/**
