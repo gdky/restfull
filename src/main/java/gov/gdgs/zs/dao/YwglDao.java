@@ -48,13 +48,11 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" AND y.yxbz = 1 ");
 		sb.append(" AND sub.id = y.id ");
 
-
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
 		params.add(startIndex);
 		params.add(pagesize);
-
 
 		// 获取符合条件的记录
 		List<Map<String, Object>> ls = jdbcTemplate.query(
@@ -74,6 +72,7 @@ public class YwglDao extends BaseJdbcDao {
 				map.put("bbhm", rs.getObject("bbhm"));
 				map.put("bbrq", rs.getDate("bbrq"));
 				map.put("ywzt", rs.getString("ywzt"));
+				map.put("is_yd", rs.getString("is_yd"));
 				return map;
 			}
 		});
