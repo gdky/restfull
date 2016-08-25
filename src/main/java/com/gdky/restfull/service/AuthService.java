@@ -243,9 +243,29 @@ public class AuthService {
 
 	public void resetPass(String userId,Map<String, Object> newPass) {
 		Long id = HashIdUtil.decode(userId);
-		String password = (String) newPass.get("password");
+		String password = (String) newPass.get("password1");
 		ShaPasswordEncoder encoder = new ShaPasswordEncoder();
 		password = encoder.encodePassword(password, null);
 		authDao.resetPass(id.intValue(),password);
+	}
+
+	public void updatePass(User user, Map<String, Object> passGroup) {
+		ShaPasswordEncoder encoder = new ShaPasswordEncoder();
+		String password = (String) passGroup.get("password");
+		String password1 = (String) passGroup.get("password1");
+		String password2 = (String) passGroup.get("password2");
+		password = encoder.encodePassword(password, null);
+		if(!password.equals(user.getPassword())){
+			throw new UserException("密码错误");
+		}
+		if (password1 == null || password1.isEmpty() || password2 == null
+				|| password2.isEmpty()) {
+			throw new UserException("未输入密码");
+		}
+		if (!password1.equals(password2) ) {
+			throw new UserException("两次输入的密码必须一致");
+		}
+		password1 = encoder.encodePassword(password1, null);
+		authDao.updatePass(password1,user.getId());
 	}
 }

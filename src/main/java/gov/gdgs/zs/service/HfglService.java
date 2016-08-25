@@ -35,7 +35,7 @@ public class HfglService {
 		}
 		return hfglDao.hyhfjnqk(pn, ps, map);
 	}
-	public Map<String, Object> fpdy(int pn, int ps, String where) throws Exception {
+	public Map<String, Object> fpdy(int pn, int ps, String where,String uname) throws Exception {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		if (where != null) {
 			try {
@@ -48,7 +48,7 @@ public class HfglService {
 				e.printStackTrace();
 			}
 		}
-		return hfglDao.fpdy(pn, ps, map);
+		return hfglDao.fpdy(pn, ps, map,uname);
 	}
 	public Map<String, Object> scglcx(int pn, int ps, String where) throws Exception {
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -65,7 +65,7 @@ public class HfglService {
 		}
 		return hfglDao.scglcx(pn, ps, map);
 	}
-	public Map<String, Object> fzyhfjn(int pn, int ps, String where) throws Exception {
+	public Map<String, Object> fzyhfjn(int pn, int ps, String where,String uname) throws Exception {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		if (where != null) {
 			try {
@@ -78,7 +78,7 @@ public class HfglService {
 				e.printStackTrace();
 			}
 		}
-		return hfglDao.fzyhfjn(pn, ps, map);
+		return hfglDao.fzyhfjn(pn, ps, map,uname);
 	}
 	public Map<String, Object> fytj( String where) throws Exception {
 		HashMap<String, Object> map = new HashMap<String, Object>();
