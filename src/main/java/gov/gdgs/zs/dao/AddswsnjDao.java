@@ -7,10 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import com.gdky.restfull.dao.BaseJdbcDao;
+
 @Repository
-public class AddswsnjDao extends BaseDao{
+public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao{
 	
 	public Map<String,Object> getswsnjb(int page, int pageSize,int Jgid,
 			Map<String, Object> where) {
@@ -31,17 +36,11 @@ public class AddswsnjDao extends BaseDao{
 				+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
 		sb.append("	 FROM  zs_jg_njb a,zs_jg c,dm_jgxz d");
 		sb.append("		"+condition.getSql()+" ");
-		//sb.append("	and a.ZSJG_ID = c.ID and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
 		sb.append("	and a.ZSJG_ID=c.ID and a.ZSJG_ID=? and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
 		sb.append("	group by a.zsjg_id,nd order by a.ND desc");
 		sb.append("	 ) as v ,(SELECT @rownum:=?) zs_jg");
-		//sb.append("	 ) as v ");
-		//sb.append("	 ) as v");
 		sb.append("		LIMIT ? ,?");
-		//ArrayList<Object> params = condition.getParams();
-		//params.add((page-1)*pageSize);
-		//params.add((page-1)*pageSize);
-		//params.add(pageSize);
+		
 		
 		// 装嵌传值数组
 				int startIndex = pageSize * (page - 1);
@@ -52,17 +51,12 @@ public class AddswsnjDao extends BaseDao{
 		        params.add(startIndex);
 				params.add(pageSize);
 				
-//				params.add(0, pageSize * (page - 1));
-//		        params.add(Jgid);	
-//				params.add(startIndex);
-//				params.add(pageSize);
 
 				// 获取符合条件的记录
 				List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
 						params.toArray());
 		
-		//List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
-		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+				int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		
 		Map<String, Object> obj = new HashMap<String, Object>();
 		obj.put("data", ls);
@@ -73,17 +67,6 @@ public class AddswsnjDao extends BaseDao{
 		return obj;
 		
 		
-//		Map<String,Object> ob = new HashMap<>();
-//		ob.put("data", ls);
-//		ob.put("total",total);
-//		Map<String, Object> meta = new HashMap<>();
-//		meta.put("pageNum", page);
-//		meta.put("pageSize", pageSize);
-		//meta.put("pageTotal",total);
-//		meta.put("pageAll",(total + pageSize - 1) / pageSize);
-//		ob.put("page", meta);
-		
-//		return ob;
 }
 	public Map<String, Object> getswsnjbById(String id) {
 		String sql="select c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,"
@@ -97,8 +80,44 @@ public class AddswsnjDao extends BaseDao{
 				+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq "
 				+ "FROM  zs_jg_njb a,zs_jg c,dm_jgxz d "
 				+ "where a.ztdm in (2,3)  and d.ID = c.JGXZ_DM and a.ZSJG_ID=c.ID and a.id=?";
-		//String sql = "select b.DWMC,CASE a.TIMEVALUE WHEN 0 THEN '半年' WHEN 1 THEN '全年' ELSE NULL END AS TIMEVALUE,a.* from "+Config.PROJECT_SCHEMA+"zs_cwbb_lrgd a, zs_jg b where a.jg_id = b.id and a.id = ?";
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
+	
+	@Override
+	public String addSwsnjb( Map <String,Object> obj){
+		String uuid = UUID.randomUUID().toString().replace("-", "");
+		obj.put("id", uuid);
+		final StringBuffer sb = new StringBuffer("insert into "
+				+ Config.PROJECT_SCHEMA + "zs_jg_njb");
+		sb.append(" ( ND, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,  ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ztdm) "
+				+ "VALUES (:nd,:NJZJ, :sz, :zczj, :zrs, :zyrs, :yjyrs, :sjjyrs, :wjyrs, :ZJ, :FZR, :ZCSWSBZJ,:ZCSWSBJS,:BAFS,:FSS,now(),'1') ");
+		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+		int count=named.update(sb.toString(), obj);
+		if(count==0){
+		return null;
+	}else {
+		return uuid;
+	}
+		//更新事务所年检表
+	}
+	@Override
+	public void updateSwsnjb(Map <String,Object> obj) {
+		StringBuffer sb = new StringBuffer("update "
+				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcmx ");
+		sb.append(" set jg_id=:jg_id,use_id=:use_id,ztbj=:ztbj,kssj=:kssj,jssj=:jssj,tjrq=sysdate(),nd=:nd,zyywcb1=:zyywcb1,zyywcb=:zyywcb,zyywsjfj1=:zyywsjfj1,zyywsjfj=:zyywsjfj,");		
+		sb.append(" gzfy1=:gzfy1,gzfy=:gzfy,qtywzc1=:qtywzc1,qtywzc=:qtywzc,flf1=:flf1,flf=:flf,glfy1=:glfy1,glfy=:glfy,jyf1=:jyf1,jyf=:jyf,glfy_gzfy1=:glfy_gzfy1,");
+		sb.append(" glfy_gzfy=:glfy_gzfy,ghjf1=:ghjf1,ghjf=:ghjf,glfy_flf1=:glfy_flf1,glfy_flf=:glfy_flf,shtc1=:shtc1,shtc=:shtc,glfy_ywzdf1=:glfy_ywzdf1,glfy_ywzdf=:glfy_ywzdf,");
+		sb.append(" bgf1=:bgf1,bgf=:bgf,glfy_bgf1=:glfy_bgf1,glfy_bgf=:glfy_bgf,clf1=:clf1,clf=:clf,glfy_qtsj1=:glfy_qtsj1,glfy_qtsj=:glfy_qtsj,hf1=:hf1,hf=:hf,");
+		sb.append(" glfy_qcfy1=:glfy_qcfy1,glfy_qcfy=:glfy_qcfy,pxzlf1=:pxzlf1,pxzlf=:pxzlf,glfy_zyfxjj1=:glfy_zyfxjj1,glfy_zyfxjj=:glfy_zyfxjj,");
+		sb.append(" hwf1=:hwf1,hwf=:hwf,glfy_zyzrbx1=:glfy_zyzrbx1,glfy_zyzrbx=:glfy_zyzrbx,zpf1=:zpf1,zpf=:zpf,glfy_clf1=:glfy_clf1,glfy_clf=:glfy_clf,zj1=:zj1,zj=:zj,");
+		sb.append(" glfy_qtfy1=:glfy_qtfy1,glfy_qtfy=:glfy_qtfy,zfgjj1=:zfgjj1,zfgjj=:zfgjj,cwfy1=:cwfy1,cwfy=:cwfy,gwzxf1=:gwzxf1,gwzxf=:gwzxf,");
+		sb.append(" yywzc1=:yywzc1,yywzc=:yywzc,qt1=:qt1,qt=:qt,zczj1=:zczj1,zczj=:zczj,sz=:sz,agkj=:agkj,zb=:zb where id=:id");
+		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+		named.update(sb.toString(), obj);
+		
+	}
+	
+	
+	
 }

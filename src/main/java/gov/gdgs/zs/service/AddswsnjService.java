@@ -1,6 +1,7 @@
 package gov.gdgs.zs.service;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -13,14 +14,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import  gov.gdgs.zs.dao.AddswsnjDao;
+import gov.gdgs.zs.dao.IAddswsnjDao;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
-public class AddswsnjService {
+public class AddswsnjService implements IAddswsnjService{
 	//事务所年检表
 	@Resource
 	private AddswsnjDao addswsnjdao;
+	@Resource
+	private IAddswsnjDao iaddswsnjdao;
+	@Override
+	public Map<String, Object> addSwsnjb (Map<String, Object> obj) {
+		
+		
+		
+		Map<String,Object> map = new LinkedHashMap<String,Object>();
+		String rs =iaddswsnjdao.addSwsnjb(obj);
+		map.put("id", rs);
+		return map;
+
+	}
+	@Override
+	public void updateSwsnjb(Map<String, Object> obj) {
+		iaddswsnjdao.updateSwsnjb(obj);
+        
+	}
+	
+
 			public Map<String, Object> getswsnjb(int page, int pageSize,int Jgid, String where) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				if (where != null) {
