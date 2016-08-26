@@ -877,7 +877,7 @@ public class RyglDao extends BaseDao{
 		StringBuffer sb = new StringBuffer();
 		sb.append("	select SQL_CALC_FOUND_ROWS ");
 		sb.append("		@rownum:=@rownum+1 as 'key',");
-		sb.append("		b.id,b.XMING,d.MC as xb,b.DHHM,b.SFZH,e.MC as xl,a.ZYZGZSBH,a.ZYZSBH,c.DWMC,");
+		sb.append("		b.id,b.XMING,d.MC as xb,b.DHHM,b.SFZH,e.MC as xl,a.ZYZGZSBH,a.ZYZSBH,c.DWMC,a.GRHYBH,date_format(b.SRI,'%Y年%m月%d日') as sri,");
 		sb.append("	case a.czr_dm when 1 then \"是\"  when 2 then \"否\" else null end as czr,");	
 		sb.append("	case a.fqr_dm when 1 then \"是\"  when 2 then \"否\" else null end as fqr");
 		sb.append("		FROM zs_zysws a,zs_ryjbxx b,zs_jg c,dm_xb d,dm_xl e,(select @rownum:=?) zs_ry ");
@@ -934,6 +934,8 @@ public class RyglDao extends BaseDao{
 				map.put("DWMC", rs.getObject("DWMC"));
 				map.put("czr", rs.getObject("czr"));
 				map.put("fqr", rs.getObject("fqr"));
+				map.put("GRHYBH", rs.getObject("GRHYBH"));
+				map.put("SRI", rs.getObject("sri"));
 				return map;
 			}
 		});
