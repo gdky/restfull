@@ -4,6 +4,7 @@ import gov.gdgs.zs.dao.SWSDao;
 import gov.gdgs.zs.dao.YwglDao;
 import gov.gdgs.zs.untils.Common;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ public class YwglService {
 			} catch (Exception e) {
 			}
 		}
+		
 		Map<String, Object> rs = ywglDao.getYwbb(page, pageSize, map);
 		return rs;
 	}
@@ -101,9 +103,7 @@ public class YwglService {
 		int now_s = cal.get(Calendar.SECOND);// 得到秒数
 
 		String currentTime = Common.getCurrentTime2MysqlDateTime();
-		String ND = String.valueOf(now_y);
-		o.put("ND", ND);
-		o.put("BBRQ", currentTime);
+				o.put("BBRQ", currentTime);
 		o.put("BGWH", yw.get("BGWH"));
 		o.put("BGRQ", Common.getTime2MysqlDateTime((String) yw.get("BGRQ")));
 		o.put("SFJE", yw.get("SFJE"));
@@ -134,6 +134,9 @@ public class YwglService {
 		List<String> sssq = (List<String>) xy.get("SSSQ");
 		o.put("SENDTIME", Common.getTime2MysqlDateTime(sssq.get(1)));
 		o.put("SSTARTTIME", Common.getTime2MysqlDateTime(sssq.get(0)));
+		Calendar calND = Calendar.getInstance();
+		calND.setTime(Common.getTimeFromJsToJava(sssq.get(1))); //暂按项目所属期止
+		o.put("ND", calND.get(Calendar.YEAR));
 		o.put("NSRXZ", yw.get("NSRXZ"));
 		o.put("HY_ID", yw.get("HY_ID"));
 		o.put("ZSFS_DM", yw.get("ZSFS_DM"));
@@ -192,7 +195,7 @@ public class YwglService {
 
 			o.put("BBHM", bbhm);
 			o.put("YZM", yzm);
-			o.put("ZT", 3);
+			o.put("ZT", 1);
 			ywglDao.addYwbb(o);
 		}
 		return null;
