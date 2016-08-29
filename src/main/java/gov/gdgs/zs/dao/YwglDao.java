@@ -59,6 +59,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" AND y.cs_dm = cs.id  ");
 		sb.append(" AND y.qx_dm = qx.id  ");
 		sb.append(" AND y.yxbz = 1 ");
+		sb.append(" AND y.zt != 0 AND y.zt != 4 ");
 		sb.append(" AND sub.id = y.id ");
 
 		// 装嵌传值数组
