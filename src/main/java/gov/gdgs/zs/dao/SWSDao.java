@@ -41,8 +41,8 @@ public class SWSDao extends BaseDao{
 		condition.add("a.swszsclsj", Condition.LESS_EQUAL, qury.get("clsj2"));
 		StringBuffer sb = new StringBuffer();
 		sb.append("		SELECT 	SQL_CALC_FOUND_ROWS	 ");
-		sb.append("		@rownum:=@rownum+1 AS 'key',");
-		sb.append("		a.id,	a.dwmc,a.zczj,");
+		sb.append("		@rownum:=@rownum+1 AS 'key',a.ZJPZWH,a.DZHI,");
+		sb.append("		a.id,	a.dwmc,a.zczj,a.YYZZHM,a.JYFW,");
 		sb.append("		a.fddbr,a.JGZCH as zsbh,");
 		sb.append("		d.mc AS swsxz,c.mc AS cs,");
 		sb.append("		(select count(id) from zs_zysws where jg_id=a.id and ZYZT_DM=1) as zyrs,");
@@ -118,6 +118,10 @@ public class SWSDao extends BaseDao{
 				map.put("zrs", rs.getObject("zrs"));
 				map.put("zyrs", rs.getObject("zyrs"));
 				map.put("clsj", rs.getObject("clsj"));
+				map.put("ZJPZWH", rs.getObject("ZJPZWH"));
+				map.put("DZHI", rs.getObject("DZHI"));
+				map.put("YYZZHM", rs.getObject("YYZZHM"));
+				map.put("JYFW", rs.getObject("JYFW"));
 				return map;
 				}
 			});
