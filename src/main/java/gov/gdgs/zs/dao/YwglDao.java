@@ -76,6 +76,7 @@ public class YwglDao extends BaseJdbcDao {
 			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
 				Map<String,Object> map = new HashMap<String,Object>();
 				map.put("id", HashIdUtil.encode(rs.getLong("id")));
+				map.put("nd", rs.getObject("nd"));
 				map.put("bbhm", rs.getObject("bbhm"));
 				map.put("bbrq", rs.getDate("bbrq"));
 				map.put("bgwh", rs.getString("bgwh"));
@@ -239,6 +240,7 @@ public class YwglDao extends BaseJdbcDao {
 				new RowMapper<Map<String,Object>>(){
 			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
 				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("nd", rs.getObject("nd"));
 				map.put("bbhm", rs.getObject("bbhm"));
 				map.put("bbrq", rs.getDate("bbrq"));
 				map.put("bgwh", rs.getString("bgwh"));
@@ -315,6 +317,11 @@ public class YwglDao extends BaseJdbcDao {
 		}else{
 			return null;
 		}
+		
+	}
+
+	public void updateYwbb(Long id) {
+		// TODO Auto-generated method stub
 		
 	}
 	

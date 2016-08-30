@@ -211,8 +211,13 @@ public class YwglService {
 		return rs;
 	}
 
-	public Map<String, Object> updateYwbb(Map<String, Object> map) {
-		// TODO Auto-generated method stub
+	public Map<String, Object> updateYwbb(String hashid,Map<String, Object> map) {
+		Long id = HashIdUtil.decode(hashid);
+		Integer lx = (Integer) map.get("lx");
+		if (lx != null && lx == 2){
+			
+		}
+		ywglDao.updateYwbb(id);
 		return null;
 	}
 

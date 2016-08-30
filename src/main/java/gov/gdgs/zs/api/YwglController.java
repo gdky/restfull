@@ -45,11 +45,12 @@ public class YwglController {
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/ywbb", method = RequestMethod.PUT)
+	@RequestMapping(value = "/ywbb{id}", method = RequestMethod.PUT)
 	public  ResponseEntity<Map<String,Object>> getYwbb(
-			@RequestBody Map<String,Object> map){ 
-		Map<String,Object> obj = ywglService.updateYwbb(map);
-		return new ResponseEntity<>(obj,HttpStatus.OK);
+			@RequestBody Map<String,Object> map,
+			@RequestParam String id){ 
+		Map<String,Object> obj = ywglService.updateYwbb(id,map);
+		return new ResponseEntity(obj,HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/ywbb/{hash}", method = RequestMethod.GET)
