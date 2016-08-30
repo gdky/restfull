@@ -211,4 +211,9 @@ public class YwglService {
 		return rs;
 	}
 
+	public Map<String, Object> updateYwbb(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

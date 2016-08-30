@@ -148,6 +148,7 @@ public class YwglDao extends BaseJdbcDao {
 				map.put("swsdh", rs.getString("SWSDH"));
 				map.put("swscz", rs.getString("SWSCZ"));
 				map.put("ywzt", rs.getString("ywzt"));
+				map.put("ywzt_dm",rs.getInt("zt"));
 				return map;
 			}
 		});

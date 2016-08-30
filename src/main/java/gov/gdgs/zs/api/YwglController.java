@@ -32,7 +32,7 @@ public class YwglController {
 	private YwglService ywglService;
 	
 	/**
-	 * 业务协议类api
+	 * 获取有效的业务报备
 	 * @para
 	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.GET)
@@ -42,6 +42,13 @@ public class YwglController {
 			@RequestParam(value="where", required=false) String where){ 
 
 		Map<String,Object> obj = ywglService.getYwbb(page,pagesize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/ywbb", method = RequestMethod.PUT)
+	public  ResponseEntity<Map<String,Object>> getYwbb(
+			@RequestBody Map<String,Object> map){ 
+		Map<String,Object> obj = ywglService.updateYwbb(map);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
