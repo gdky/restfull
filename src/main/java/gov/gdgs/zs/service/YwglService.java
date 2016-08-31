@@ -171,28 +171,32 @@ public class YwglService {
 		}
 
 		/* 判断是否有报备上报资质 */
+		// TODO 
+		
 		/* 判断协议号是否唯一 */
 		int xyhNum = ywglDao.getXyhNum((String) o.get("XYH"));
 		if (xyhNum > 0) {
 			throw new YwbbException("协议文号已存在");
 		}
+		/* 判断是否存在同企业同年度同类型的撤销报告，是则不允许提交 */
+		// TODO
+
+		// 生成随机验证码
+		String yzm = RandomStringUtils.randomNumeric(8);
+		// 生成报备号码
+		StringBuffer bbhm = new StringBuffer(String.valueOf(now_y)
+				+ Common.addZero(now_m, 2));
+		bbhm.append(RandomStringUtils.randomNumeric(4));
+		bbhm.append(cal.getTimeInMillis());
+		bbhm.delete(21, 23);
+		bbhm.delete(10, 17);
 		/* 判断直接提交还是保存 */
 		if (type.equals("save")) { // 保存
-			o.put("YZM", null);
-			o.put("BBHM", null);
+			o.put("YZM", yzm);
+			o.put("BBHM", bbhm);
 			o.put("ZT", 0);
 			ywglDao.addYwbb(o);
 		} else if (type.equals("commit")) { // 直接报备
-			// 生成随机验证码
-			String yzm = RandomStringUtils.randomNumeric(8);
-			// 生成报备号码
-			StringBuffer bbhm = new StringBuffer(String.valueOf(now_y)
-					+ Common.addZero(now_m, 2));
-			bbhm.append(RandomStringUtils.randomNumeric(4));
-			bbhm.append(cal.getTimeInMillis());
-			bbhm.delete(21, 23);
-			bbhm.delete(10, 17);
-
 			o.put("BBHM", bbhm);
 			o.put("YZM", yzm);
 			o.put("ZT", 1);
@@ -211,14 +215,38 @@ public class YwglService {
 		return rs;
 	}
 
-	public Map<String, Object> updateYwbb(String hashid,Map<String, Object> map) {
+	/*
+	 * 按类型处理业务报备修改操作
+	 * 修改请求json结构为{lx:int number, data:{}}
+	 * data为修改的业务具体属性信息，lx为修改操作类型
+	 * 1 - 业务信息修改
+	 * 2 - 退回操作，将业务状态置为0(保存)
+	 * 3 - 报备操作，将业务状态置为1（报备）
+	 * 4 - 收费操作，将业务状态置为3（已收费）
+	 * 5 - 申请撤销，将业务状态置为7（申请撤销）
+	 * 6 - 同意撤销操作，将业务状态置为5（撤销）
+	 * 7 - 拒绝撤销操作，将业务状态置为1（报备）
+	 * 8 - 申请退回操作，将业务状态置为6（申请退回）
+	 * 9 - 拒绝退回操作，将业务状态置为1（报备）
+	 * 10- 申请启用操作，将业务状态置为8（申请启用）
+	 * 11- 同意启用操作，将当条业务状态置为0（作废），
+	 *     同时建立一条新记录，保留原记录信息，使用新的报备号码，状态置为0（保存）
+	 */
+	public void updateYwbb(String hashid,Map<String, Object> map) {
 		Long id = HashIdUtil.decode(hashid);
 		Integer lx = (Integer) map.get("lx");
+		Map<String,Object> data = (Map<String,Object>) map.get("data");
 		if (lx != null && lx == 2){
-			
+			this.sentBackYw(id,data);
 		}
-		ywglDao.updateYwbb(id);
-		return null;
+	}
+
+	/*
+	 * 退回，填写退回原因
+	 */
+	private void sentBackYw(Long id, Map<String, Object> data) {
+		data.put("zt", 0);
+		this.ywglDao.sentBack(id,data);
 	}
 
 }

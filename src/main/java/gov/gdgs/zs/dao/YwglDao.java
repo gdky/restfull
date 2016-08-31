@@ -217,7 +217,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	public int getXyhNum(String xyh) {
-		String sql = "select id from zs_ywbb where xyh = ?";
+		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1";
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql,new Object[]{xyh});
 		return ls.size();
 	}
@@ -320,10 +320,10 @@ public class YwglDao extends BaseJdbcDao {
 		
 	}
 
-	public void updateYwbb(Long id) {
-		// TODO Auto-generated method stub
-		
+	public void sentBack(Long id, Map<String, Object> data) {
+		String sql = "update zs_ywbb set thyy = ?,zt=? where id = ? ";
+		this.jdbcTemplate.update(sql, new Object[]{data.get("thyy"),data.get("zt"),id});		
 	}
-	
+
 
 }

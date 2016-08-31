@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gdky.restfull.entity.ResponseMessage;
+
 
 /**
  * 业务管理API controller
@@ -44,13 +46,17 @@ public class YwglController {
 		Map<String,Object> obj = ywglService.getYwbb(page,pagesize,where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
-	
-	@RequestMapping(value = "/ywbb{id}", method = RequestMethod.PUT)
-	public  ResponseEntity<Map<String,Object>> getYwbb(
+
+	/*
+	 * 修改业务报备信息
+	 */
+	@RequestMapping(value = "/ywbb/{id}", method = RequestMethod.PUT)
+	public  ResponseEntity<?> getYwbb(
 			@RequestBody Map<String,Object> map,
-			@RequestParam String id){ 
-		Map<String,Object> obj = ywglService.updateYwbb(id,map);
-		return new ResponseEntity(obj,HttpStatus.OK);
+			@PathVariable String id){ 
+		ywglService.updateYwbb(id,map);
+		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
+		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/ywbb/{hash}", method = RequestMethod.GET)
