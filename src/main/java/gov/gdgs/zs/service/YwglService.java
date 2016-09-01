@@ -43,7 +43,7 @@ public class YwglService {
 			} catch (Exception e) {
 			}
 		}
-		
+
 		Map<String, Object> rs = ywglDao.getYwbb(page, pageSize, map);
 		return rs;
 	}
@@ -103,7 +103,7 @@ public class YwglService {
 		int now_s = cal.get(Calendar.SECOND);// 得到秒数
 
 		String currentTime = Common.getCurrentTime2MysqlDateTime();
-				o.put("BBRQ", currentTime);
+		o.put("BBRQ", currentTime);
 		o.put("BGWH", yw.get("BGWH"));
 		o.put("BGRQ", Common.getTime2MysqlDateTime((String) yw.get("BGRQ")));
 		o.put("SFJE", yw.get("SFJE"));
@@ -135,7 +135,7 @@ public class YwglService {
 		o.put("SENDTIME", Common.getTime2MysqlDateTime(sssq.get(1)));
 		o.put("SSTARTTIME", Common.getTime2MysqlDateTime(sssq.get(0)));
 		Calendar calND = Calendar.getInstance();
-		calND.setTime(Common.getTimeFromJsToJava(sssq.get(1))); //暂按项目所属期止
+		calND.setTime(Common.getTimeFromJsToJava(sssq.get(1))); // 暂按项目所属期止
 		o.put("ND", calND.get(Calendar.YEAR));
 		o.put("NSRXZ", yw.get("NSRXZ"));
 		o.put("HY_ID", yw.get("HY_ID"));
@@ -171,8 +171,8 @@ public class YwglService {
 		}
 
 		/* 判断是否有报备上报资质 */
-		// TODO 
-		
+		// TODO
+
 		/* 判断协议号是否唯一 */
 		int xyhNum = ywglDao.getXyhNum((String) o.get("XYH"));
 		if (xyhNum > 0) {
@@ -206,12 +206,12 @@ public class YwglService {
 	}
 
 	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
-		if(bbhm==null || bbhm.isEmpty()||yzm==null||yzm.isEmpty()){
+		if (bbhm == null || bbhm.isEmpty() || yzm == null || yzm.isEmpty()) {
 			throw new YwbbException("报备号码或者验证码不能为空");
 		}
-		bbhm=bbhm.trim();
-		yzm=yzm.trim();
-		Map<String,Object> rs = ywglDao.getYwbbByYzmAndBbhm(bbhm,yzm);
+		bbhm = bbhm.trim();
+		yzm = yzm.trim();
+		Map<String, Object> rs = ywglDao.getYwbbByYzmAndBbhm(bbhm, yzm);
 		return rs;
 	}
 
@@ -231,22 +231,52 @@ public class YwglService {
 	 * 10- 申请启用操作，将业务状态置为8（申请启用）
 	 * 11- 同意启用操作，将当条业务状态置为0（作废），
 	 *     同时建立一条新记录，保留原记录信息，使用新的报备号码，状态置为0（保存）
+	 * 12- 拒绝启用操作，将业务状态置为5（撤销）
 	 */
-	public void updateYwbb(String hashid,Map<String, Object> map) {
+	public void updateYwbb(String hashid, Map<String, Object> map) {
 		Long id = HashIdUtil.decode(hashid);
 		Integer lx = (Integer) map.get("lx");
-		Map<String,Object> data = (Map<String,Object>) map.get("data");
-		if (lx != null && lx == 2){
-			this.sentBackYw(id,data);
+		Map<String, Object> data = (Map<String, Object>) map.get("data");
+		if (lx != null && lx == 2) {
+			this.sentBackYw(id, data);
+		} else if (lx != null && lx == 6) {
+			this.updateYwbbZT(id, 5);
+		} else if (lx != null && lx == 7) {
+			this.updateYwbbZT(id, 1);
+		} else if (lx != null && lx == 9) {
+			this.updateYwbbZT(id, 1);
+		} else if (lx != null && lx == 11) {
+			this.passQY(id);
 		}
+	}
+
+	private void passQY(Long id) {
+		// 生成随机验证码
+		String yzm = RandomStringUtils.randomNumeric(8);
+		// 生成报备号码
+		Calendar cal = Calendar.getInstance();
+		int now_y = cal.get(Calendar.YEAR);// 得到年份
+		int now_m = cal.get(Calendar.MONTH) + 1;// 得到月份
+		StringBuffer bbhm = new StringBuffer(String.valueOf(now_y)
+				+ Common.addZero(now_m, 2));
+		bbhm.append(RandomStringUtils.randomNumeric(4));
+		bbhm.append(cal.getTimeInMillis());
+		bbhm.delete(21, 23);
+		bbhm.delete(10, 17);
+		
+	}
+
+	private void updateYwbbZT(Long id, int zt) {
+		this.ywglDao.updateYwbbZT(id, zt);
+
 	}
 
 	/*
 	 * 退回，填写退回原因
 	 */
-	private void sentBackYw(Long id, Map<String, Object> data) {
+	public void sentBackYw(Long id, Map<String, Object> data) {
 		data.put("zt", 0);
-		this.ywglDao.sentBack(id,data);
+		this.ywglDao.sentBack(id, data);
 	}
 
 }

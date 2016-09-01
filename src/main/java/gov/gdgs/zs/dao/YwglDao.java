@@ -324,5 +324,11 @@ public class YwglDao extends BaseJdbcDao {
 		this.jdbcTemplate.update(sql, new Object[]{data.get("thyy"),data.get("zt"),id});		
 	}
 
+	public void updateYwbbZT(Long id, int zt) {
+		String sql = "update zs_ywbb set zt=? where id = ? ";
+		this.jdbcTemplate.update(sql, new Object[]{zt,id});	
+		
+	}
+
 
 }
