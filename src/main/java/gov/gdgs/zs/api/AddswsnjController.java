@@ -45,6 +45,7 @@ public class AddswsnjController {
 			@RequestParam(value="where", required=false) String where,HttpServletRequest request)
 			throws Exception{ 
 	User user =  accountService.getUserFromHeaderToken(request);
+	
 		Map<String,Object> obj = addswsnjService.getswsnjb(page, pageSize, user.getJgId(), where);
 				
 		return new ResponseEntity<>(obj,HttpStatus.OK); 
