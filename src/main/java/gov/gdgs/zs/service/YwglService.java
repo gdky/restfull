@@ -229,7 +229,7 @@ public class YwglService {
 	 * 8 - 申请退回操作，将业务状态置为6（申请退回）
 	 * 9 - 拒绝退回操作，将业务状态置为1（报备）
 	 * 10- 申请启用操作，将业务状态置为8（申请启用）
-	 * 11- 同意启用操作，将当条业务状态置为0（作废），
+	 * 11- 同意启用操作，将当条业务状态置为4（作废），
 	 *     同时建立一条新记录，保留原记录信息，使用新的报备号码，状态置为0（保存）
 	 * 12- 拒绝启用操作，将业务状态置为5（撤销）
 	 */
@@ -263,6 +263,10 @@ public class YwglService {
 		bbhm.append(cal.getTimeInMillis());
 		bbhm.delete(21, 23);
 		bbhm.delete(10, 17);
+		//生成一条新记录
+		Number newId = this.ywglDao.newRecordFromId(id,bbhm,yzm);
+		//将原记录置为作废
+		this.ywglDao.updateYwbbZT(id, 4);
 		
 	}
 

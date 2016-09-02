@@ -330,5 +330,10 @@ public class YwglDao extends BaseJdbcDao {
 		
 	}
 
+	public Number newRecordFromId(Long id, StringBuffer bbhm, String yzm) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
