@@ -72,7 +72,7 @@ public class AddswsnjController {
 		return new ResponseEntity<>(rs,HttpStatus.CREATED);
 	}
    //更新事务所年检表
-   @RequestMapping(value = "/addSwsnjb/{id}", method = RequestMethod.PUT)
+   @RequestMapping(value = "/addswsnjb/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateSwsnjb(@PathVariable("id") String id,
 			@RequestBody Map <String,Object> obj,HttpServletRequest request) 
 			throws Exception{

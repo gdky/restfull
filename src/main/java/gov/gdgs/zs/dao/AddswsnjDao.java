@@ -20,12 +20,12 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao{
 	public Map<String,Object> getswsnjb(int page, int pageSize,int Jgid,
 			Map<String, Object> where) {
 		Condition condition = new Condition();
-		condition.add("c.dwmc", Condition.FUZZY, where.get("dwmc"));
-		condition.add("c.cs_dm", Condition.EQUAL, where.get("cs"));
-		condition.add("a.nd", Condition.EQUAL, where.get("nd"));
-		condition.add("a.ztdm", Condition.EQUAL, where.get("bbzt"));
-		condition.add("a.zjrq", Condition.GREATER_EQUAL, where.get("sbsj"));
-		condition.add("a.zjrq", Condition.LESS_EQUAL, where.get("sbsj2"));
+		//condition.add("c.dwmc", Condition.FUZZY, where.get("dwmc"));
+		//condition.add("c.cs_dm", Condition.EQUAL, where.get("cs"));
+		condition.add("a.nd", "FUZZY", where.get("nd"));
+		//condition.add("a.ztdm", Condition.EQUAL, where.get("bbzt"));
+		//condition.add("a.zjrq", Condition.GREATER_EQUAL, where.get("sbsj"));
+		//condition.add("a.zjrq", Condition.LESS_EQUAL, where.get("sbsj2"));
 		StringBuffer sb = new StringBuffer();
 		sb.append("		select  SQL_CALC_FOUND_ROWS  @rownum:=@rownum+1 AS 'key',v.* from ( SELECT ");
 		sb.append("		c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,");
@@ -79,7 +79,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao{
 				+ "DATE_FORMAT(c.SWSZSCLSJ ,'%Y-%m-%d') AS clsj,"
 				+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq "
 				+ "FROM  zs_jg_njb a,zs_jg c,dm_jgxz d "
-				+ "where a.ztdm in (2,3)  and d.ID = c.JGXZ_DM and a.ZSJG_ID=c.ID and a.id=?";
+				+ "where 1=1 and d.ID = c.JGXZ_DM and a.ZSJG_ID=c.ID and a.id=?";
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
@@ -113,11 +113,11 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao{
 		StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_jg_njb ");
 		
-		sb.append(" set ZSJG_ID=:jg_id,ZSJGXZ_ID=:xz,ND =:nd, ZJWGDM=:wg,NJZJ=:NJZJ, SZ=:sz, ZCZJ=:zczj,"
-				+ " ZRS=:zrs, ZYRS=:zyrs, YJYRS=:yjyrs, SJJYRS=:sjjyrs, "
-				+ "WJYRS=:wjyrs,  ZJ=:ZJ, FZR=:FZR, ZCSWSBZJ=:ZCSWSBZJ, "
-				+ "ZCSWSBJS=:ZCSWSBJS,BAFS=:BAFS, FSS=:FSS,ZDSJ=now(),"
-				+ "ztdm='2',where id=:id ");
+		sb.append(" set ZSJG_ID=:jg_id,ZSJGXZ_ID=:xz,ND =:nd,ZJWGDM=:wg,NJZJ=:NJZJ,GDBDQKZJ=:GDBDQKZJ,"
+				+ "GDBDQKJS=:GDBDQKJS,ZRS=:ZRS,ZYRS=:zyrs,YJYRS=:yjyrs,SJJYRS=:sjjyrs, "
+				+ "WJYRS=:wjyrs,ZJ=:ZJ,FZR=:FZR,ZCSWSBZJ=:ZCSWSBZJ, "
+				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS,"
+				+ "ztdm='2'where id=:id ");
 		
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
