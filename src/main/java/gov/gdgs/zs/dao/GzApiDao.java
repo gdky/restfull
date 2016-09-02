@@ -10,14 +10,17 @@ import com.gdky.restfull.dao.BaseJdbcDao;
 @Repository
 public class GzApiDao extends BaseJdbcDao {
 
-	public List<Map<String, Object>> getSws() {
+	public List<Map<String, Object>> getSws(String year, String month, String day,
+			String hour) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select ID,XM,XB,SFZH,SWSSWSXLH,CS,MZ,XL,ZZMM,ZYZGZH,ZYZCHM,YZBM,DH,YDDH,ZW,SFSC,SFCZR,SFFQR,SJZT, ");
 		sb.append(" DATE_FORMAT(CSNY,'%Y-%m-%d') AS CSNY, ");
 		sb.append(" DATE_FORMAT(ZYZGZQFRQ,'%Y-%m-%d') AS ZYZGZQFRQ, ");
 		sb.append(" DATE_FORMAT(ZYZCRQ,'%Y-%m-%d') AS ZYZCRQ ");
-		sb.append(" FROM gzapi_data_sws ");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString());
+		sb.append(" FROM gzapi_data_sws where addtime between  ? and ?");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),
+				new Object[]{year+"-"+month+"-"+day+" "+hour+":00:00",
+			year+"-"+month+"-"+day+" "+hour+":59:59"});
 		return ls;
 	}
 
@@ -36,14 +39,16 @@ public class GzApiDao extends BaseJdbcDao {
 		return ls;
 	}
 
-	public List<Map<String, Object>> getSwsjg() {
+	public List<Map<String, Object>> getSwsjg(String year, String month, String day,
+			String hour) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select SWSSWSXLH,SWDJZHM,DWMC,SZCS,FRDB,DZ,SWJG_DM,ZJPZWH,YZBM,DH,CZ,JGXZ,ZSBH,ZCZJ,JYFW,DZYJ,KHH,KHHZH,ZXYY,SJZT,PARENTJGID, ");
 		sb.append(" DATE_FORMAT(ZJPZSJ,'%Y-%m-%d') AS ZJPZSJ, ");
 		sb.append(" DATE_FORMAT(ZXSJ,'%Y-%m-%d') AS ZXSJ ");
-		sb.append(" from gzapi_data_swsjg t ");
-		sb.append(" limit 10 ");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString());
+		sb.append(" from gzapi_data_swsjg  where addtime between  ? and ?");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),
+				new Object[]{year+"-"+month+"-"+day+" "+hour+":00:00",
+			year+"-"+month+"-"+day+" "+hour+":59:59"});
 		return ls;
 	}
 
