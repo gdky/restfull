@@ -62,4 +62,88 @@ public class ZshyNbbService {
 		}
 		return zshyNbbDao.getHyryqktjb(map);
 	}
+
+	/**
+	 * 事务所机构情况统计表3
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getSwsjgqktjb(String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return zshyNbbDao.getSwsjgqktjb(map);
+	}
+
+	/**
+	 * 行业经营收入情况汇总表4
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getHyjysrqkhzb(String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return zshyNbbDao.getHyjysrqkhzb(map);
+	}
+
+	/**
+	 * 行业经营规模情况统计表5
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getHyjygmqktjb(String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return zshyNbbDao.getHyjygmqktjb(map);
+	}
+
+	/**
+	 * 行业鉴证业务情况统计表6
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getHyjzywqktjb(String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return zshyNbbDao.getHyjzywqktjb(map);
+	}
 }
