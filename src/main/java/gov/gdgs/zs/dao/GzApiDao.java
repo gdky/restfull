@@ -24,7 +24,7 @@ public class GzApiDao extends BaseJdbcDao {
 		return ls;
 	}
 
-	public List<Map<String, Object>> getYwba() {
+	public List<Map<String, Object>> getYwba(String start, String end) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select ID,BBHM,ND,BGWH,YZM,SFJE,SWSSWSXLH,SWSMC,SWSSWDJZH,WTDW,WTDWSWDJZH,XYH,YJFH,RJFH,SJFH,QZSWS, ");
 		sb.append(" TXDZ,SWSDZYJ,SWSWZ,YWLX,JTXM,VALUE1,VALUE2,ZSXYID,NSRXZ,HYLX,ZSFS,ISWS,SB,CITY,QX,WTDWXZ,ZTBJ, ");
@@ -34,8 +34,8 @@ public class GzApiDao extends BaseJdbcDao {
 		sb.append(" DATE_FORMAT(SSTARTTIME,'%Y-%m-%d') AS  SSTARTTIME, ");
 		sb.append(" DATE_FORMAT(SENDTIME,'%Y-%m-%d') AS  SENDTIME ");
 		sb.append(" from gzapi_data_ywba ");
-		sb.append(" limit 10 ");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString());
+		sb.append(" where addtime between ? and ? ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{start , end});
 		return ls;
 	}
 
@@ -52,7 +52,7 @@ public class GzApiDao extends BaseJdbcDao {
 		return ls;
 	}
 
-	public List<Map<String, Object>> getZsxy() {
+	public List<Map<String, Object>> getZsxy(String start, String end) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select ID,XYH,YWLXNAME,WTFMC,DJHM_GS,DJHM_DS,JFLXR,JFTELEPHONE,JFADDRESS,JG_ID,SWSMC, ");
 		sb.append(" FPHM,XYJE,SSJE,XYZT,MEMO, ");
@@ -60,8 +60,8 @@ public class GzApiDao extends BaseJdbcDao {
 		sb.append(" DATE_FORMAT(XYJSSJ,'%Y-%m-%d') AS  XYJSSJ, ");
 		sb.append(" DATE_FORMAT(EDITDATE,'%Y-%m-%d') AS  EDITDATE ");
 		sb.append(" FROM gzapi_data_zsxy ");
-		sb.append(" limit 10 ");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString());
+		sb.append(" where addtime between ? and ? ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{start,end});
 		return ls;
 	}
 
