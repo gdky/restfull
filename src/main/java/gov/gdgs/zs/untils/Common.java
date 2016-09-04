@@ -43,6 +43,22 @@ public class Common {
 
 		return time;
 	}
+	public static Date getTimeFromJsToJava(String date) {
+
+		SimpleDateFormat utcFormat = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.CHINA);
+		
+		utcFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date d = null;
+		try {
+			d = utcFormat.parse(date);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return d;
+	}
+
 	// 数字补零兼转换字符串 
     public static String addZero(int num,int len){  
         StringBuffer s = new StringBuffer() ;  
