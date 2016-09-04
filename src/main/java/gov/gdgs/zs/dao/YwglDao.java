@@ -20,28 +20,7 @@ import com.gdky.restfull.utils.HashIdUtil;
 public class YwglDao extends BaseJdbcDao {
 
 	public Map<String, Object> getYwbb(int page, int pagesize,
-			Map<String, Object> where) {
-
-		// 子查询，用于拼接查询条件和返回起止区间
-		Condition condition = new Condition();
-		condition.add("swsmc", "FUZZY", where.get("swsmc"));
-		condition.add("wtdw", "FUZZY", where.get("wtdw"));
-		condition.add("wtdwnsrsbh", "FUZZY", where.get("wtdwnsrsbh"));
-		condition.add("ywlx_dm", "EQUAL", where.get("ywlx_dm"));
-		condition.add("xyje", "BETWEEN", where.get("xyje"));
-		condition.add("sjsqje", "BETWEEN", where.get("sjsqje"));
-		condition.add("xyh", "FUZZY", where.get("xyh"));
-		condition.add("bgwh", "FUZZY", where.get("bgwh"));
-		condition.add("bbhm", "FUZZY", where.get("bbhm"));
-		condition.add("bbrq", "DATE_BETWEEN", where.get("bbrq"));
-		condition.add("bgrq", "DATE_BETWEEN", where.get("bgrq"));
-		condition.add("cs_dm", "EQUAL", where.get("cs_dm"));
-		condition.add("zt", "EQUAL", where.get("zt"));
-		condition.add("nd", "EQUAL", where.get("nd"));
-		condition.add("zsfs_dm", "EQUAL", where.get("zsfs_dm"));
-		condition.add("is_yd", "EQUAL", where.get("is_yd"));
-		condition.add("swbz", "EQUAL", where.get("swbz"));
-		condition.add(" AND yxbz = 1 AND zt != 0 AND zt != 4 ");
+			Condition condition) {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
