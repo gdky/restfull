@@ -36,7 +36,6 @@ public class YwglController {
 	
 	/**
 	 * 获取有效的业务报备
-	 * @para
 	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.GET)
 	public  ResponseEntity<Map<String,Object>> getYwbb(
@@ -45,6 +44,19 @@ public class YwglController {
 			@RequestParam(value="where", required=false) String where){ 
 
 		Map<String,Object> obj = ywglService.getYwbb(page,pagesize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
+	
+	/**
+	 * 获取收费金额预警的业务报备列表
+	 */
+	@RequestMapping(value = "/ywbbsfjeyj", method = RequestMethod.GET)
+	public  ResponseEntity<Map<String,Object>> getYwbbSFJEYJ(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value="where", required=false) String where){ 
+
+		Map<String,Object> obj = ywglService.getYwbbSFJEYJ(page,pagesize,where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 
@@ -60,6 +72,9 @@ public class YwglController {
 		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
 	
+	/*
+	 * 获取业务报备细节信息
+	 */
 	@RequestMapping(value = "/ywbb/{hash}", method = RequestMethod.GET)
 	public  ResponseEntity<Map<String,Object>> getYwbbById(@PathVariable("hash") String hash){ 
 		
@@ -67,7 +82,9 @@ public class YwglController {
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
-	//客户端用业务报备查询
+	/*
+	 * 客户端用业务报备查询
+	 */
 	@RequestMapping(value="/jg/{hashId}/yw",method = RequestMethod.GET)
 	public ResponseEntity<?> getYwbbByJg(
 			@PathVariable("hashId") String hashId,
@@ -78,14 +95,18 @@ public class YwglController {
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
-	//客户端用机构关联执业税务师和机构信息
+	/*
+	 * 客户端用机构关联执业税务师和机构信息
+	 */
 	@RequestMapping(value="/ywbbmisc/{jgHashid}",method = RequestMethod.GET)
 	public ResponseEntity<?> getYwbbMiscByJg(
 			@PathVariable("jgHashid") String jgHashid){
 		Map<String,Object> obj = ywglService.getYwbbMiscByJg(jgHashid);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
-	//客户端提交业务报备信息
+	/*
+	 * 客户端提交业务报备信息
+	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.POST)
 	public  ResponseEntity<Map<String,Object>> addYwbb(
 			@RequestBody Map<String,Object> values){ 
