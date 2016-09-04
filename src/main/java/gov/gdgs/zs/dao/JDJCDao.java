@@ -119,6 +119,13 @@ public class JDJCDao extends BaseDao{
 			 
 			 return ob;
 		}
+    /**
+     * 未交报表
+     * @param page
+     * @param pageSize
+     * @param where
+     * @return
+     */
     public Map<String, Object> getWsbbb(int page, int pageSize, Map<String,Object> where) {    	
     	List<String> arr = new ArrayList<String>();
     	arr.add("zs_cwbb_lrgd");

@@ -15,7 +15,6 @@ import java.util.Map;
 import org.hashids.Hashids;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class SPDao extends BaseDao{
@@ -85,7 +84,7 @@ public class SPDao extends BaseDao{
 			sb.append("		FROM zs_splc a,dm_lclx d,zs_splcbz b,zs_spzx c,zs_jg e,fw_user_role g,fw_role h,(SELECT @rownum:=?) zs_jg");
 			sb.append(condition.getSql());
 			sb.append("		and a.ID=b.LCID AND b.ROLEID=g.role_id and g.USER_ID=? AND d.ID=a.LCLXID AND a.ZTBJ=2 and b.ROLEID=h.ID AND a.LCLXID<>'29' and a.LCLXID=? ");
-			sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.ZSJG_ID group by e.dwmc order by c.TJSJ desc");
+			sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.sjid group by e.dwmc order by c.TJSJ desc");
 			sb.append("		    LIMIT ?, ? ");
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
@@ -128,7 +127,7 @@ public class SPDao extends BaseDao{
 		sb.append("		FROM zs_splc a,dm_lclx d,zs_splcbz b,zs_spzx c,zs_jg e,zs_jgyjxxb f,fw_user_role g,fw_role h,(SELECT @rownum:=?) zs_jg");
 		sb.append(condition.getSql());
 		sb.append("		and a.ID=b.LCID AND b.ROLEID=g.role_id and g.USER_ID=? AND d.ID=a.LCLXID AND a.ZTBJ=2 and b.ROLEID=h.ID AND a.LCLXID<>'29' and a.LCLXID=? and e.id=f.id");
-		sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.ZSJG_ID group by e.dwmc order by c.TJSJ desc");
+		sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.ZSJG_ID group by c.id order by c.TJSJ desc");
 		sb.append("		    LIMIT ?, ? ");
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
@@ -324,6 +323,17 @@ public class SPDao extends BaseDao{
 			Map<String,Object> ll =tl.get(0);
 			ll.put("nbjgsz", this.jdbcTemplate.queryForList(sql,new Object[]{sjid}));
 			return ll;
+		case "jgnj"://机构年检
+			sb.append("		SELECT ");
+			sb.append("		c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,");
+			sb.append("		case a.ztdm when 3 then '已年检' when 2 then '已自检'  "
+					+ " else null end as njzt, CASE a.WGCL_DM WHEN 1 THEN '年检予以通过' WHEN 2 THEN '年检不予通过，"
+					+ "责令2个月整改' WHEN 6 THEN '年检不予以通过' WHEN 7 THEN '资料填写有误，请重新填写' ELSE NULL END AS njcl,"
+					+ "DATE_FORMAT(a.zjsj,'%Y-%m-%d') AS zjrq,DATE_FORMAT(c.SWSZSCLSJ ,'%Y-%m-%d') AS clsj,"
+					+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
+			sb.append("	 FROM  zs_jg_njb a,zs_jg c,dm_jgxz d where 1=1 ");
+			sb.append("	and a.ZSJG_ID = c.ID  and d.ID = c.JGXZ_DM and a.id=?");
+			return this.jdbcTemplate.queryForMap(sb.toString(),new Object[]{sjid});
 		case "zyzs"://执业税务师转所审批详细信息
 			sb.append("		select (select dwmc from zs_jg c where c.id=a.yjg_id) as yjg,");
 			sb.append("		(select dwmc from zs_jg b where id=a.xjg_id) as xjg,");
@@ -477,6 +487,10 @@ public class SPDao extends BaseDao{
 					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1',a.jg_id='-2' where a.id =?",
 							 new Object[]{mp.get("SJID")});
 					 break;
+				 case 39:
+					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1'  where a.id =?",
+							 new Object[]{mp.get("SJID")});
+					 break;
 				 case 46:
 					 Map<String, Object> zzyy2 = this.jdbcTemplate.queryForMap("select c.ID,b.ZYZGZSBH,b.ZGZSQFRQ,b.ZW_DM,a.XDW from zs_fzyzzy a,zs_fzysws b,zs_ryjbxx c where a.FZY_ID=b.ID and c.ID=b.RY_ID and a.id=?",
 							 new Object[]{mp.get("SJID")});
@@ -560,6 +574,10 @@ public class SPDao extends BaseDao{
 					 break;
 				 case 38:
 					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1' where a.id =?",
+							 new Object[]{mp.get("SJID")});
+					 break;
+				 case 39:
+					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1',a.jg_id='-2' where a.id =?",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 46:

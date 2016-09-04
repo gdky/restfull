@@ -22,7 +22,7 @@ public class GzApiService {
 	public Map<String, Object> getSws(String year, String month, String day,
 			String hour) {
 		HashMap<String,Object> obj = new HashMap<String,Object>();
-		List<Map<String,Object>> ls = gzApiDao.getSws();
+		List<Map<String,Object>> ls = gzApiDao.getSws(year,month,day,hour);
 		obj.put("code", 200);
 		obj.put("total", ls.size());
 		obj.put("data", ls);	
@@ -33,7 +33,7 @@ public class GzApiService {
 	public Map<String, Object> getSwsjg(String year, String month, String day,
 			String hour) {
 		HashMap<String,Object> obj = new HashMap<String,Object>();
-		List<Map<String,Object>> ls = gzApiDao.getSwsjg();
+		List<Map<String,Object>> ls = gzApiDao.getSwsjg(year,month,day,hour);
 		obj.put("code", 200);
 		obj.put("total", ls.size());
 		obj.put("data", ls);	

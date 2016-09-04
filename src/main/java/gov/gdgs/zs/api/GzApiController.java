@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,7 +22,7 @@ public class GzApiController {
 	private GzApiService gzApiService ;
 	
 	//获取税务师数据
-	@RequestMapping(value="/sws/{year}/{month}/{day}/{hour}")
+	@RequestMapping(value="/sws/{year}/{month}/{day}/{hour}", method = RequestMethod.GET)
 	public ResponseEntity<?> getSws(
 			@PathVariable String year,
 			@PathVariable String month,
@@ -32,7 +33,7 @@ public class GzApiController {
 	}
 	
 	//获取机构数据
-	@RequestMapping(value="/swsjg/{year}/{month}/{day}/{hour}")
+	@RequestMapping(value="/swsjg/{year}/{month}/{day}/{hour}", method = RequestMethod.GET)
 	public ResponseEntity<?> getJg(
 			@PathVariable String year,
 			@PathVariable String month,

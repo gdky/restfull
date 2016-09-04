@@ -139,7 +139,7 @@ public class HfglDao extends BaseDao{
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String,Object> fpdy(int pn,int ps,Map<String, Object> qury) throws Exception{
+	public Map<String,Object> fpdy(int pn,int ps,Map<String, Object> qury,String uname) throws Exception{
 		Condition condition = new Condition();
 		condition.add("a.dwmc", Condition.FUZZY, qury.get("dwmc"));
 		condition.add("a.nd", Condition.EQUAL, qury.get("nd"));
@@ -149,12 +149,18 @@ public class HfglDao extends BaseDao{
 		params.add(ps);
 		StringBuffer sb = new StringBuffer();
 		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.ID as jlid,a.JG_ID as jgid,a.SCJLID as scid,a.ND,a.DWMC,"); 
-		sb.append("		a.JFZE,a.YJTTHF,a.YJGRHF,a.JFRQ,a.DYCS,a.BZ,a.YJE,a.GGR,a.XGR from zs_hyhfjnqk a,(select @rownum:=?) zs_ry");
-		sb.append("		"+condition.getSql()+" and a.yxbz=1 order by a.JFRQ desc LIMIT ?, ?");
+		sb.append("		a.JFZE,a.YJTTHF,a.YJGRHF,a.JFRQ,a.DYCS,a.BZ,a.YJE,a.GGR,a.XGR,'"+uname+"' as KPR from zs_hyhfjnqk a,(select @rownum:=?) zs_ry");
+		sb.append("		"+condition.getSql()+" and a.yxbz=1 order by a.LRRQ desc LIMIT ?, ?");
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();
 		ob.put("data", ls);
+		Calendar ca = Calendar.getInstance();
+		String nd = ca.get(Calendar.YEAR)+"";
+		if(qury.containsKey("nd")){
+			nd=qury.get("nd").toString();
+		}
+		ob.put("jftj", this.jdbcTemplate.queryForMap("select sum(JFZE*DYCS) as dyze,'"+nd+"' as dynd,sum(DYCS) as cs,count(id) as ts  from zs_hyhfjnqk where nd=?",nd));
 		Map<String, Object> meta = new HashMap<>();
 		meta.put("pageNum", pn);
 		meta.put("pageSize", ps);
@@ -343,7 +349,7 @@ public class HfglDao extends BaseDao{
             			yfgr="0";
             		}
             	}
-            	this.jdbcTemplate.update("insert into zs_hyhfjnqk (ID,JG_ID,DWMC,ND,JFZE,YJTTHF,YJGRHF,JFRQ,YJRS,SCJLID,YXBZ,BZ) values(?,?,?,?,?,?,?,?,?,?,'1',?)",
+            	this.jdbcTemplate.update("insert into zs_hyhfjnqk (ID,JG_ID,DWMC,ND,JFZE,YJTTHF,YJGRHF,JFRQ,YJRS,SCJLID,YXBZ,BZ,LRRQ) values(?,?,?,?,?,?,?,?,?,?,'1',?,sysdate())",
             			new Object[]{uuid,jgs.get("id"),params.get(3)+"",nd,params.get(4)+"",yftt,yfgr,params.get(0)+"",jgs.get("yjrs"),uuid2,params.get(2)+""});
             	i+=1;
             }
@@ -362,7 +368,7 @@ public class HfglDao extends BaseDao{
 	 * @return
 	 * @throws Exception
 	 */
-	public Map<String,Object> fzyhfjn(int pn,int ps,Map<String, Object> qury) throws Exception{
+	public Map<String,Object> fzyhfjn(int pn,int ps,Map<String, Object> qury,String uname) throws Exception{
 		Calendar ca = Calendar.getInstance();
 	     Object lyear =new Object();
 	     DateFormat df = new SimpleDateFormat("MM-dd");
@@ -382,7 +388,8 @@ public class HfglDao extends BaseDao{
 		params.add((pn-1)*ps);
 		params.add(ps);
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key','"+lyear+"' as nd,c.XMING,d.mc as XB,c.SFZH,e.mc as CS,DATE_FORMAT(a.FZYZCRQ,'%Y-%m-%d') AS FZYZCRQ,a.ZYZGZSBH,a.FZYZCZSBH,a.ZZDW,b.JE,b.BZ,f.MC as ryzt,b.id as jlid,b.YJE,b.LRR,b.XGR,b.YJE");
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key','"+lyear+"' as nd,c.XMING,d.mc as XB,c.SFZH,e.mc as CS,DATE_FORMAT(a.FZYZCRQ,'%Y-%m-%d') AS FZYZCRQ, ");
+		sb.append("a.ZYZGZSBH,a.FZYZCZSBH,a.ZZDW,b.JE,b.BZ,f.MC as ryzt,b.id as jlid,b.YJE,b.LRR,b.XGR,b.YJE,b.JFRQ,'"+uname+"' as KPR ");
 		sb.append("	from zs_ryjbxx c,dm_xb d,dm_cs e,dm_ryspgczt f,(select @rownum:=?) zs_ry,zs_fzysws a left join zs_hyhffzyjfb b on a.RY_ID=b.RY_ID and b.ND=? and b.yxbz=1");
 		sb.append("	"+condition.getSql()+" and a.FZYZT_DM=1 and c.ID=a.RY_ID and c.XB_DM=d.ID and c.CS_DM=e.ID and a.RYSPGCZT_DM=f.ID ");
 		if(qury.containsKey("sorder")){
@@ -437,15 +444,22 @@ public class HfglDao extends BaseDao{
 	 * @return
 	 */
 	public boolean fzytj(Map<String, Object> fptj,String name){
-		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList("select a.ry_id from zs_fzysws a,zs_ryjbxx b where a.ry_id=b.id and b.sfzh=?  and a.fzyzt_dm=1",fptj.get("sfzh"));
+		if(!fptj.containsKey("nd")||!fptj.containsKey("sfzh")||!fptj.containsKey("je")||!fptj.containsKey("jfrq")){
+			return false;
+		}
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList("select a.ry_id from zs_fzysws a,zs_ryjbxx b where a.ry_id=b.id and b.sfzh=?  and a.fzyzt_dm=1",
+				fptj.get("sfzh"));
 		if(ls.size()==0){
 			return false;
 		}
 		if(this.jdbcTemplate.queryForList("select id from zs_hyhffzyjfb where ry_id=? and nd=? and yxbz=1",new Object[]{ls.get(0).get("ry_id"),fptj.get("nd")}).size()!=0){
 			return false;
 		}
-		String sql="insert into zs_hyhffzyjfb (ID,ND,RY_ID,JE,BZ,LRR,LRRQ,YXBZ) values(?,?,?,?,?,?,sysdate(),1)";
-		this.jdbcTemplate.update(sql,new Object[]{new Common().newUUID(),fptj.get("nd"),ls.get(0).get("ry_id"),fptj.get("je"),fptj.get("bz"),name});
+		String sql="insert into zs_hyhffzyjfb (ID,ND,RY_ID,JE,JFRQ,BZ,LRR,LRRQ,YXBZ) values(?,?,?,?,?,?,?,sysdate(),1)";
+		this.jdbcTemplate.update(sql,
+				new Object[]{new Common().newUUID(),fptj.get("nd"),ls.get(0).get("ry_id"),
+				fptj.get("je"),new Common().getTime2MysqlDateTime((String)fptj.get("jfrq")),
+				fptj.get("bz"),name});
 		return true;
 	}
 	/**
@@ -526,8 +540,8 @@ public class HfglDao extends BaseDao{
             	fls.add(params.get(1)+""+"   "+sfzh+"（该年度缴费记录已存在，请使用修改操作修改）");
             	continue;
     		}
-            String sql="insert into zs_hyhffzyjfb (ID,ND,RY_ID,JE,BZ,LRR,SCJLID,LRRQ,YXBZ) values(?,?,?,?,?,?,?,sysdate(),1)";
-    		this.jdbcTemplate.update(sql,new Object[]{new Common().newUUID(),nd,ls.get(0).get("ry_id"),params.get(3)+"",params.get(4)+"",uname,uuid2});
+            String sql="insert into zs_hyhffzyjfb (ID,ND,RY_ID,JE,BZ,LRR,SCJLID,JFRQ,LRRQ,YXBZ) values(?,?,?,?,?,?,?,?,sysdate(),1)";
+    		this.jdbcTemplate.update(sql,new Object[]{new Common().newUUID(),nd,ls.get(0).get("ry_id"),params.get(3)+"",params.get(5)+"",uname,uuid2,params.get(4)+""});
     		i+=1;
         }
         this.jdbcTemplate.update("insert into zs_hyhfscjlb (ID,SUCESS,FAIL,SCRQ,SCR,YXBZ) values(?,?,?,sysdate(),?,3)",new Object[]{uuid2,i,j,uname});
@@ -588,7 +602,7 @@ public class HfglDao extends BaseDao{
 		int lx = (int)qury.get("lx");
 		if(lx==0||lx==1){
 			this.jdbcTemplate.update("update zs_hyhfjnqk a,zs_hyhfscjlb b"
-					+ " set b.YXBZ=?,a.YXBZ=? where b.id=?"
+					+ " set b.YXBZ=?,a.YXBZ=?,b.CZRQ=sysdate() where b.id=?"
 					+ " and a.SCJLID=b.id",
 					new Object[]{lx,qury.get("bj"),qury.get("jlid")});
 			if(this.jdbcTemplate.queryForList("select id from zs_hyhfjfryls where SCJLID=?",qury.get("jlid")).size()!=0){
@@ -597,7 +611,7 @@ public class HfglDao extends BaseDao{
 			}
 		}else{
 			this.jdbcTemplate.update("update zs_hyhfscjlb b,zs_hyhffzyjfb c"
-					+ " set b.YXBZ=?,c.YXBZ=? where b.id=?"
+					+ " set b.YXBZ=?,c.YXBZ=?,b.CZRQ=sysdate() where b.id=?"
 					+ " and c.SCJLID=b.id ",
 					new Object[]{lx,qury.get("bj"),qury.get("jlid")});
 		}
