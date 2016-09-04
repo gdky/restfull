@@ -50,7 +50,7 @@ public class YwglDao extends BaseJdbcDao {
 		// <=== 查询条件集合
 		sb.append(" ( "
 				+ condition.getSelectSql("zs_ywbb", "id"));
-		sb.append("    ORDER BY bbrq DESC ");
+		sb.append("    ORDER BY id ");
 		sb.append("    LIMIT ? , ?) sub ");
 		// ===> 插入查询条件集合结束
 		
@@ -60,6 +60,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" AND y.cs_dm = cs.id  ");
 		sb.append(" AND y.qx_dm = qx.id  ");
 		sb.append(" AND sub.id = y.id ");
+		sb.append(" ORDER BY y.bbrq desc ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
@@ -149,6 +150,9 @@ public class YwglDao extends BaseJdbcDao {
 				map.put("swscz", rs.getString("SWSCZ"));
 				map.put("ywzt", rs.getString("ywzt"));
 				map.put("ywzt_dm",rs.getInt("zt"));
+				map.put("sqthyy",rs.getString("sqthyy"));
+				map.put("sqqyly",rs.getString("sqqyly"));
+				
 				return map;
 			}
 		});
@@ -330,9 +334,23 @@ public class YwglDao extends BaseJdbcDao {
 		
 	}
 
-	public Number newRecordFromId(Long id, StringBuffer bbhm, String yzm) {
-		// TODO Auto-generated method stub
-		return null;
+	public Number newRecordFromId(Long id, String bbhm, String yzm) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into zs_ywbb (BBHM,BBRQ,ND,BGWH,BGRQ,ZBRQ,YZM,SFJE,JG_ID,SWSMC, ");
+		sb.append(" SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH,QZSWS,TXDZ,SWSDZYJ,SWSWZ, ");
+		sb.append(" YWLX_DM,JTXM,TZVALUE1,TJVALUE2,SSTARTTIME,SENDTIME,NSRXZ,HY_ID,ZSFS_DM, ");
+		sb.append(" ISWS,SB_DM,CS_DM,QX_DM,WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ, ");
+		sb.append(" FPHM,XYJE,SJSQJE,XYZT_DM,MEMO,USER_ID,ZGSWJG,QMSWSID,SWSDH,SWSCZ,IS_YD, ");
+		sb.append(" CUSTOMER_ID,SQTHYY,SQQYLY,THYY,ZT,YDSPZT,SWBZ,YXBZ) ");
+		sb.append(" select ?,BBRQ,ND,BGWH,BGRQ,ZBRQ,?,SFJE,JG_ID,SWSMC, ");
+		sb.append(" SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH,QZSWS,TXDZ,SWSDZYJ,SWSWZ, ");
+		sb.append(" YWLX_DM,JTXM,TZVALUE1,TJVALUE2,SSTARTTIME,SENDTIME,NSRXZ,HY_ID,ZSFS_DM, ");
+		sb.append(" ISWS,SB_DM,CS_DM,QX_DM,WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ, ");
+		sb.append(" FPHM,XYJE,SJSQJE,XYZT_DM,MEMO,USER_ID,ZGSWJG,QMSWSID,SWSDH,SWSCZ,IS_YD, ");
+		sb.append(" CUSTOMER_ID,SQTHYY,SQQYLY,THYY,?,YDSPZT,SWBZ,YXBZ  ");
+		sb.append(" from zs_ywbb where id = ? ");
+		Number idNum = this.insertAndGetKeyByJdbc(sb.toString(), new Object[]{bbhm,yzm,0,id}, new String[]{"id"});
+		return idNum;
 	}
 
 

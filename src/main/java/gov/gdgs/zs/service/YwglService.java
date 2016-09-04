@@ -247,6 +247,8 @@ public class YwglService {
 			this.updateYwbbZT(id, 1);
 		} else if (lx != null && lx == 11) {
 			this.passQY(id);
+		} else if (lx != null && lx ==12 ){
+			this.updateYwbbZT(id, 5);
 		}
 	}
 
@@ -264,7 +266,7 @@ public class YwglService {
 		bbhm.delete(21, 23);
 		bbhm.delete(10, 17);
 		//生成一条新记录
-		Number newId = this.ywglDao.newRecordFromId(id,bbhm,yzm);
+		Number newId = this.ywglDao.newRecordFromId(id,bbhm.toString(),yzm);
 		//将原记录置为作废
 		this.ywglDao.updateYwbbZT(id, 4);
 		
@@ -272,7 +274,6 @@ public class YwglService {
 
 	private void updateYwbbZT(Long id, int zt) {
 		this.ywglDao.updateYwbbZT(id, zt);
-
 	}
 
 	/*
@@ -282,5 +283,6 @@ public class YwglService {
 		data.put("zt", 0);
 		this.ywglDao.sentBack(id, data);
 	}
+
 
 }
