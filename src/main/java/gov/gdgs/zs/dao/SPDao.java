@@ -84,7 +84,7 @@ public class SPDao extends BaseDao{
 			sb.append("		FROM zs_splc a,dm_lclx d,zs_splcbz b,zs_spzx c,zs_jg e,fw_user_role g,fw_role h,(SELECT @rownum:=?) zs_jg");
 			sb.append(condition.getSql());
 			sb.append("		and a.ID=b.LCID AND b.ROLEID=g.role_id and g.USER_ID=? AND d.ID=a.LCLXID AND a.ZTBJ=2 and b.ROLEID=h.ID AND a.LCLXID<>'29' and a.LCLXID=? ");
-			sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.ZSJG_ID group by e.dwmc order by c.TJSJ desc");
+			sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.sjid group by e.dwmc order by c.TJSJ desc");
 			sb.append("		    LIMIT ?, ? ");
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
@@ -127,7 +127,7 @@ public class SPDao extends BaseDao{
 		sb.append("		FROM zs_splc a,dm_lclx d,zs_splcbz b,zs_spzx c,zs_jg e,zs_jgyjxxb f,fw_user_role g,fw_role h,(SELECT @rownum:=?) zs_jg");
 		sb.append(condition.getSql());
 		sb.append("		and a.ID=b.LCID AND b.ROLEID=g.role_id and g.USER_ID=? AND d.ID=a.LCLXID AND a.ZTBJ=2 and b.ROLEID=h.ID AND a.LCLXID<>'29' and a.LCLXID=? and e.id=f.id");
-		sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.ZSJG_ID group by e.dwmc order by c.TJSJ desc");
+		sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.ZSJG_ID group by c.id order by c.TJSJ desc");
 		sb.append("		    LIMIT ?, ? ");
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
@@ -323,6 +323,17 @@ public class SPDao extends BaseDao{
 			Map<String,Object> ll =tl.get(0);
 			ll.put("nbjgsz", this.jdbcTemplate.queryForList(sql,new Object[]{sjid}));
 			return ll;
+		case "jgnj"://机构年检
+			sb.append("		SELECT ");
+			sb.append("		c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,");
+			sb.append("		case a.ztdm when 3 then '已年检' when 2 then '已自检'  "
+					+ " else null end as njzt, CASE a.WGCL_DM WHEN 1 THEN '年检予以通过' WHEN 2 THEN '年检不予通过，"
+					+ "责令2个月整改' WHEN 6 THEN '年检不予以通过' WHEN 7 THEN '资料填写有误，请重新填写' ELSE NULL END AS njcl,"
+					+ "DATE_FORMAT(a.zjsj,'%Y-%m-%d') AS zjrq,DATE_FORMAT(c.SWSZSCLSJ ,'%Y-%m-%d') AS clsj,"
+					+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
+			sb.append("	 FROM  zs_jg_njb a,zs_jg c,dm_jgxz d where 1=1 ");
+			sb.append("	and a.ZSJG_ID = c.ID  and d.ID = c.JGXZ_DM and a.id=?");
+			return this.jdbcTemplate.queryForMap(sb.toString(),new Object[]{sjid});
 		case "zyzs"://执业税务师转所审批详细信息
 			sb.append("		select (select dwmc from zs_jg c where c.id=a.yjg_id) as yjg,");
 			sb.append("		(select dwmc from zs_jg b where id=a.xjg_id) as xjg,");
@@ -331,6 +342,21 @@ public class SPDao extends BaseDao{
 			sb.append("		date_format(a.TBRQ, '%Y-%m-%d') as TBRQ,a.SZQM,date_format(a.QMSJ, '%Y-%m-%d') as QMSJ,");
 			sb.append("		a.XSZQM,date_format(a.XQMSJ, '%Y-%m-%d') as XQMSJ");
 			sb.append("		 from zs_zyswssndz a where a.id=?");
+			return this.jdbcTemplate.queryForMap(sb.toString(),new Object[]{sjid});
+		case "zyswsnj":
+			sb.append("	select max( a.nd),a.nd,a.ID,c.XMING,c.DHHM,d.ZYZSBH,d.ZYZGZSBH,");
+			sb.append("	b.dwmc,a.swsfzryj,e1.MC as xb,f1.mc as xl,a.CZBL,DATE_FORMAT(a.SWSFZRSJ,'%Y-%m-%d') AS SWSFZRSJ,a.SWSFZR,");
+			sb.append("	DATE_FORMAT(c.SRI,'%Y-%m-%d') AS SRI,c.SFZH,a.BAFS,a.ZJWGDM,a.NJWGDM,a.ZJ,a.SWSFZRYJ,");
+			sb.append("	CASE a.ZTDM WHEN 1 THEN '保存'  WHEN 2 THEN '未审批' WHEN 0 THEN '退回' WHEN 3 THEN '已年检' ELSE NULL END AS njzt,");
+			sb.append("	DATE_FORMAT( f.SPSJ,'%Y-%m-%d') AS spsj,f.SPYJ,f.SPRNAME");
+			sb.append("	FROM  ( zs_zcswsnj a left join(zs_jg b,zs_ryjbxx c,zs_zysws d,dm_xb e1,dm_xl f1) on (");
+			sb.append("	a.ZSJG_ID=b.ID AND c.id=d.RY_ID");
+			sb.append("	and c.XL_DM=f1.id and c.XB_DM=e1.ID");
+			sb.append("	AND d.id = a.sws_id ) ) left join(zs_spzx e,zs_spxx f,zs_splcbz g,zs_splc h) on (");
+			sb.append("	f.SPID=e.ID AND g.ID=f.LCBZID and a.ZTDM <> 1");
+			sb.append("	AND h.ID=g.LCID AND h.LCLXID='12'");
+			sb.append("	AND a.ID=e.SJID )");
+			sb.append("	WHERE  a.id=? group by nd");
 			return this.jdbcTemplate.queryForMap(sb.toString(),new Object[]{sjid});
 		}
 		return null;
@@ -350,8 +376,24 @@ public class SPDao extends BaseDao{
 		 sb.append("	 and f.USER_ID=?");
 		 Map<String, Object> mp = this.jdbcTemplate.queryForMap(sb.toString(),new Object[]{spsq.get("spid"),spsq.get("uid")});
 		 String sql ="update zs_spxx set SPYJ=?,ISPASS=?,USERID=?,SPRNAME=?,SPSJ=sysdate() where id =?";
-		 this.jdbcTemplate.update(sql,new Object[]{spsq.get("spyj"),spsq.get("ispass"),spsq.get("uid"),spsq.get("uname"),mp.get("ID")});
-		 if(spsq.get("ispass").equals("Y")){
+		 Object ispass=new Object();
+		 if(spsq.containsKey("ispass")){
+			 ispass=spsq.get("ispass");
+		 }else if(spsq.containsKey("jgnj")){
+			 if((int)spsq.get("jgnj")==1){
+				 ispass="Y";
+			 }else{
+				 ispass="N";
+			 }
+		 }else if(spsq.containsKey("zynj")){
+			 if((int)spsq.get("zynj")==1){
+				 ispass="Y";
+			 }else{
+				 ispass="N";
+			 }
+		 }
+		 this.jdbcTemplate.update(sql,new Object[]{spsq.get("spyj"),ispass,spsq.get("uid"),spsq.get("uname"),mp.get("ID")});
+		 if(spsq.containsKey("ispass")&&spsq.get("ispass").equals("Y")){
 			 int c = (int)mp.get("SPBZLX");
 			 if(c==1||c==2){
 				 this.jdbcTemplate.update("update zs_spzx set ZTBJ='N', QRBJ=null where id =?",new Object[]{spsq.get("spid")});
@@ -476,6 +518,10 @@ public class SPDao extends BaseDao{
 					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1',a.jg_id='-2' where a.id =?",
 							 new Object[]{mp.get("SJID")});
 					 break;
+				 case 39:
+					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1'  where a.id =?",
+							 new Object[]{mp.get("SJID")});
+					 break;
 				 case 46:
 					 Map<String, Object> zzyy2 = this.jdbcTemplate.queryForMap("select c.ID,b.ZYZGZSBH,b.ZGZSQFRQ,b.ZW_DM,a.XDW from zs_fzyzzy a,zs_fzysws b,zs_ryjbxx c where a.FZY_ID=b.ID and c.ID=b.RY_ID and a.id=?",
 							 new Object[]{mp.get("SJID")});
@@ -496,7 +542,7 @@ public class SPDao extends BaseDao{
 						 new Object[]{this.jdbcTemplate.queryForObject("select id from zs_splcbz where lcid=? and lcbz=?",
 								 new Object[]{mp.get("LCID"),(int)mp.get("LCBZ")+1}, Object.class),spsq.get("spid")});
 			 };
-		 }else if(spsq.get("ispass").equals("N")){
+		 }else if(spsq.containsKey("ispass")&&spsq.get("ispass").equals("N")){
 			 int c = (int)mp.get("BHBZLX");
 			 if(c==1||c==2){
 				 this.jdbcTemplate.update("update zs_spzx set ZTBJ='N', QRBJ=null where id =?",new Object[]{spsq.get("spid")});
@@ -561,6 +607,10 @@ public class SPDao extends BaseDao{
 					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1' where a.id =?",
 							 new Object[]{mp.get("SJID")});
 					 break;
+				 case 39:
+					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1',a.jg_id='-2' where a.id =?",
+							 new Object[]{mp.get("SJID")});
+					 break;
 				 case 46:
 					 this.jdbcTemplate.update("update zs_fzyzzy a,zs_fzysws b set b.RYSPGCZT_DM=1,a.RYSPZT_DM=2,a.BDRQ=sysdate(),XDWYJ=?,LRR=? where a.FZY_ID=b.ID and a.id=?",
 							 new Object[]{spsq.get("spyj"),spsq.get("uname"),mp.get("SJID")});
@@ -570,6 +620,22 @@ public class SPDao extends BaseDao{
 				 this.jdbcTemplate.update("update zs_spzx set LCBZID=?, QRBJ='Y' where id =?",
 						 new Object[]{this.jdbcTemplate.queryForObject("select id from zs_splcbz where lcid=? and lcbz=?",
 								 new Object[]{mp.get("LCID"),(int)mp.get("LCBZ")-1}, Object.class),spsq.get("spid")});
+			 }
+		 }else if(spsq.containsKey("jgnj")){
+			 if((int)spsq.get("jgnj")==1){
+				 this.jdbcTemplate.update("update zs_jg_njb a set a.ZTDM=3,a.WGCL_DM=1 where a.id=?",
+						 new Object[]{mp.get("SJID")});
+			 }else{
+				 this.jdbcTemplate.update("update zs_jg_njb a set a.WGCL_DM=? where a.id=?",
+						 new Object[]{spsq.get("jgnj"),mp.get("SJID")});
+			 }
+		 }else if(spsq.containsKey("zynj")){
+			 if((int)spsq.get("zynj")==1){
+				 this.jdbcTemplate.update("update zs_zcswsnj a set a.ZTDM=3,a.WGCL_DM=1 where a.id=?",
+						 new Object[]{mp.get("SJID")});
+			 }else{
+				 this.jdbcTemplate.update("update zs_zcswsnj a set a.WGCL_DM=? where a.id=?",
+						 new Object[]{spsq.get("zynj"),mp.get("SJID")});
 			 }
 		 }
 		 return true;

@@ -1,6 +1,7 @@
 package gov.gdgs.zs.api;
 
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gdky.restfull.entity.ResponseMessage;
+
 
 /**
  * 业务管理API controller
@@ -32,19 +35,46 @@ public class YwglController {
 	private YwglService ywglService;
 	
 	/**
-	 * 业务协议类api
-	 * @para
+	 * 获取有效的业务报备
 	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.GET)
 	public  ResponseEntity<Map<String,Object>> getYwbb(
 			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
 			@RequestParam(value="where", required=false) String where){ 
 
-		Map<String,Object> obj = ywglService.getYwbb(page,pageSize,where);
+		Map<String,Object> obj = ywglService.getYwbb(page,pagesize,where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
+	/**
+	 * 获取收费金额预警的业务报备列表
+	 */
+	@RequestMapping(value = "/ywbbsfjeyj", method = RequestMethod.GET)
+	public  ResponseEntity<Map<String,Object>> getYwbbSFJEYJ(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value="where", required=false) String where){ 
+
+		Map<String,Object> obj = ywglService.getYwbbSFJEYJ(page,pagesize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
+
+	/*
+	 * 修改业务报备信息
+	 */
+	@RequestMapping(value = "/ywbb/{id}", method = RequestMethod.PUT)
+	public  ResponseEntity<?> getYwbb(
+			@RequestBody Map<String,Object> map,
+			@PathVariable String id){ 
+		ywglService.updateYwbb(id,map);
+		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
+		return new ResponseEntity<>(rm,HttpStatus.OK);
+	}
+	
+	/*
+	 * 获取业务报备细节信息
+	 */
 	@RequestMapping(value = "/ywbb/{hash}", method = RequestMethod.GET)
 	public  ResponseEntity<Map<String,Object>> getYwbbById(@PathVariable("hash") String hash){ 
 		
@@ -52,7 +82,9 @@ public class YwglController {
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
-	//客户端用业务报备查询
+	/*
+	 * 客户端用业务报备查询
+	 */
 	@RequestMapping(value="/jg/{hashId}/yw",method = RequestMethod.GET)
 	public ResponseEntity<?> getYwbbByJg(
 			@PathVariable("hashId") String hashId,
@@ -63,14 +95,18 @@ public class YwglController {
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
-	//客户端用机构关联执业税务师和机构信息
+	/*
+	 * 客户端用机构关联执业税务师和机构信息
+	 */
 	@RequestMapping(value="/ywbbmisc/{jgHashid}",method = RequestMethod.GET)
 	public ResponseEntity<?> getYwbbMiscByJg(
 			@PathVariable("jgHashid") String jgHashid){
 		Map<String,Object> obj = ywglService.getYwbbMiscByJg(jgHashid);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
-	//客户端提交业务报备信息
+	/*
+	 * 客户端提交业务报备信息
+	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.POST)
 	public  ResponseEntity<Map<String,Object>> addYwbb(
 			@RequestBody Map<String,Object> values){ 
@@ -78,5 +114,6 @@ public class YwglController {
 		Map<String,Object> obj = ywglService.addYwbb(values);
 		return new ResponseEntity<>(obj,HttpStatus.CREATED);
 	}
+
 
 }

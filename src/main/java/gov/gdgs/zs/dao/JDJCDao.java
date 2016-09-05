@@ -119,6 +119,13 @@ public class JDJCDao extends BaseDao{
 			 
 			 return ob;
 		}
+    /**
+     * 未交报表
+     * @param page
+     * @param pageSize
+     * @param where
+     * @return
+     */
     public Map<String, Object> getWsbbb(int page, int pageSize, Map<String,Object> where) {    	
     	List<String> arr = new ArrayList<String>();
     	arr.add("zs_cwbb_lrgd");
@@ -128,9 +135,6 @@ public class JDJCDao extends BaseDao{
 		arr.add("zs_cwbb_zcmx");
 		Condition condition = new Condition();
 		condition.add("b.dwmc",Condition.FUZZY,where.get("dwmc"));
-
-		
-		
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
 		sb.append(" FROM (select a.id,a.nd,b.DWMC,c.MC as cs,b.DHUA,");
