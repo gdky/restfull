@@ -2,6 +2,7 @@ package gov.gdgs.zs.dao;
 
 import gov.gdgs.zs.untils.Condition;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,39 +17,81 @@ public class XttjbbDao extends BaseJdbcDao {
 	public Map<String, Object> getXttjbb(int page, int pageSize, HashMap<String, Object> where) {
 		// TODO Auto-generated method stub
 		Condition condition = new Condition();
-		condition.add(" and g.ID = s.JG_ID ");
-		Object year = where.get("year");
-		Object jgmc = where.get("dwmc");
-		if(year == null){
-			condition.add(" and s.ND = if((date_format(now(),'%m')>3),(date_format(now(),'%Y')-1),(date_format(now(),'%Y')-2)) ");
-		}else{
-			//condition.add("s.ND", Condition.EQUAL, year);
-			condition.add(" and s.ND ="+year+" ");
-		}
-		if(jgmc != null){
-			//condition.add("g.DWMC", Condition.FUZZY, jgmc);
-			condition.add(" and g.DWMC like '%"+jgmc+"%' ");
-		}
-		//获取count查询语句
-		String sqlCount = condition.getCountSql("s.id",
-				" zs_sdsb_swsjbqk s,zs_jg g,(SELECT @rownum:=0) temp ");
-		condition.add(" limit ?,? ");
-		//获取查询语句
-		String sql = condition.getSelectSql(" zs_sdsb_swsjbqk s,zs_jg g ",
-				new String[] { "SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'KEY'","g.DWMC", "s.DWXZ", "s.FRDBXM", "s.CZRS",
-						"s.HHRS", "s.RYZS", "s.ZYZCSWSRS",
-						"(s.RYZS - s.ZYZCSWSRS) as CYRS", "s.ZCZJ", "s.YYSR",
-						"s.ZCZE", "s.SRZE", "s.LRZE", "s.JGSZD" });
-		int total = this.jdbcTemplate.queryForObject(sqlCount, Integer.class);
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql , new Object[] {
-				pageSize * (page - 1), pageSize });
-		Map<String,Object> obj = new HashMap<String,Object>();
-		obj.put("data", ls);
-		obj.put("total", total);
-		obj.put("pageSize", pageSize);
-		obj.put("current", page);
+		condition.add("jg.DWMC", Condition.EQUAL, where.get("dwmc")); 
+		StringBuffer sql=new StringBuffer(" SELECT SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 AS 'KEY', xj.* ");
+		sql.append("   FROM (SELECT jg.ID id, ");
+		sql.append("                jg.DWMC DWMC, ");
+		sql.append("                xz.MC DWXZ, ");
+		sql.append("                jg.FDDBR FRDBXM, ");
+		sql.append("                (IFNULL(cy.gdrs, 0) + IFNULL(zy.gdrs, 0) + IFNULL(f.gdrs, 0) + IFNULL(q.gdrs, 0)) CZRS, ");
+		sql.append("                (IFNULL(cy.hhrs, 0) + IFNULL(zy.hhrs, 0) + IFNULL(f.hhrs, 0) + IFNULL(q.hhrs, 0)) HHRS, ");
+		sql.append("                (IFNULL(cy.rs, 0) + IFNULL(zy.rs, 0) + IFNULL(f.rs, 0) + IFNULL(q.rs, 0)) RYZS, ");
+		sql.append("                IFNULL(zy.rs, 0) ZYZCSWSRS, ");
+		sql.append("                IFNULL(cy.rs, 0) CYRS, ");
+		sql.append("                IFNULL(jg.ZCZJ, 0) ZCZJ, ");
+		sql.append("                0 YYSR, ");
+		sql.append("                NULL ZCZE, ");
+		sql.append("                NULL SRZE, ");
+		sql.append("                NULL LRZE, ");
+		sql.append("                cs.MC JGSZD ");
+		sql.append("           FROM zs_jg jg ");
+		sql.append("           LEFT JOIN dm_jgxz xz ");
+		sql.append("             ON jg.JGXZ_DM = xz.ID ");
+		sql.append("           LEFT JOIN dm_cs cs ");
+		sql.append("             ON jg.CS_DM = cs.ID ");
+		sql.append("           LEFT JOIN (SELECT cy.JG_ID, ");
+		sql.append("                            COUNT(cy.JG_ID) rs, ");
+		sql.append("                            SUM(IF(cy.CZR_DM = '1', 1, 0)) gdrs, ");
+		sql.append("                            SUM(IF(cy.FQR_DM = '1', 1, 0)) hhrs ");
+		sql.append("                       FROM zs_cyry cy ");
+		sql.append("                      WHERE cy.yxbz = '1' ");
+		sql.append("                      GROUP BY cy.JG_ID) cy ");
+		sql.append("             ON jg.ID = cy.JG_ID ");
+		sql.append("           LEFT JOIN (SELECT zy.JG_ID, ");
+		sql.append("                            COUNT(zy.JG_ID) rs, ");
+		sql.append("                            SUM(IF(zy.CZR_DM = '1', 1, 0)) gdrs, ");
+		sql.append("                            SUM(IF(zy.FQR_DM = '1', 1, 0)) hhrs ");
+		sql.append("                       FROM zs_zysws zy ");
+		sql.append("                      WHERE zy.yxbz = '1' ");
+		sql.append("                      GROUP BY zy.JG_ID) zy ");
+		sql.append("             ON jg.ID = zy.JG_ID ");
+		sql.append("           LEFT JOIN (SELECT f.ZSJGID, ");
+		sql.append("                            COUNT(f.ZSJGID) rs, ");
+		sql.append("                            SUM(IF(f.CZR_DM = '1', 1, 0)) gdrs, ");
+		sql.append("                            SUM(IF(f.FQR_DM = '1', 1, 0)) hhrs ");
+		sql.append("                       FROM zs_fzysws f ");
+		sql.append("                      WHERE f.yxbz = '1' ");
+		sql.append("                      GROUP BY f.ZSJGID) f ");
+		sql.append("             ON jg.ID = f.ZSJGID ");
+		sql.append("           LEFT JOIN (SELECT q.JG_ID, ");
+		sql.append("                            COUNT(q.JG_ID) rs, ");
+		sql.append("                            SUM(IF(q.CZR_DM = '1', 1, 0)) gdrs, ");
+		sql.append("                            SUM(IF(q.FQR_DM = '1', 1, 0)) hhrs ");
+		sql.append("                       FROM zs_qtry q ");
+		sql.append("                      WHERE q.qtryzt_dm = '1' ");
+		sql.append("                      GROUP BY q.JG_ID) q ");
+		sql.append("             ON jg.ID = q.JG_ID ");
+		sql.append("           "+condition.getSql());
+		sql.append("            AND jg.YXBZ = '1' ");
+		sql.append("          ORDER BY jg.ID) xj, ");
+		sql.append("        (SELECT @rownum := ?) xh  ");
+		sql.append("        LIMIT ?,? ");
 		
-		return obj;
+		ArrayList<Object> params = condition.getParams();
+		params.add((page-1)*pageSize);
+		params.add((page-1)*pageSize);
+		params.add(pageSize);
+		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", page);
+		meta.put("pageSize", pageSize);
+		meta.put("pageTotal",total);
+		meta.put("pageAll",(total + pageSize - 1) / pageSize);
+		ob.put("page", meta);
+		return ob;
 	}
 
 	public Map<String, Object> getHyryqktj(int page, int pageSize,

@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 
+
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.XtsjfxService;
 
@@ -42,4 +43,20 @@ public class XtsjfxController {
 	 			@RequestParam(value="where", required=false) String where){
 		 return new ResponseEntity<>(xtsjfxService.getRynjsjfxb(page, pageSize, where),HttpStatus.OK);
 	 }
+	 
+	 /**
+	  * 职业证书号数据分析_主表查询
+	  * @param page
+	  * @param pageSize
+	  * @param where
+	  * @return
+	  */
+	 @RequestMapping(value = "/zyzshsjfxb", method = RequestMethod.GET )
+	 public ResponseEntity<?> getZyzshSjfxb(
+				@RequestParam(value = "pagenum", required = true) int page,
+				@RequestParam(value = "pagesize", required = true) int pageSize,
+				@RequestParam(value = "where", required = false) String where){
+		Map<String,Object> map=xtsjfxService.getZyzshSjfxb(page, pageSize, where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
 }
