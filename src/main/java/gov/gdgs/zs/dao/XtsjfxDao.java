@@ -3,11 +3,15 @@ package gov.gdgs.zs.dao;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.untils.Condition;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hashids.Hashids;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
@@ -190,6 +194,84 @@ public class XtsjfxDao extends BaseJdbcDao{
 		//obj.put("pageSize", pageSize);
 		//obj.put("current", page);
 		return obj;
+	}
+
+	public Map<String, Object> getZyzshSjfxb(int page, int pageSize,
+			HashMap<String, Object> map) {
+		final String url=Config.URL_PROJECT;
+		Condition condition = new Condition();
+		condition.add("r.XMING", Condition.FUZZY, map.get("XMING"));
+		condition.add("z.ZYZSBH", Condition.EQUAL, map.get("ZYZSBH"));
+		condition.add("z.JG_ID", Condition.EQUAL, map.get("ID"));
+		StringBuffer sql=new StringBuffer(" SELECT SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 AS 'key', T.* ");
+		sql.append("   FROM (SELECT z.ID, ");
+		sql.append("                z.RY_ID, ");
+		sql.append("                r.XMING, ");
+		sql.append("                xb.MC XB, ");
+		sql.append("                xl.MC XL, ");
+		sql.append("                z.ZYZGZSBH, ");
+		sql.append("                z.ZYZSBH, ");
+		sql.append("                IF(z.CZR_DM = '0', '是', '否') isCzr, ");
+		sql.append("                IF(z.FQR_DM = '0', '是', '否') isFqr, ");
+		sql.append("                jg.DWMC ");
+		sql.append("           FROM zs_zysws z, zs_ryjbxx r, dm_xb xb, dm_xl xl, zs_jg jg ");
+		sql.append("  "+condition.getSql());
+		sql.append("            AND z.RY_ID = r.ID ");
+		sql.append("            AND r.XB_DM = xb.ID ");
+		sql.append("            AND r.XL_DM = xl.ID ");
+		sql.append("            AND z.JG_ID = jg.ID ");
+		sql.append("            and z.YXBZ = '1' ");
+		sql.append("            AND r.YXBZ = '1' ");
+		sql.append("            AND z.ZYZSBH IS NOT NULL ");
+		sql.append("            AND z.ZYZSBH IN (SELECT t.ZYZSBH ");
+		sql.append("                               FROM zs_zysws t ");
+		sql.append("                              where t.YXBZ = '1' ");
+		sql.append("                              GROUP BY t.ZYZSBH ");
+		sql.append("                             HAVING COUNT(t.ZYZSBH) > 1) ");
+		sql.append("          ORDER BY z.ZYZSBH, z.RY_ID) T, ");
+		sql.append("        (SELECT @rownum := ?) xh ");
+		sql.append("  LIMIT ?, ? ");
+		
+		ArrayList<Object> params = condition.getParams();
+		params.add((page-1)*pageSize);
+		params.add((page-1)*pageSize);
+		params.add(pageSize);
+		List<Map<String,Object>> ls=this.jdbcTemplate.query(sql.toString(),params.toArray(),new RowMapper<Map<String,Object>>(){
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				Map<String,Object> map = new HashMap<String,Object>();
+				Map<String,Object> link = new HashMap<>();
+				String id = hashids.encode(rs.getLong("RY_ID"));
+				link.put("herf_xxzl", url+"/ryxx/zyryxx/"+id);
+				link.put("herf_bgjl", url+"/ryxx/zyrybgjl/"+id);
+				link.put("herf_zsjl", url+"/ryxx/zyryzsjl/"+id);
+				link.put("herf_zjjl", url+"/ryxx/zyryzjjl/"+id);
+				link.put("herf_zzjl", url+"/ryxx/zyryzzjl/"+id);
+				map.put("key", rs.getObject("key"));
+				map.put("ID", rs.getObject("ID"));
+				map.put("_links", link);
+				map.put("XMING", rs.getObject("XMING"));
+				map.put("XB", rs.getObject("XB"));
+				map.put("XL", rs.getObject("XL"));
+				map.put("ZYZGZSBH", rs.getObject("ZYZGZSBH"));
+				map.put("ZYZSBH", rs.getObject("ZYZSBH"));
+				map.put("isCzr", rs.getObject("isCzr"));
+				map.put("isFqr", rs.getObject("isFqr"));
+				map.put("DWMC", rs.getObject("DWMC"));
+				return map;
+			}
+		});
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", page);
+		meta.put("pageSize", pageSize);
+		meta.put("pageTotal",total);
+		meta.put("pageAll",(total + pageSize - 1) / pageSize);
+		ob.put("page", meta);
+		
+		return ob; 
 	}
 
 }

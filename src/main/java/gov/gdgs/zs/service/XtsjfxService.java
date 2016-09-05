@@ -53,4 +53,28 @@ public class XtsjfxService {
 		}
 		return xtsjfxDao.getRynjsjfxb(page, pageSize, map);
 	}
+
+	/**
+	 * 执业证书号数据分析_主表查询
+	 * @param page
+	 * @param pageSize
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getZyzshSjfxb(int page, int pageSize,
+			String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return xtsjfxDao.getZyzshSjfxb(page, pageSize, map);
+	}
 }
