@@ -3,6 +3,7 @@ package gov.gdgs.zs.service;
 import gov.gdgs.zs.dao.SWSDao;
 import gov.gdgs.zs.dao.YwglDao;
 import gov.gdgs.zs.untils.Common;
+import gov.gdgs.zs.untils.Condition;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,20 +32,40 @@ public class YwglService {
 	@Resource
 	private SWSDao swsDao;
 
-	public Map<String, Object> getYwbb(int page, int pageSize, String where) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		if (where != null) {
+	public Map<String, Object> getYwbb(int page, int pageSize, String whereParam) {
+		HashMap<String, Object> where = new HashMap<String, Object>();
+		if (whereParam != null) {
 			try {
-				where = java.net.URLDecoder.decode(where, "UTF-8");
+				whereParam = java.net.URLDecoder.decode(whereParam, "UTF-8");
 				ObjectMapper mapper = new ObjectMapper();
-				map = mapper.readValue(where,
+				where = mapper.readValue(whereParam,
 						new TypeReference<Map<String, Object>>() {
 						});
 			} catch (Exception e) {
 			}
 		}
+		// 拼接查询条件
+		Condition condition = new Condition();
+		condition.add("swsmc", "FUZZY", where.get("swsmc"));
+		condition.add("wtdw", "FUZZY", where.get("wtdw"));
+		condition.add("wtdwnsrsbh", "FUZZY", where.get("wtdwnsrsbh"));
+		condition.add("ywlx_dm", "EQUAL", where.get("ywlx_dm"));
+		condition.add("xyje", "BETWEEN", where.get("xyje"));
+		condition.add("sjsqje", "BETWEEN", where.get("sjsqje"));
+		condition.add("xyh", "FUZZY", where.get("xyh"));
+		condition.add("bgwh", "FUZZY", where.get("bgwh"));
+		condition.add("bbhm", "FUZZY", where.get("bbhm"));
+		condition.add("bbrq", "DATE_BETWEEN", where.get("bbrq"));
+		condition.add("bgrq", "DATE_BETWEEN", where.get("bgrq"));
+		condition.add("cs_dm", "EQUAL", where.get("cs_dm"));
+		condition.add("zt", "EQUAL", where.get("zt"));
+		condition.add("nd", "EQUAL", where.get("nd"));
+		condition.add("zsfs_dm", "EQUAL", where.get("zsfs_dm"));
+		condition.add("is_yd", "EQUAL", where.get("is_yd"));
+		condition.add("swbz", "EQUAL", where.get("swbz"));
+		condition.add(" AND yxbz = 1 AND zt != 0 AND zt != 4 ");
 
-		Map<String, Object> rs = ywglDao.getYwbb(page, pageSize, map);
+		Map<String, Object> rs = ywglDao.getYwbb(page, pageSize, condition);
 		return rs;
 	}
 
@@ -247,7 +268,7 @@ public class YwglService {
 			this.updateYwbbZT(id, 1);
 		} else if (lx != null && lx == 11) {
 			this.passQY(id);
-		} else if (lx != null && lx ==12 ){
+		} else if (lx != null && lx == 12) {
 			this.updateYwbbZT(id, 5);
 		}
 	}
@@ -265,11 +286,11 @@ public class YwglService {
 		bbhm.append(cal.getTimeInMillis());
 		bbhm.delete(21, 23);
 		bbhm.delete(10, 17);
-		//生成一条新记录
-		Number newId = this.ywglDao.newRecordFromId(id,bbhm.toString(),yzm);
-		//将原记录置为作废
+		// 生成一条新记录
+		Number newId = this.ywglDao.newRecordFromId(id, bbhm.toString(), yzm);
+		// 将原记录置为作废
 		this.ywglDao.updateYwbbZT(id, 4);
-		
+
 	}
 
 	private void updateYwbbZT(Long id, int zt) {
@@ -284,5 +305,52 @@ public class YwglService {
 		this.ywglDao.sentBack(id, data);
 	}
 
+	public Map<String, Object> getYwbbSFJEYJ(int page, int pagesize,
+			String whereParam) {
+		HashMap<String, Object> where = new HashMap<String, Object>();
+		if (whereParam != null) {
+			try {
+				whereParam = java.net.URLDecoder.decode(whereParam, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				where = mapper.readValue(whereParam,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+			}
+		}
+		// 拼接查询条件
+		Condition condition = new Condition();
+		condition.add("swsmc", "FUZZY", where.get("swsmc"));
+		condition.add("wtdw", "FUZZY", where.get("wtdw"));
+		condition.add("wtdwnsrsbh", "FUZZY", where.get("wtdwnsrsbh"));
+		condition.add("ywlx_dm", "EQUAL", where.get("ywlx_dm"));
+		condition.add("xyje", "BETWEEN", where.get("xyje"));
+		condition.add("sjsqje", "BETWEEN", where.get("sjsqje"));
+		condition.add("xyh", "FUZZY", where.get("xyh"));
+		condition.add("bgwh", "FUZZY", where.get("bgwh"));
+		condition.add("bbhm", "FUZZY", where.get("bbhm"));
+		condition.add("bbrq", "DATE_BETWEEN", where.get("bbrq"));
+		condition.add("bgrq", "DATE_BETWEEN", where.get("bgrq"));
+		condition.add("cs_dm", "EQUAL", where.get("cs_dm"));
+		condition.add("zt", "EQUAL", where.get("zt"));
+		condition.add("nd", "EQUAL", where.get("nd"));
+		condition.add("zsfs_dm", "EQUAL", where.get("zsfs_dm"));
+		condition.add("is_yd", "EQUAL", where.get("is_yd"));
+		condition.add("swbz", "EQUAL", where.get("swbz"));
+		condition.add(" AND yxbz = 1  ");
+		condition.add(" AND (zt = 1  OR zt = 3)  ");
+		String yjlx = (String) where.get("yjlx");
+		if (yjlx!=null && yjlx.equals("1")){
+			condition.add(" AND sjsqje is null ");
+		} else if (yjlx != null && yjlx.equals("2")){
+			condition.add(" AND sjsqje > 1000000 ");
+		} else if (yjlx != null && yjlx.equals("3")){
+			condition.add(" AND sjsqje < 500 ");
+		} else {
+			condition.add(" AND (sjsqje < 500 OR sjsqje > 1000000 OR sjsqje is null) ");
+		}
+		Map<String, Object> rs = ywglDao.getYwbb(page, pagesize, condition);
+		return rs;
+	}
 
 }
