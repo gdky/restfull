@@ -24,20 +24,19 @@ public class YwglDao extends BaseJdbcDao {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
-		sb.append(" FROM zs_ywbb Y,dm_ywbb_zt z,dm_ywlx l,dm_hy hy,dm_cs cs,dm_cs qx,  ");
+		sb.append(" FROM (zs_ywbb y,dm_ywbb_zt z,dm_ywlx l,  ");
 		
 		// <=== 查询条件集合
 		sb.append(" ( "
 				+ condition.getSelectSql("zs_ywbb", "id"));
 		sb.append("    ORDER BY id ");
-		sb.append("    LIMIT ? , ?) sub ");
+		sb.append("    LIMIT ? , ?) sub) ");
 		// ===> 插入查询条件集合结束
 		
+		sb.append(" left join (dm_hy hy,dm_cs cs,dm_cs qx) ");
+		sb.append(" on (y.hy_id = hy.id and y.cs_dm = cs.id and y.qx_dm = qx.id) ");
 		sb.append(" WHERE y.zt = z.id  ");
 		sb.append(" AND y.ywlx_dm = l.id  ");
-		sb.append(" AND y.hy_id = hy.id  ");
-		sb.append(" AND y.cs_dm = cs.id  ");
-		sb.append(" AND y.qx_dm = qx.id  ");
 		sb.append(" AND sub.id = y.id ");
 		sb.append(" ORDER BY y.bbrq desc ");
 
