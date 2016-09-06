@@ -343,6 +343,21 @@ public class SPDao extends BaseDao{
 			sb.append("		a.XSZQM,date_format(a.XQMSJ, '%Y-%m-%d') as XQMSJ");
 			sb.append("		 from zs_zyswssndz a where a.id=?");
 			return this.jdbcTemplate.queryForMap(sb.toString(),new Object[]{sjid});
+		case "zyswsnj":
+			sb.append("	select max( a.nd),a.nd,a.ID,c.XMING,c.DHHM,d.ZYZSBH,d.ZYZGZSBH,");
+			sb.append("	b.dwmc,a.swsfzryj,e1.MC as xb,f1.mc as xl,a.CZBL,DATE_FORMAT(a.SWSFZRSJ,'%Y-%m-%d') AS SWSFZRSJ,a.SWSFZR,");
+			sb.append("	DATE_FORMAT(c.SRI,'%Y-%m-%d') AS SRI,c.SFZH,a.BAFS,a.ZJWGDM,a.NJWGDM,a.ZJ,a.SWSFZRYJ,");
+			sb.append("	CASE a.ZTDM WHEN 1 THEN '保存'  WHEN 2 THEN '未审批' WHEN 0 THEN '退回' WHEN 3 THEN '已年检' ELSE NULL END AS njzt,");
+			sb.append("	DATE_FORMAT( f.SPSJ,'%Y-%m-%d') AS spsj,f.SPYJ,f.SPRNAME");
+			sb.append("	FROM  ( zs_zcswsnj a left join(zs_jg b,zs_ryjbxx c,zs_zysws d,dm_xb e1,dm_xl f1) on (");
+			sb.append("	a.ZSJG_ID=b.ID AND c.id=d.RY_ID");
+			sb.append("	and c.XL_DM=f1.id and c.XB_DM=e1.ID");
+			sb.append("	AND d.id = a.sws_id ) ) left join(zs_spzx e,zs_spxx f,zs_splcbz g,zs_splc h) on (");
+			sb.append("	f.SPID=e.ID AND g.ID=f.LCBZID and a.ZTDM <> 1");
+			sb.append("	AND h.ID=g.LCID AND h.LCLXID='12'");
+			sb.append("	AND a.ID=e.SJID )");
+			sb.append("	WHERE  a.id=? group by nd");
+			return this.jdbcTemplate.queryForMap(sb.toString(),new Object[]{sjid});
 		}
 		return null;
 	}
@@ -361,8 +376,24 @@ public class SPDao extends BaseDao{
 		 sb.append("	 and f.USER_ID=?");
 		 Map<String, Object> mp = this.jdbcTemplate.queryForMap(sb.toString(),new Object[]{spsq.get("spid"),spsq.get("uid")});
 		 String sql ="update zs_spxx set SPYJ=?,ISPASS=?,USERID=?,SPRNAME=?,SPSJ=sysdate() where id =?";
-		 this.jdbcTemplate.update(sql,new Object[]{spsq.get("spyj"),spsq.get("ispass"),spsq.get("uid"),spsq.get("uname"),mp.get("ID")});
-		 if(spsq.get("ispass").equals("Y")){
+		 Object ispass=new Object();
+		 if(spsq.containsKey("ispass")){
+			 ispass=spsq.get("ispass");
+		 }else if(spsq.containsKey("jgnj")){
+			 if((int)spsq.get("jgnj")==1){
+				 ispass="Y";
+			 }else{
+				 ispass="N";
+			 }
+		 }else if(spsq.containsKey("zynj")){
+			 if((int)spsq.get("zynj")==1){
+				 ispass="Y";
+			 }else{
+				 ispass="N";
+			 }
+		 }
+		 this.jdbcTemplate.update(sql,new Object[]{spsq.get("spyj"),ispass,spsq.get("uid"),spsq.get("uname"),mp.get("ID")});
+		 if(spsq.containsKey("ispass")&&spsq.get("ispass").equals("Y")){
 			 int c = (int)mp.get("SPBZLX");
 			 if(c==1||c==2){
 				 this.jdbcTemplate.update("update zs_spzx set ZTBJ='N', QRBJ=null where id =?",new Object[]{spsq.get("spid")});
@@ -511,7 +542,7 @@ public class SPDao extends BaseDao{
 						 new Object[]{this.jdbcTemplate.queryForObject("select id from zs_splcbz where lcid=? and lcbz=?",
 								 new Object[]{mp.get("LCID"),(int)mp.get("LCBZ")+1}, Object.class),spsq.get("spid")});
 			 };
-		 }else if(spsq.get("ispass").equals("N")){
+		 }else if(spsq.containsKey("ispass")&&spsq.get("ispass").equals("N")){
 			 int c = (int)mp.get("BHBZLX");
 			 if(c==1||c==2){
 				 this.jdbcTemplate.update("update zs_spzx set ZTBJ='N', QRBJ=null where id =?",new Object[]{spsq.get("spid")});
@@ -589,6 +620,22 @@ public class SPDao extends BaseDao{
 				 this.jdbcTemplate.update("update zs_spzx set LCBZID=?, QRBJ='Y' where id =?",
 						 new Object[]{this.jdbcTemplate.queryForObject("select id from zs_splcbz where lcid=? and lcbz=?",
 								 new Object[]{mp.get("LCID"),(int)mp.get("LCBZ")-1}, Object.class),spsq.get("spid")});
+			 }
+		 }else if(spsq.containsKey("jgnj")){
+			 if((int)spsq.get("jgnj")==1){
+				 this.jdbcTemplate.update("update zs_jg_njb a set a.ZTDM=3,a.WGCL_DM=1 where a.id=?",
+						 new Object[]{mp.get("SJID")});
+			 }else{
+				 this.jdbcTemplate.update("update zs_jg_njb a set a.WGCL_DM=? where a.id=?",
+						 new Object[]{spsq.get("jgnj"),mp.get("SJID")});
+			 }
+		 }else if(spsq.containsKey("zynj")){
+			 if((int)spsq.get("zynj")==1){
+				 this.jdbcTemplate.update("update zs_zcswsnj a set a.ZTDM=3,a.WGCL_DM=1 where a.id=?",
+						 new Object[]{mp.get("SJID")});
+			 }else{
+				 this.jdbcTemplate.update("update zs_zcswsnj a set a.WGCL_DM=? where a.id=?",
+						 new Object[]{spsq.get("zynj"),mp.get("SJID")});
 			 }
 		 }
 		 return true;

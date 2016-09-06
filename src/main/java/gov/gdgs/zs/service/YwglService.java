@@ -346,7 +346,9 @@ public class YwglService {
 			condition.add(" AND sjsqje > 1000000 ");
 		} else if (yjlx != null && yjlx.equals("3")){
 			condition.add(" AND sjsqje < 500 ");
-		} 
+		} else {
+			condition.add(" AND (sjsqje < 500 OR sjsqje > 1000000 OR sjsqje is null) ");
+		}
 		Map<String, Object> rs = ywglDao.getYwbb(page, pagesize, condition);
 		return rs;
 	}
