@@ -46,7 +46,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao{
 				int startIndex = pageSize * (page - 1);
 				ArrayList<Object> params = condition.getParams();
 				
-				params.add(0,Jgid);
+				params.add(Jgid);
 				params.add( pageSize * (page - 1));
 		        params.add(startIndex);
 				params.add(pageSize);
@@ -93,7 +93,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao{
 		obj.put("xz", xz);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_jg_njb");
-		sb.append(" ( ZSJG_ID, ND,ZSJGXZ_ID,ZJWGDM, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,  ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ZJSJ,ztdm,GDBDQKZJ,GDBDQKJS,qzrq ) "
+		sb.append(" ( ZSJG_ID, ND,ZSJGXZ_ID,ZJWGDM, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,  ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ZJSJ,ztdm,GDBDQKZJ,GDBDQKJS,FZRSJ) "
 				+ "VALUES (:jg_id,:nd,:xz,:wg,:NJZJ, :sz, :zczj, :zrs, :zyrs, :yjyrs, :sjjyrs, :wjyrs, :ZJ, :FZR, :ZCSWSBZJ,:ZCSWSBJS,:BAFS,:FSS,now(),now(),'1',:GDBDQKZJ,:GDBDQKJS,:qzrq ) ");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
