@@ -253,6 +253,14 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" from (zs_ywbb a, ");
 		// <=== 查询条件集合
 		sb.append(" ( " + condition.getSelectSql("zs_ywbb", "id"));
+		sb.append("    ORDER BY id) sub) ");
+		// ===> 插入查询条件集合结束
+		sb.append(" left join zs_ywbb b ");
+		sb.append(" on ( a.customer_id = b.customer_id and a.YWLX_DM = b.YWLX_DM) ");
+		sb.append(" where a.id = sub.id and  a.ND != b. nd and a.JG_ID!= b.JG_ID ");
+		sb.append(" and (a.zt=1 or a.zt = 3) ");
+		sb.append(" group by a.id ");
+		sb.append(" LIMIT ? , ? ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
