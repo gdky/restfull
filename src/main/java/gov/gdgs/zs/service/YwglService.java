@@ -384,7 +384,7 @@ public class YwglService {
 		condition.add("swbz", "EQUAL", where.get("swbz"));
 		condition.add(" AND yxbz = 1 AND zt != 0 AND zt != 4 ");
 		
-		Map<String, Object> rs = ywglDao.getYwbb(page, pagesize, condition);
+		Map<String, Object> rs = ywglDao.getYwbbNDBTYJ(page, pagesize, condition);
 		return rs;
 	}
 
