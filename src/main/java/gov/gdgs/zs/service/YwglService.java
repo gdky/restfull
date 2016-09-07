@@ -353,4 +353,39 @@ public class YwglService {
 		return rs;
 	}
 
+	public Map<String, Object> getYwbbNDBTYJ(int page, int pagesize,
+			String whereParam) {
+		HashMap<String, Object> where = new HashMap<String, Object>();
+		if (whereParam != null) {
+			try {
+				whereParam = java.net.URLDecoder.decode(whereParam, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				where = mapper.readValue(whereParam,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+			}
+		}
+		// 拼接查询条件
+		Condition condition = new Condition();
+		condition.add("swsmc", "FUZZY", where.get("swsmc"));
+		condition.add("wtdw", "FUZZY", where.get("wtdw"));
+		condition.add("wtdwnsrsbh", "FUZZY", where.get("wtdwnsrsbh"));
+		condition.add("ywlx_dm", "EQUAL", where.get("ywlx_dm"));
+		condition.add("xyje", "BETWEEN", where.get("xyje"));
+		condition.add("sjsqje", "BETWEEN", where.get("sjsqje"));
+		condition.add("bbhm", "FUZZY", where.get("bbhm"));
+		condition.add("bbrq", "DATE_BETWEEN", where.get("bbrq"));
+		condition.add("cs_dm", "EQUAL", where.get("cs_dm"));
+		condition.add("zt", "EQUAL", where.get("zt"));
+		condition.add("nd", "EQUAL", where.get("nd"));
+		condition.add("zsfs_dm", "EQUAL", where.get("zsfs_dm"));
+		condition.add("is_yd", "EQUAL", where.get("is_yd"));
+		condition.add("swbz", "EQUAL", where.get("swbz"));
+		condition.add(" AND yxbz = 1 AND zt != 0 AND zt != 4 ");
+		
+		Map<String, Object> rs = ywglDao.getYwbb(page, pagesize, condition);
+		return rs;
+	}
+
 }
