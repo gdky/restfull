@@ -17,7 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class AddzyswsnjService {
-	//执业税务师年检表增加
+	//执业税务师年检表
 	@Resource
 	private AddzyswsnjDao addzyswsnjdao;
 			public Map<String, Object> getzyswsnjb(int page, int pageSize,int Jgid, String where) {

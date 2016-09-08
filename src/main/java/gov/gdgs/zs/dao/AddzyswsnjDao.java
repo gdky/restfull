@@ -18,9 +18,9 @@ public class AddzyswsnjDao extends BaseDao {
 			Map<String, Object> where) {
 			
 			Condition condition = new Condition();
-			condition.add("a.nd", Condition.EQUAL, where.get("nd"));
-			condition.add("b.dwmc",Condition.FUZZY,where.get("dwmc"));
-			condition.add("a.ZTDM", Condition.EQUAL, where.get("ZTDM"));
+//			condition.add("a.nd", Condition.EQUAL, where.get("nd"));
+//			condition.add("b.dwmc",Condition.FUZZY,where.get("dwmc"));
+//			condition.add("a.ZTDM", Condition.EQUAL, where.get("ZTDM"));
             
 
 			StringBuffer sb = new StringBuffer();
@@ -28,13 +28,13 @@ public class AddzyswsnjDao extends BaseDao {
 			sb.append(" from  ( select a.id,a.ND,c.XMING,b.dwmc,");
 			sb.append(" CASE a.ZTDM WHEN 0 THEN '退回' WHEN 1 THEN '保存' WHEN 2 THEN '自检' WHEN 3 THEN '年检' ELSE NULL END AS ZTDM");
 			sb.append(" from "+Config.PROJECT_SCHEMA+"zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d,(SELECT @rownum:=?) temp");
-			sb.append(condition.getSql());//相当元 where x.xx like '%%'
-			sb.append(" and a.ZSJG_ID=? and  a.SWS_ID=d.ID and c.ID=d.RY_ID   order by a.ND desc) as t");
+//			sb.append(condition.getSql());//相当元 where x.xx like '%%'
+			sb.append(" where a.ZSJG_ID=? and a.ZSJG_ID=b.ID and a.SWS_ID=d.ID and c.ID=d.RY_ID order by a.ND desc) as t");
 			sb.append("    LIMIT ?, ? ");
 			// 装嵌传值数组
 			int startIndex = pageSize * (page - 1);
 			ArrayList<Object> params = condition.getParams();
-			params.add(0, pageSize * (page - 1));
+			params.add(pageSize * (page - 1));
 			params.add(Jgid);
 			params.add(startIndex);
 			params.add(pageSize);
@@ -56,15 +56,16 @@ public class AddzyswsnjDao extends BaseDao {
 
 			return obj;
 		}
+    
     public Map<String, Object> getzyswsnjbById(String id) {
 		String sql = "select a.id,a.ND,c.XMING,"
 				+ "b.dwmc, CASE a.ZTDM WHEN 0 THEN '退回' "
 				+ "WHEN 1 THEN '保存' "
-				+ "WHEN 2 THEN '自检'"
-				+ " WHEN 3 THEN '年检'"
-				+ " ELSE NULL END AS ZTDM"
-				+ "from zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d"
-				+ "where a.SWS_ID=d.ID and c.ID=d.RY_ID and a.id=? ";
+				+ "WHEN 2 THEN '自检' "
+				+ " WHEN 3 THEN '年检' "
+				+ " ELSE NULL END AS ZTDM "
+				+ "  from zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws  d "
+				+ "  where a.SWS_ID=d.ID and c.ID=d.RY_ID and a.id=? ";
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
