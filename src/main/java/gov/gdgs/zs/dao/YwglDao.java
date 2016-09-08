@@ -32,9 +32,13 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append("    ORDER BY id ");
 		sb.append("    LIMIT ? , ?) sub) ");
 		// ===> 插入查询条件集合结束
+		sb.append(" left join dm_hy AS hy ");
+		sb.append(" on y.hy_id = hy.id ");
+		sb.append(" left join dm_cs AS cs ");
+		sb.append(" on y.cs_dm = cs.id ");
+		sb.append(" left join dm_cs AS qx ");
+		sb.append(" on y.qx_dm = qx.id ");
 		
-		sb.append(" left join (dm_hy hy,dm_cs cs,dm_cs qx) ");
-		sb.append(" on (y.hy_id = hy.id and y.cs_dm = cs.id and y.qx_dm = qx.id) ");
 		sb.append(" WHERE y.zt = z.id  ");
 		sb.append(" AND y.ywlx_dm = l.id  ");
 		sb.append(" AND sub.id = y.id ");
@@ -249,17 +253,26 @@ public class YwglDao extends BaseJdbcDao {
 	public Map<String, Object> getYwbbNDBTYJ(int page, int pagesize,
 			Condition condition) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select a.* ");
-		sb.append(" from (zs_ywbb a, ");
+		sb.append(" select SQL_CALC_FOUND_ROWS a.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
+		sb.append(" from (zs_ywbb a,dm_ywbb_zt z,dm_ywlx l, ");
 		// <=== 查询条件集合
 		sb.append(" ( " + condition.getSelectSql("zs_ywbb", "id"));
 		sb.append("    ORDER BY id) sub) ");
 		// ===> 插入查询条件集合结束
 		sb.append(" left join zs_ywbb b ");
-		sb.append(" on ( a.customer_id = b.customer_id and a.YWLX_DM = b.YWLX_DM) ");
+		sb.append(" on ( a.customer_id = b.customer_id and a.YWLX_DM = b.YWLX_DM ) ");
+		sb.append(" left join dm_hy AS hy ");
+		sb.append(" on a.hy_id = hy.id ");
+		sb.append(" left join dm_cs AS cs ");
+		sb.append(" on a.cs_dm = cs.id ");
+		sb.append(" left join dm_cs AS qx ");
+		sb.append(" on a.qx_dm = qx.id ");
 		sb.append(" where a.id = sub.id and  a.ND != b. nd and a.JG_ID!= b.JG_ID ");
+		sb.append(" and  a.zt = z.id ");
+		sb.append(" AND a.ywlx_dm = l.id  ");
 		sb.append(" and (a.zt=1 or a.zt = 3) ");
 		sb.append(" group by a.id ");
+		sb.append(" order by a.customer_id , a.nd desc ");
 		sb.append(" LIMIT ? , ? ");
 
 		// 装嵌传值数组
@@ -273,9 +286,8 @@ public class YwglDao extends BaseJdbcDao {
 				params.toArray(), new YwbbRowMapper());
 
 		// 获取符合条件的记录数
-		String countSql = condition.getCountSql("id", "zs_ywbb");
-		int total = jdbcTemplate.queryForObject(countSql, condition.getParams()
-				.toArray(), Integer.class);
+		String countSql = " SELECT FOUND_ROWS()";
+		int total = jdbcTemplate.queryForObject(countSql, Integer.class);
 
 		Map<String, Object> obj = new HashMap<String, Object>();
 		obj.put("data", ls);
