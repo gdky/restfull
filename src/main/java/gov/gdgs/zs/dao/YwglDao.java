@@ -253,27 +253,25 @@ public class YwglDao extends BaseJdbcDao {
 	public Map<String, Object> getYwbbNDBTYJ(int page, int pagesize,
 			Condition condition) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select SQL_CALC_FOUND_ROWS a.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
+		sb.append(" SELECT SQL_CALC_FOUND_ROWS  @rownum := IF(@rowtype = customer_id, @rownum + 1, 1) AS row_number, @rowtype := customer_id AS dummy, t .* ");
+		sb.append(" FROM ( ");
+		sb.append(" select a.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
 		sb.append(" from (zs_ywbb a,dm_ywbb_zt z,dm_ywlx l, ");
 		// <=== 查询条件集合
 		sb.append(" ( " + condition.getSelectSql("zs_ywbb", "id"));
 		sb.append("    ORDER BY id) sub) ");
 		// ===> 插入查询条件集合结束
-		sb.append(" left join zs_ywbb b ");
-		sb.append(" on ( a.customer_id = b.customer_id and a.YWLX_DM = b.YWLX_DM ) ");
-		sb.append(" left join dm_hy AS hy ");
-		sb.append(" on a.hy_id = hy.id ");
-		sb.append(" left join dm_cs AS cs ");
-		sb.append(" on a.cs_dm = cs.id ");
-		sb.append(" left join dm_cs AS qx ");
-		sb.append(" on a.qx_dm = qx.id ");
-		sb.append(" where a.id = sub.id and  a.ND != b. nd and a.JG_ID!= b.JG_ID ");
-		sb.append(" and  a.zt = z.id ");
-		sb.append(" AND a.ywlx_dm = l.id  ");
-		sb.append(" and (a.zt=1 or a.zt = 3) ");
-		sb.append(" group by a.id ");
-		sb.append(" order by a.customer_id , a.nd desc ");
-		sb.append(" LIMIT ? , ? ");
+		sb.append(" LEFT JOIN zs_ywbb b ON (a.customer_id = b.customer_id AND a.YWLX_DM = b.YWLX_DM) ");
+		sb.append(" LEFT JOIN dm_hy AS hy ON a.hy_id = hy.id ");
+		sb.append(" LEFT JOIN dm_cs AS cs ON a.cs_dm = cs.id ");
+		sb.append(" LEFT JOIN dm_cs AS qx ON a.qx_dm = qx.id ");
+		sb.append(" WHERE a.id = sub.id AND a.ND != b. nd AND a.JG_ID != b. JG_ID AND a.zt = z. id AND a.ywlx_dm = l.id AND (a.zt= 1 OR a.zt = 3) ");
+		sb.append(" GROUP BY a.id ");
+		sb.append(" ORDER BY a.customer_id, a.nd DESC) t,( ");
+		sb.append(" SELECT @rownum:= 1) tmp_row, ( ");
+		sb.append(" SELECT @rowtype := '') tmp_type ");
+		sb.append(" HAVING row_number <= 2  ");
+		sb.append(" limit ?,? ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
