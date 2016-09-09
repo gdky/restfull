@@ -108,6 +108,7 @@ public class YwglController {
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
+	
 	/*
 	 * 客户端用业务报备查询
 	 */
