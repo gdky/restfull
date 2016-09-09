@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import gov.gdgs.zs.configuration.Config;
+import gov.gdgs.zs.service.SettingService;
 import gov.gdgs.zs.service.YwglService;
 
 import org.springframework.http.HttpStatus;
@@ -35,15 +36,15 @@ public class SettingController {
 	private SettingService settingService;
 	
 	/**
-	 * 获取有效的业务报备
+	 * 获取系统参数
 	 */
-	@RequestMapping(value = "/setting", method = RequestMethod.GET)
-	public  ResponseEntity<Map<String,Object>> getYwbb(
+	@RequestMapping(value = "/settings", method = RequestMethod.GET)
+	public  ResponseEntity<Map<String,Object>> getSettings(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pagesize,
-			@RequestParam(value="where", required=false) String where){ 
+			@RequestParam(value = "lx", required = true) String lx){ 
 
-		Map<String,Object> obj = settingService.getYwbb(page,pagesize,where);
+		Map<String,Object> obj = settingService.getSettings(lx,page,pagesize);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
@@ -52,11 +53,11 @@ public class SettingController {
 	/*
 	 * 修改业务报备信息
 	 */
-	@RequestMapping(value = "/setting/{id}", method = RequestMethod.PUT)
-	public  ResponseEntity<?> getYwbb(
+	@RequestMapping(value = "/settings", method = RequestMethod.PUT)
+	public  ResponseEntity<?> updateSetting(
 			@RequestBody Map<String,Object> map,
 			@PathVariable String id){ 
-		settingService.updateYwbb(id,map);
+		settingService.updateSetting(id,map);
 		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
 		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
