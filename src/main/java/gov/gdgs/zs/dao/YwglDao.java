@@ -296,6 +296,48 @@ public class YwglDao extends BaseJdbcDao {
 		return obj;
 	}
 	
+
+	public Map<String, Object> getYwbbWTFYJ(int page, int pagesize,
+			Condition condition) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT   SQL_CALC_FOUND_ROWS a.*, z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy, cs.mc AS cs,qx.mc AS qx ");
+		sb.append(" from (zs_ywbb a,dm_ywbb_zt z,dm_ywlx l, ");
+		// <=== 查询条件集合
+		sb.append(" ( " + condition.getSelectSql("zs_ywbb", "id"));
+		sb.append("    ORDER BY id) sub) ");
+		// ===> 插入查询条件集合结束
+		sb.append(" LEFT JOIN zs_ywbb b ON (a.customer_id = b.customer_id AND a.nd = b.nd) ");
+		sb.append(" LEFT JOIN dm_hy AS hy ON a.hy_id = hy.id ");
+		sb.append(" LEFT JOIN dm_cs AS cs ON a.cs_dm = cs.id ");
+		sb.append(" LEFT JOIN dm_cs AS qx ON a.qx_dm = qx.id ");
+		sb.append(" WHERE a.id = sub.id AND a.ywlx_dm != b.ywlx_dm AND a.JG_ID != b. JG_ID AND a.zt = z. id AND a.ywlx_dm = l.id AND (a.zt= 1 OR a.zt = 3) ");
+		sb.append(" GROUP BY a.id ");
+		sb.append(" ORDER BY a.customer_id, a.nd DESC ");
+		sb.append(" limit ?,? ");
+
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		ArrayList<Object> params = condition.getParams();
+		params.add(startIndex);
+		params.add(pagesize);
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),
+				params.toArray(), new YwbbRowMapper());
+
+		// 获取符合条件的记录数
+		String countSql = " SELECT FOUND_ROWS()";
+		int total = jdbcTemplate.queryForObject(countSql, Integer.class);
+
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+
+		return obj;
+	}
+	
 	
 	public class YwbbRowMapper implements RowMapper<Map<String, Object>> {
 
