@@ -36,15 +36,11 @@ public class SettingController {
 	private SettingService settingService;
 	
 	/**
-	 * 获取系统参数
+	 * 获取业务参数
 	 */
-	@RequestMapping(value = "/settings", method = RequestMethod.GET)
-	public  ResponseEntity<Map<String,Object>> getSettings(
-			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pagesize", required = true) int pagesize,
-			@RequestParam(value = "lx", required = true) String lx){ 
-
-		Map<String,Object> obj = settingService.getSettings(lx,page,pagesize);
+	@RequestMapping(value = "/ywsettings", method = RequestMethod.GET)
+	public  ResponseEntity<Map<String,Object>> getSettings(){ 
+		Map<String,Object> obj = settingService.getSettings("yw",0,100);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
 	
@@ -53,7 +49,7 @@ public class SettingController {
 	/*
 	 * 修改业务报备信息
 	 */
-	@RequestMapping(value = "/settings", method = RequestMethod.PUT)
+	@RequestMapping(value = "/settings/{id}", method = RequestMethod.PUT)
 	public  ResponseEntity<?> updateSetting(
 			@RequestBody Map<String,Object> map,
 			@PathVariable String id){ 
