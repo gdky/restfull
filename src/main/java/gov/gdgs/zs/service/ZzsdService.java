@@ -1,6 +1,7 @@
 package gov.gdgs.zs.service;
 
 import gov.gdgs.zs.dao.ZzsdDao;
+import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
 import java.util.ArrayList;
@@ -10,11 +11,14 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.dao.AuthDao;
+import com.gdky.restfull.entity.Role;
 import com.gdky.restfull.entity.User;
 
 @Service
@@ -24,8 +28,11 @@ public class ZzsdService {
 	@Resource
 	private ZzsdDao zzsdDao;
 
+	@Autowired
+	private AuthDao authDao;
 
-	public Map<String, Object> getJgZzsd(int page, int pagesize, String whereParam) {
+	public Map<String, Object> getJgZzsd(int page, int pagesize,
+			String whereParam) {
 		HashMap<String, Object> where = new HashMap<String, Object>();
 		if (whereParam != null) {
 			try {
@@ -44,19 +51,35 @@ public class ZzsdService {
 		condition.add("jsr_role", "EQUAL", where.get("jsr_role"));
 		condition.add("sdtime", "DATE_BETWEEN", where.get("sdtime"));
 		condition.add("jstime", "DATE_BETWEEN", where.get("jstime"));
-		
+
 		Map<String, Object> rs = zzsdDao.getJgZzsd(page, pagesize, condition);
 		return rs;
 	}
 
+	public void addJgZzsd(User user, String sdyy, List<Integer> jgId) {
+		String sdtime = Common.getCurrentTime2MysqlDateTime();
+		List<Role> role = authDao.getRolesByUser(user.getUsername());
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
 
-	public void addJgZzsd(User user, String sdyy, Integer[] jgId) {
-		List<Object[]> batchArgs  = new ArrayList<Object[]>();
-		
-		for (int i = 0 ; i < jgId.length; i++){
-			
+		for (int i = 0; i < jgId.size(); i++) {
+			Object[] arg = new Object[] { jgId.get(i), sdyy, user.getUsername(),
+					role.get(0), sdtime, 1 };
+			batchArgs.add(arg);
 		}
-		zzsdDao.addJgZzsd(user.getId(),)
-		
+		zzsdDao.addJgZzsd(batchArgs);
+
+	}
+
+	public void addJgZzsd(User user, String sdyy, Integer jgId) {
+		String sdtime = Common.getCurrentTime2MysqlDateTime();
+		List<Role> role = authDao.getRolesByUser(user.getUsername());
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
+
+		Object[] arg = new Object[] { jgId, sdyy, user.getUsername(),
+				role.get(0), sdtime, 1 };
+		batchArgs.add(arg);
+
+		zzsdDao.addJgZzsd(batchArgs);
+
 	}
 }

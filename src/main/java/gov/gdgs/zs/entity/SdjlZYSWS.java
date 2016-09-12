@@ -14,11 +14,11 @@ public class SdjlZYSWS implements Serializable {
 	private Integer id;
 	private Integer zyswsId;
 	private String sdyy;
-	private Integer sdrId;
-	private Integer sdrRole;
+	private String sdr;
+	private String sdrRole;
 	private Timestamp sdTime;
-	private Integer jsrId;
-	private Integer jsrRole;
+	private String jsr;
+	private String jsrRole;
 	private Timestamp jsTime;
 	private Boolean yxbz;
 	public Integer getId() {
@@ -27,22 +27,28 @@ public class SdjlZYSWS implements Serializable {
 	public void setId(Integer id) {
 		this.id = id;
 	}
+	public Integer getZyswsId() {
+		return zyswsId;
+	}
+	public void setZyswsId(Integer zyswsId) {
+		this.zyswsId = zyswsId;
+	}
 	public String getSdyy() {
 		return sdyy;
 	}
 	public void setSdyy(String sdyy) {
 		this.sdyy = sdyy;
 	}
-	public Integer getSdrId() {
-		return sdrId;
+	public String getSdr() {
+		return sdr;
 	}
-	public void setSdrId(Integer sdrId) {
-		this.sdrId = sdrId;
+	public void setSdr(String sdr) {
+		this.sdr = sdr;
 	}
-	public Integer getSdrRole() {
+	public String getSdrRole() {
 		return sdrRole;
 	}
-	public void setSdrRole(Integer sdrRole) {
+	public void setSdrRole(String sdrRole) {
 		this.sdrRole = sdrRole;
 	}
 	public Timestamp getSdTime() {
@@ -51,16 +57,16 @@ public class SdjlZYSWS implements Serializable {
 	public void setSdTime(Timestamp sdTime) {
 		this.sdTime = sdTime;
 	}
-	public Integer getJsrId() {
-		return jsrId;
+	public String getJsr() {
+		return jsr;
 	}
-	public void setJsrId(Integer jsrId) {
-		this.jsrId = jsrId;
+	public void setJsr(String jsr) {
+		this.jsr = jsr;
 	}
-	public Integer getJsrRole() {
+	public String getJsrRole() {
 		return jsrRole;
 	}
-	public void setJsrRole(Integer jsrRole) {
+	public void setJsrRole(String jsrRole) {
 		this.jsrRole = jsrRole;
 	}
 	public Timestamp getJsTime() {
@@ -75,10 +81,5 @@ public class SdjlZYSWS implements Serializable {
 	public void setYxbz(Boolean yxbz) {
 		this.yxbz = yxbz;
 	}
-	public Integer getZyswsId() {
-		return zyswsId;
-	}
-	public void setZyswsId(Integer zyswsId) {
-		this.zyswsId = zyswsId;
-	}
+	
 }

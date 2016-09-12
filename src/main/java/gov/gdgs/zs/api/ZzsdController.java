@@ -3,6 +3,7 @@ package gov.gdgs.zs.api;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.ZzsdService;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +58,9 @@ public class ZzsdController {
 			@RequestBody Map<String,Object> rqbody,
 			HttpServletRequest request){ 
 		User user =  accountService.getUserFromHeaderToken(request);
-		zzsdService.addJgZzsd(user,rqbody);
+		String sdyy = (String)rqbody.get("sdyy");
+		List<Integer> jgId = (List<Integer>) rqbody.get("jgId");
+		zzsdService.addJgZzsd(user,sdyy,jgId);
 		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
 		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
