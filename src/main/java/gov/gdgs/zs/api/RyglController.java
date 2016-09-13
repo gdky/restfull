@@ -1,5 +1,6 @@
 package gov.gdgs.zs.api;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -122,4 +123,12 @@ public class RyglController {
 		return new ResponseEntity<>(ryglService.zyglscdy(pn, ps, where),HttpStatus.OK);
 		
 	}	
+	@RequestMapping(value = "/swsrycx/zyglscdy/{rylx}", method = RequestMethod.GET )
+	public ResponseEntity<List<Map<String, Object>>> zyglscdy(
+			@RequestParam(value="where", required=true) String where,
+			@PathVariable(value = "rylx") int rylx,HttpServletRequest request)  {
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(ryglService.zyglscdy(rylx,where,user.getJgId()),HttpStatus.OK);
+		
+	}
 }

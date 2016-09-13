@@ -26,23 +26,34 @@ public class JDJCDao extends BaseDao{
 		condition.add("a.zjrq", Condition.GREATER_EQUAL, qury.get("sbsj"));
 		condition.add("a.zjrq", Condition.LESS_EQUAL, qury.get("sbsj2"));
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select  SQL_CALC_FOUND_ROWS  @rownum:=@rownum+1 AS 'key',v.* from ( SELECT ");
-		sb.append("		c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,");
-		sb.append("		case a.ztdm when 3 then '已年检' when 2 then '已自检'  "
-				+ " else null end as njzt, CASE a.WGCL_DM WHEN 1 THEN '年检予以通过' WHEN 2 THEN '年检不予通过，"
-				+ "责令2个月整改' WHEN 6 THEN '年检不予以通过' WHEN 7 THEN '资料填写有误，请重新填写' ELSE NULL END AS njcl,"
-				+ "DATE_FORMAT(a.zjsj,'%Y-%m-%d') AS zjrq,DATE_FORMAT(c.SWSZSCLSJ ,'%Y-%m-%d') AS clsj,"
-				+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
-		sb.append("	 FROM  zs_jg_njb a,zs_jg c,dm_jgxz d");
-		sb.append("		"+condition.getSql()+" ");
-		sb.append("	and a.ZSJG_ID = c.ID and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
-		sb.append("	group by a.zsjg_id,nd order by a.ND desc");
-		sb.append("	 ) as v ,(SELECT @rownum:=?) zs_jg");
+		sb.append("		SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',v.*,");
+		sb.append("		case v.ztdm when 3 then '已年检' when 2 then '已自检' else null end as njzt,");
+		sb.append("		 if(v.WGCL_DM is not null,(select b.CLMC from dm_jgwgcl b where b.ID=v.WGCL_DM),null)  as njcl,");
+		sb.append("		if((SELECT e.ID FROM zs_spzx e,zs_spxx f WHERE e.sjid=v.id AND e.ID=f.SPID limit 1),");
+		sb.append("		(SELECT CONCAT_WS(',', IF(f.SPSJ IS NULL,'',DATE_FORMAT(f.SPSJ,'%Y-%m-%d')), IF(f.SPYJ IS NULL,'',f.SPYJ), ");
+		sb.append("		IF(f.SPRNAME IS NULL,'',f.SPRNAME)) AS njcl");
+		sb.append("		FROM zs_spzx e,zs_spxx f");
+		sb.append("		WHERE e.sjid=v.id AND e.ID=f.SPID");
+		sb.append("		ORDER BY e.TJSJ DESC");
+		sb.append("		LIMIT 1),null");
+		sb.append("		) as spcl");
+		sb.append("		FROM (");
+		sb.append("		SELECT 		c.dwmc,c.JGZCH AS zsbh,d.mc AS jgxz,c.yzbm,c.DZHI AS bgdz,c.DHUA AS dhhm,a.*,");
+		sb.append("		  DATE_FORMAT(a.zjsj,'%Y-%m-%d') AS zjrq,");
+		sb.append("		DATE_FORMAT(c.SWSZSCLSJ,'%Y-%m-%d') AS clsj, ");
+		sb.append("		DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
+		sb.append("		FROM zs_jg_njb a,zs_jg c,dm_jgxz d");
+		sb.append(condition.getSql());
+		sb.append("		 AND a.ZSJG_ID = c.ID AND a.ztdm IN (2,3) AND d.ID = c.JGXZ_DM");
+		sb.append("		GROUP BY a.zsjg_id,nd");
+		sb.append("		ORDER BY a.ND DESC	");
 		sb.append("		    LIMIT ?, ? ");
+		sb.append("		) AS v,(");
+		sb.append("		SELECT @rownum:=?) zs_jg");
 		ArrayList<Object> params = condition.getParams();
 		params.add((pn-1)*ps);
-		params.add((pn-1)*ps);
 		params.add(ps);
+		params.add((pn-1)*ps);
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();

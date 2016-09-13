@@ -89,4 +89,7 @@ public class SwsService {
 		}
 		return obj;
 	}
+	public Object chilchenJG(Object pid){
+		return swsDao.chilchenJG(pid);
+	}
 }
