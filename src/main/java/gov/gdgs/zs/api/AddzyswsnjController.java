@@ -5,6 +5,8 @@
 package gov.gdgs.zs.api;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.AddzyswsnjService;
+import gov.gdgs.zs.service.IAddswsnjService;
+import gov.gdgs.zs.service.IAddzyswsnjService;
 
 import java.util.Map;
 
@@ -14,11 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.service.AccountService;
 @RestController
@@ -26,6 +30,8 @@ import com.gdky.restfull.service.AccountService;
 public class AddzyswsnjController {
 	@Resource 
 	AccountService accountService;
+	@Resource
+	 private IAddzyswsnjService iaddzyswsnjService;
 	@Resource 
 	private AddzyswsnjService addzyswsnjService;
 @RequestMapping(value = "/add/zyswsnj", method = RequestMethod.GET) 
@@ -47,5 +53,37 @@ public ResponseEntity<Map<String, Object>> getZyswsnjById(
 Map<String, Object> obj = addzyswsnjService.getzyswsnjbById(id);
 return new ResponseEntity<>(obj, HttpStatus.OK);
 }
+
+//执业税务师年检表增加
+@RequestMapping(value = "/addzyswsnjb", method = RequestMethod.POST)
+	public ResponseEntity<Map<String,Object>> addSwsnjb(@RequestBody  Map<String ,Object> obj,HttpServletRequest request)
+	throws Exception{
+		 try{
+			 User user =  accountService.getUserFromHeaderToken(request);
+			 obj.put("use_id",user.getId());
+			 obj.put("jg_id", user.getJgId());
+		 }catch (Exception e){	 
+		 }
+		Map<String,Object> rs = iaddzyswsnjService.addZyswsnjb(obj);
+		return new ResponseEntity<>(rs,HttpStatus.CREATED);
+	}
+//更新执业税务师年检表
+@RequestMapping(value = "/addzyswsnjb/{id}", method = RequestMethod.PUT)
+	public ResponseEntity<ResponseMessage> updateZyswsnjb(@PathVariable("id") String id,
+			@RequestBody Map <String,Object> obj,HttpServletRequest request) 
+			throws Exception{
+		try{
+			 User user =  accountService.getUserFromHeaderToken(request);
+			 obj.put("use_id",user.getId());
+			 obj.put("jg_id", user.getJgId());
+		 }catch (Exception e){	 
+		 }
+		
+		addzyswsnjService.updateZyswsnjb(obj);
+		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
+
+	}
+
+
 }
 

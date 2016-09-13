@@ -36,7 +36,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao{
 				+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
 		sb.append("	 FROM  zs_jg_njb a,zs_jg c,dm_jgxz d");
 		sb.append("		"+condition.getSql()+" ");
-		sb.append("	and a.ZSJG_ID=c.ID and a.ZSJG_ID=? and a.ztdm in (1,2,3)  and d.ID = c.JGXZ_DM");
+		sb.append("	and a.ZSJG_ID=c.ID and a.ZSJG_ID=? and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
 		sb.append("	group by a.zsjg_id,nd order by a.ND desc");
 		sb.append("	 ) as v ,(SELECT @rownum:=?) zs_jg");
 		sb.append("		LIMIT ? ,?");
@@ -68,6 +68,8 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao{
 		
 		
 }
+	
+	
 	public Map<String, Object> getswsnjbById(String id) {
 		String sql="select c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,"
 				+ "case a.ztdm when 3 then '已年检' when 2 then '已自检'else null end as njzt,"

@@ -7,11 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.gdky.restfull.dao.BaseJdbcDao;
+
 @Repository
-public class AddzyswsnjDao extends BaseDao {
+public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao{
 
 	//执业税务师年检
     public Map<String, Object> getZyswsnjb(int page, int pageSize,int Jgid,
@@ -91,5 +95,43 @@ public class AddzyswsnjDao extends BaseDao {
 		 
 		 return rs;
 	}
-	
+    @Override
+	public String addZyswsnjb( Map <String,Object> obj){
+		String uuid = UUID.randomUUID().toString().replace("-", "");
+		obj.put("id", uuid);
+//		String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
+//		String xz =this.jdbcTemplate.queryForObject(sql,new Object[]{obj.get("jg_id")},String.class);
+//		obj.put("xz", xz);
+		final StringBuffer sb = new StringBuffer("insert into "
+				+ Config.PROJECT_SCHEMA + "zs_zcswsnj");
+		sb.append(" ( ZSJG_ID, ND,ZSJGXZ_ID,ZJWGDM, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,  ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ZJSJ,ztdm,GDBDQKZJ,GDBDQKJS,FZRSJ) "
+				+ "VALUES (:jg_id,:nd,:xz,:wg,:NJZJ, :sz, :zczj, :zrs, :zyrs, :yjyrs, :sjjyrs, :wjyrs, :ZJ, :FZR, :ZCSWSBZJ,:ZCSWSBJS,:BAFS,:FSS,now(),now(),:ztbj,:GDBDQKZJ,:GDBDQKJS,:qzrq ) ");
+		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+		int count=named.update(sb.toString(), obj);
+		
+		if(count==0){
+		return null;
+	}else {
+		return uuid;
+	}
+		//更新事务所年检表
+	}
+    @Override
+	public void updateZyswsnjb(Map <String,Object> obj) {
+		String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
+		String xz =this.jdbcTemplate.queryForObject(sql,new Object[]{obj.get("jg_id")},String.class);
+		obj.put("xz", xz);
+		StringBuffer sb = new StringBuffer("update "
+				+ Config.PROJECT_SCHEMA + "zs_jg_njb ");
+		
+		sb.append(" set ZSJG_ID=:jg_id,ZSJGXZ_ID=:xz,ND =:nd,ZJWGDM=:wg,NJZJ=:NJZJ,GDBDQKZJ=:GDBDQKZJ,"
+				+ "GDBDQKJS=:GDBDQKJS,ZRS=:ZRS,ZYRS=:zyrs,YJYRS=:yjyrs,SJJYRS=:sjjyrs, "
+				+ "WJYRS=:wjyrs,ZJ=:ZJ,FZR=:FZR,ZCSWSBZJ=:ZCSWSBZJ, "
+				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS,"
+				+ "ztdm='2'where id=:id ");
+		
+		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+		named.update(sb.toString(), obj);
+		
+	}  
 }
