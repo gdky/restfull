@@ -307,7 +307,11 @@ public class SWSDao extends BaseDao{
 		ob.put("page", meta);
 		return ob;
 	}
-	
+	/**
+	 * 添加机构
+	 * @param jgtj
+	 * @return
+	 */
 	public Object insertjg(Map<String, Object> jgtj){
 		if(this.jdbcTemplate.queryForList("select id from zs_jg where dwmc=? ",jgtj.get("dwmc")).size()!=0){
 			return null;
@@ -324,5 +328,23 @@ public class SWSDao extends BaseDao{
 		}
 		String sql ="insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,SBCLSJ,YXBZ) values(?,?,5,5,sysdate(),0)";
 		return this.insertAndGetKeyByJdbc(sql,new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
+	}
+	/**
+	 * 当前用户分所
+	 * @param pid
+	 * @return
+	 */
+	public List<Map<String, Object>> chilchenJG(Object pid){
+		return this.jdbcTemplate.query("select ID,DWMC from zs_jg where PARENTJGID=? and jgzt_dm=11",new Object[]{pid},
+				new RowMapper<Map<String,Object>>() {
+					public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+						Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+						String id = hashids.encode(rs.getLong("id"));
+						Map<String,Object> map = new HashMap<String,Object>();
+						map.put("ID", id);
+						map.put("DWMC", rs.getObject("DWMC"));
+						return map;
+					}
+				});
 	}
 }

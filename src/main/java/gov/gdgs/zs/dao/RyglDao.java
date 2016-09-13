@@ -20,6 +20,9 @@ import java.util.Map;
 
 
 
+
+import javax.management.Query;
+
 import org.hashids.Hashids;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -521,7 +524,7 @@ public class RyglDao extends BaseDao{
 		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.id as zyswsid, b.id,b.xming,d.mc as xb,b.sfzh,a.zyzsbh,e.mc as cs,f.mc as xl,g.mc as zw,c.mc as ryzt, ");
 		sb.append("		a.ryspgczt_dm from zs_zysws a,zs_ryjbxx b,dm_ryspgczt c,dm_xb d,dm_cs e,dm_xl f,dm_zw g,(select @rownum:=?) zs_ry  ");
 		sb.append(condition.getSql());
-		sb.append("		and  a.JG_ID=? and b.ID=a.ry_id and c.ID=a.RYSPGCZT_DM and ZYZT_DM in (1,2,3)");
+		sb.append("		and  a.JG_ID=? and b.ID=a.ry_id and c.ID=a.RYSPGCZT_DM and ZYZT_DM in (1,3)");
 		sb.append("		and b.XB_DM=d.ID and b.CS_DM=e.ID and f.ID=b.XL_DM and a.ZW_DM=g.ID");
 		if(qury.containsKey("sorder")){
 			Boolean asc = qury.get("sorder").toString().equals("ascend");
@@ -950,6 +953,45 @@ public class RyglDao extends BaseDao{
 		ob.put("page", meta);
 		
 		return ob;
+	}
+	/**
+	 * 人员调入
+	 * @param rylx
+	 * @param qury
+	 * @return
+	 */
+	public List<Map<String,Object>> zyglscdy(int rylx,Map<String, Object> qury,int pJgid) {
+		StringBuffer sb = new StringBuffer();
+		switch(rylx){
+		case 1:
+			sb.append("		SELECT b.XMING as '执业税务师姓名：',b.SFZH as '身份证号：',d.MC as '性别：',e.MC as '学历：',a.ZYZSBH as '证书编号：',a.id");
+			sb.append("		FROM zs_zysws a,zs_ryjbxx b,dm_xb d,dm_xl e");
+			sb.append("		WHERE a.RY_ID=b.ID AND a.ZYZT_DM=1 AND a.JG_ID=-2 AND b.XB_DM=d.ID AND b.XL_DM=e.ID and a.RYSPGCZT_DM=1 and a.ZYZSBH=? and b.sfzh=?");
+			break;
+		case 2:
+			sb.append("		SELECT b.XMING as '从业人员姓名：',b.SFZH as '身份证号：',d.MC as '性别：',e.MC as '学历：',a.id");
+			sb.append("		FROM zs_cyry a,zs_ryjbxx b,dm_xb d,dm_xl e");
+			sb.append("		WHERE a.RY_ID=b.ID AND a.CYRYZT_DM=1 AND a.JG_ID=-2 AND b.XB_DM=d.ID AND b.XL_DM=e.ID and b.xming=? and b.sfzh=?");
+			break;
+		case 3:
+			sb.append("		SELECT b.XMING as '执业税务师姓名：',b.SFZH as '身份证号：',d.MC as '性别：',e.MC as '学历：',a.ZYZSBH as '证书编号：',a.id");
+			sb.append("		FROM zs_zysws a,zs_ryjbxx b,dm_xb d,dm_xl e");
+			sb.append("		WHERE a.RY_ID=b.ID AND a.ZYZT_DM=1 AND a.JG_ID in (select id from zs_jg where PARENTJGID='"+pJgid+"' and JGZT_DM=11)");
+			sb.append("		 AND b.XB_DM=d.ID AND b.XL_DM=e.ID and a.RYSPGCZT_DM=1 and a.ZYZSBH=? and b.sfzh=?");
+			break;
+		case 4:
+			sb.append("		SELECT b.XMING as '从业人员姓名：',b.SFZH as '身份证号：',d.MC as '性别：',e.MC as '学历：',a.id");
+			sb.append("		FROM zs_cyry a,zs_ryjbxx b,dm_xb d,dm_xl e");
+			sb.append("		WHERE a.RY_ID=b.ID AND a.CYRYZT_DM=1 AND a.JG_ID in (select id from zs_jg where PARENTJGID='"+pJgid+"' and JGZT_DM=11)");
+			sb.append("		 AND b.XB_DM=d.ID AND b.XL_DM=e.ID and b.xming=? and b.sfzh=?");
+			break;
+		case 5:
+			sb.append("		SELECT b.XMING as '非执业税务师姓名：',b.SFZH as '身份证号：',d.MC as '性别：',e.MC as '学历：',a.FZYZCZSBH as '非执业注册证书编号：',a.id,");
+			sb.append("		a.ZZDW as '工作单位：' FROM zs_fzysws a,zs_ryjbxx b,dm_xb d,dm_xl e");
+			sb.append("		WHERE a.RY_ID=b.ID AND a.FZYZT_DM=1 AND b.XB_DM=d.ID AND b.XL_DM=e.ID and a.RYSPGCZT_DM=1 and a.FZYZCZSBH=? and b.sfzh=?");
+			break;
+		}
+		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{qury.get("xming"),qury.get("sfzh")});
 	}
 }
 
