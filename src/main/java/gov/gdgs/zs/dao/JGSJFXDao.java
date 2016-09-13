@@ -3,6 +3,7 @@
  */
 package gov.gdgs.zs.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,301 +18,106 @@ public class JGSJFXDao extends BaseDao {
 	 */
 	public Map<String, Object> getHyxlsjfxb(int page, int pageSize,
 			HashMap<String, Object> map){
-		StringBuffer sb = new StringBuffer();
-		sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1,t.*");
-		sb.append("  from(select date_format(now(),'%Y') as nd, ");
-		sb.append("  cs.ID, ");
-		sb.append("        cs.PARENT_ID, ");
-		sb.append("        cs.mc, ");
-		sb.append("        ifnull((select count(id) from zs_ryjbxx where yxbz = '1'),0) zrs,  ");
-		sb.append("        ifnull((select count(id) ");
-		sb.append("           from zs_ryjbxx ");
-		sb.append("          where yxbz = '1' ");
-		sb.append("            and xl_dm in ('4', '5')),0) yjs_zrs,  ");
-		sb.append("       ifnull( (select count(id) ");
-		sb.append("           from zs_ryjbxx ");
-		sb.append("          where yxbz = '1' ");
-		sb.append("            and xl_dm = '1') ,0)bk_zrs,  ");
-		sb.append("       ifnull( (select count(id) ");
-		sb.append("           from zs_ryjbxx ");
-		sb.append("          where yxbz = '1' ");
-		sb.append("            and xl_dm = '2'),0) dz_zrs,  ");
-		sb.append("       ifnull( (select count(id) ");
-		sb.append("           from zs_ryjbxx ");
-		sb.append("          where yxbz = '1' ");
-		sb.append("            and xl_dm in ('6', '3')),0) gz_zrs,  ");
-		sb.append("         ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1'),0) zy_zrs,  ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm in ('4', '5')),0) zy_yjs_zrs,  ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm = '1'),0) zy_bk_zrs, ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm = '2'),0) zy_dz_zrs, ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm in ('6', '3')),0) zy_gz_zrs,  ");
-		sb.append("         ");
-		sb.append("       ifnull( (select count(zy.id) ");
-		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1'),0) fzy_zrs, ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm in ('4', '5')) ,0)fzy_yjs_zrs,  ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm = '1'),0) fzy_bk_zrs,");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm = '2'),0) fzy_dz_zrs, ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm in ('6', '3')) ,0)fzy_gz_zrs,");
-		sb.append("         ");
-		sb.append("       ifnull( (select count(zy.id) ");
-		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1') ,0)cy_zrs,");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm in ('4', '5')),0) cy_yjs_zrs,  ");
-		sb.append("        ifnull((select count(zy.id) ");
-		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm = '1'),0) cy_bk_zrs, ");
-		sb.append("       ifnull( (select count(zy.id) ");
-		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm = '2'),0) cy_dz_zrs,    ");
-		sb.append("       ifnull( (select count(zy.id) ");
-		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
-		sb.append("          where zy.ry_id = jb.id ");
-		sb.append("            and jb.yxbz = '1' ");
-		sb.append("            and jb.xl_dm in ('6', '3')),0) cy_gz_zrs      ");
-		sb.append("   from dm_cs cs ");
-		sb.append("  where cs.parent_id is null ");
-		sb.append(" union all ");
-		sb.append("  ");
-		sb.append(" select date_format(now(),'%Y') as nd, ");
-		sb.append("  cs.ID, ");
-		
-		sb.append("        cs.PARENT_ID, ");
-		sb.append("        cs.mc, ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0'  is not null then ");
-		sb.append("            1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null then ");
-		sb.append("           1 ");
-		sb.append("          else 0 ");
-		sb.append("        end),0) zrs, ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm in ('4', '5') then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and ");
-		sb.append("               xl_dm in ('4', '5') then ");
-		sb.append("            1 ");
-		sb.append("           else 0 ");
-		sb.append("        end),0), ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm = '1' then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and xl_dm = '1' then ");
-		sb.append("           1 ");
-		sb.append("          else 0 ");
-		sb.append("        end),0), ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm = '2' then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and xl_dm = '2' then ");
-		sb.append("           1 ");
-		sb.append("          else 0 ");
-		sb.append("        end),0), ");
-		sb.append("       ifnull( sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm in ('6', '3') then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and ");
-		sb.append("               xl_dm in ('6', '3') then ");
-		sb.append("           1 ");
-		sb.append("          else 0 ");
-		sb.append("        end),0), ");
-		sb.append("         ");
-		
-		sb.append("       ifnull(sum( case ");
-		sb.append("          when parent_id = '0' and id_2 is not null then ");
-		sb.append("          1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and id_2 is not null then ");
-		sb.append("           1 ");
-		sb.append("        end),0) zrs, ");
-		sb.append("       ifnull(sum( case ");
-		sb.append("          when parent_id = '0' and id_2 is not null and xl_dm in ('4', '5') then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and ");
-		sb.append("               xl_dm in ('4', '5') and id_2 is not null then ");
-		sb.append("          1 ");
-		sb.append("          else 0 ");
-		sb.append("        end),0), ");
-		sb.append("       ifnull(sum( case ");
-		sb.append("          when parent_id = '0' and xl_dm = '1' and id_2 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and xl_dm = '1' and id_2 is not null then ");
-		sb.append("           1 ");
-		sb.append("         else 0 ");
-		sb.append("        end),0), ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm = '2' and id_2 is not null then ");
-		sb.append("          1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and xl_dm = '2' and id_2 is not null then ");
-		sb.append("          1 ");
-		sb.append("          else 0 ");
-		sb.append("        end),0), ");
-		sb.append("       ifnull( sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm in ('6', '3') and id_2 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null  and id_2 is not null and ");
-		sb.append("               xl_dm in ('6', '3') then ");
-		sb.append("          1 ");
-		sb.append("          else 0 ");
-		sb.append("        end),0), ");
-		sb.append("         ");
-		sb.append("       ifnull( sum(case ");
-		sb.append("          when parent_id = '0' and id_3 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and id_3 is not null then ");
-		sb.append("          1 ");
-		sb.append("          else 0 ");
-		sb.append("        end),0) zrs, ");
-		sb.append("       ifnull( sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm in ('4', '5') and id_3 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and id_3 is not null and ");
-		sb.append("               xl_dm in ('4', '5') then ");
-		sb.append("           1 ");
-		sb.append("           else 0 ");
-		sb.append("        end),0), ");
-		sb.append("       ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm = '1' and id_3 is not null then ");
-		sb.append("          1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and xl_dm = '1' and id_3 is not null then ");
-		sb.append("           1 ");
-		sb.append("        end),0), ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm = '2' and id_3 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and xl_dm = '2'  and id_3 is not null then ");
-		sb.append("           1 ");
-		sb.append("           else 0 ");
-		sb.append("        end),0), ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm in ('6', '3') and id_3 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and id_3 is not null and ");
-		sb.append("               xl_dm in ('6', '3') then ");
-		sb.append("           1 ");
-		sb.append("           else 0 ");
-		sb.append("        end),0), ");
-		sb.append("         ");
-		sb.append("        ");
-		sb.append("       ifnull( sum(case ");
-		sb.append("          when parent_id = '0' and id_4 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and  id_4 is not null then ");
-		sb.append("           1 ");
-		sb.append("           else 0 ");
-		sb.append("        end) ,0)zrs, ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm in ('4', '5') and  id_4 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and id_4 is not null and ");
-		sb.append("               xl_dm in ('4', '5') then ");
-		sb.append("           1 ");
-		sb.append("           else 0 ");
-		sb.append("        end),0), ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm = '1'and  id_4 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and  id_4 is not null and xl_dm = '1' then ");
-		sb.append("           1 ");
-		sb.append("           else 0 ");
-		sb.append("        end),0), ");
-		sb.append("        ifnull(sum(case ");
-		sb.append("          when parent_id = '0' and xl_dm = '2' and  id_4 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and xl_dm = '2' and  id_4 is not null then ");
-		sb.append("           1 ");
-		sb.append("           else 0 ");
-		sb.append("        end),0), ");
-		sb.append("       ifnull(sum( case ");
-		sb.append("          when parent_id = '0' and xl_dm in ('6', '3') and  id_4 is not null then ");
-		sb.append("           1 ");
-		sb.append("          when parent_id <> '0' and parent_id is not null and  id_4 is not null and ");
-		sb.append("               xl_dm in ('6', '3') then ");
-		sb.append("           1 ");
-		sb.append("           else 0 ");
-		sb.append("        end),0) ");
-		sb.append("  ");
-		sb.append("   from (select jb.id    id_1, ");
-		sb.append("                zy.id    id_2, ");
-		sb.append("                fz.id    id_3, ");
-		sb.append("                cy.id    id_4, ");
-		sb.append("                jb.xl_dm, ");
-		sb.append("                jb.cs_dm ");
-		sb.append("           from zs_ryjbxx jb ");
-		sb.append("           left join zs_zysws zy ");
-		sb.append("             on jb.id = zy.ry_id ");
-		sb.append("           left join zs_fzysws fz ");
-		sb.append("             on jb.id = fz.ry_id ");
-		sb.append("           left join zs_cyry cy ");
-		sb.append("             on jb.id = cy.ry_id ");
-		sb.append("          where jb.yxbz = '1') jg ");
-		sb.append("  right join dm_cs cs ");
-		sb.append("     on jg.CS_DM = cs.id ");
-		sb.append("  where cs.parent_id is not null ");
-		sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc )as t");
-		sb.append("    ");
-	//StringBuffer sqlCount = new StringBuffer(" select count(*) from( ");
-	//sqlCount.append(sb).append(" )t ");
-	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString());
-	//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(),new Object[]{nd,nd}, int.class);
-	
-   int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", Integer.class);
-	Map<String, Object> obj = new HashMap<String, Object>();
-	
-	
-	obj.put("data", ls);
-	obj.put("total", total);
-	//obj.put("pageSize", 1);
-	//obj.put("current", 1);
-
-	return obj;
+		List<Map<String, Object>> ls=this.getHyxlsj(null);
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		for(int i=0;i<ls.size();i++){
+			this.getHyxlsjfxbTree(ls.get(i));
+		}
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		return obj;
 	
 	}
+	
+	/**
+	 * 递归树
+	 * @param parent
+	 */
+	private void getHyxlsjfxbTree(Map parent){
+		Integer id=((Number) parent.get("cs_dm")).intValue();
+		String idStr=id.toString();
+		List<Map<String,Object>> children=this.getHyxlsj(idStr);
+		for(int i=0;i<children.size();i++){
+			this.getHyxlsjfxbTree(children.get(i));
+		}
+		if(children.size()>0)
+		parent.put("children", children);
+	}
+	
+	/**
+	 * 数据查询
+	 * @param pid
+	 * @return
+	 */
+	private List<Map<String,Object>> getHyxlsj(String pid){
+		List<Map<String, Object>> ls=new ArrayList<>();
+		if(null==pid){
+			StringBuffer sql=new StringBuffer(" select c.mc, ");
+			sql.append("        t.nd, ");
+			sql.append("        t.cs_dm, ");
+			sql.append("        t.cs_dm ID, ");
+			sql.append("        t.yjs_zrs, ");
+			sql.append("        t.bk_zrs, ");
+			sql.append("        t.dz_zrs, ");
+			sql.append("        t.gz_zrs, ");
+			sql.append("        t.zrs, ");
+			sql.append("        t.zy_yjs_zrs, ");
+			sql.append("        t.zy_bk_zrs, ");
+			sql.append("        t.zy_dz_zrs, ");
+			sql.append("        t.zy_gz_zrs, ");
+			sql.append("        t.zy_zrs, ");
+			sql.append("        t.fzy_yjs_zrs, ");
+			sql.append("        t.fzy_bk_zrs, ");
+			sql.append("        t.fzy_dz_zrs, ");
+			sql.append("        t.fzy_gz_zrs, ");
+			sql.append("        t.fzy_zrs, ");
+			sql.append("        t.cy_yjs_zrs, ");
+			sql.append("        t.cy_bk_zrs, ");
+			sql.append("        t.cy_dz_zrs, ");
+			sql.append("        t.cy_gz_zrs, ");
+			sql.append("        t.cy_zrs, ");
+			sql.append("        t.gxsj ");
+			sql.append("   from zs_hyxlsjfxb_jg t, dm_cs c ");
+			sql.append("  where t.cs_dm = c.ID ");
+			sql.append("    and c.PARENT_ID is null ");
+			ls=jdbcTemplate.queryForList(sql.toString());
+		}else{
+			StringBuffer sql=new StringBuffer(" select c.mc, ");
+			sql.append("        t.nd, ");
+			sql.append("        t.cs_dm, ");
+			sql.append("        t.cs_dm ID, ");
+			sql.append("        t.yjs_zrs, ");
+			sql.append("        t.bk_zrs, ");
+			sql.append("        t.dz_zrs, ");
+			sql.append("        t.gz_zrs, ");
+			sql.append("        t.zrs, ");
+			sql.append("        t.zy_yjs_zrs, ");
+			sql.append("        t.zy_bk_zrs, ");
+			sql.append("        t.zy_dz_zrs, ");
+			sql.append("        t.zy_gz_zrs, ");
+			sql.append("        t.zy_zrs, ");
+			sql.append("        t.fzy_yjs_zrs, ");
+			sql.append("        t.fzy_bk_zrs, ");
+			sql.append("        t.fzy_dz_zrs, ");
+			sql.append("        t.fzy_gz_zrs, ");
+			sql.append("        t.fzy_zrs, ");
+			sql.append("        t.cy_yjs_zrs, ");
+			sql.append("        t.cy_bk_zrs, ");
+			sql.append("        t.cy_dz_zrs, ");
+			sql.append("        t.cy_gz_zrs, ");
+			sql.append("        t.cy_zrs, ");
+			sql.append("        t.gxsj ");
+			sql.append("   from zs_hyxlsjfxb_jg t, dm_cs c ");
+			sql.append("  where t.cs_dm = c.ID ");
+			sql.append("    and c.PARENT_ID = ? ");
+			sql.append(" 	order by c.ID ");
+			ls=jdbcTemplate.queryForList(sql.toString(),pid);
+		}
+		return ls;
+	}
+	
+	
 /*
  * 资金规模数据分析
  */

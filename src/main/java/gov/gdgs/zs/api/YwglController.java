@@ -59,6 +59,32 @@ public class YwglController {
 		Map<String,Object> obj = ywglService.getYwbbSFJEYJ(page,pagesize,where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
+	
+	/**
+	 * 获取年度不同预警的业务报备列表
+	 */
+	@RequestMapping(value = "/ywbbndbtyj", method = RequestMethod.GET)
+	public  ResponseEntity<?> getYwbbNDBTYJ(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value="where", required=false) String where){ 
+
+		Map<String,Object> obj = ywglService.getYwbbNDBTYJ(page,pagesize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
+	
+	/**
+	 * 获取业务委托方变更预警列表
+	 */
+	@RequestMapping(value = "/ywbbwtfyj", method = RequestMethod.GET)
+	public  ResponseEntity<Map<String,Object>> getYwbbWTFYJ(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value="where", required=false) String where){ 
+
+		Map<String,Object> obj = ywglService.getYwbbWTFYJ(page,pagesize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
 
 	/*
 	 * 修改业务报备信息
@@ -81,6 +107,7 @@ public class YwglController {
 		Map<String,Object> obj = ywglService.getYwbbById(hash);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
+	
 	
 	/*
 	 * 客户端用业务报备查询
