@@ -106,14 +106,22 @@ public class SPservice {
 			this.spDao.zyswsbgsq(sqxm);break;
 		case"zyzjsq"://执业转籍申请
 			this.spDao.zyzjsq(sqxm);break;
-		case"zyzfzysq"://执业注销申请
+		case"zyzfzysq"://执业转非执业申请
 			this.spDao.zyzfzysq(sqxm);break;
 		case"zyzxsq"://执业注销申请
 			this.spDao.zyzxsq(sqxm);break;
+		case"zyzcsq"://执业转出申请
+			this.spDao.zyzcsq(sqxm);break;
+		case"zyzssq"://执业转所申请
+			this.spDao.zyzssq(sqxm);break;
+		case"zydrsq"://执业转入申请
+			this.spDao.zydrsq(sqxm);break;
 		case"fzyswsbasq"://非执业备案申请
 			this.spDao.fzyswsba(sqxm);break;
 		case"fzyswszjsq"://非执业转籍申请
 			this.spDao.fzyzjsq(sqxm);break;
+		case"fzyzzysq"://非执业转执业申请
+			this.spDao.fzyzzysq(sqxm);break;
 		}
 	}
 	/**
@@ -125,7 +133,15 @@ public class SPservice {
 	public void fspsq(Map<String,Object> ptxm,String splx)throws Exception {
 		 switch (splx) {
 			case "jgbgsq":
-		 this.spDao.updatePTXM(ptxm);
+				this.spDao.updatePTXM(ptxm);
+			case "zyzrfs":
+				this.spDao.zyzrfssq(ptxm);
+			case "cydrsq":
+				this.spDao.cydrsq(ptxm);
+			case "zydrzssq":
+				this.spDao.zydrzssq(ptxm);
+			case "cydrzssq":
+				this.spDao.cydrzssq(ptxm);
 		 }
 	}
 

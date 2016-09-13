@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.gdky.restfull.configuration.Constants;
 import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.entity.User;
+import com.gdky.restfull.service.AccountService;
 import com.gdky.restfull.service.AuthService;
 
 @RestController
@@ -31,6 +32,8 @@ public class SWSCXController {
 	private SwsService swsService;
 	@Autowired
 	  private AuthService authService;
+	@Resource
+	AccountService accountService;
 
 	@RequestMapping(value = "/jgs", method = { RequestMethod.GET })
 	public ResponseEntity<Map<String, Object>> swscx(
@@ -79,5 +82,11 @@ public class SWSCXController {
 			authService.addRoleUser(4,authService.addUsers(jgtj));
 		}
 		return new ResponseEntity<>(true,HttpStatus.CREATED);
+	}
+	@RequestMapping(value = "/jg/jgchild", method = { RequestMethod.GET })
+	public ResponseEntity<?> chilchenJG(
+			HttpServletRequest request)  {
+		return new ResponseEntity<>(swsService.chilchenJG(accountService.getUserFromHeaderToken(request).getJgId().toString()),HttpStatus.OK);
+		
 	}
 }

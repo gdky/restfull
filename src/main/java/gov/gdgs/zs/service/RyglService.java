@@ -1,6 +1,7 @@
 package gov.gdgs.zs.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import gov.gdgs.zs.configuration.Config;
@@ -183,5 +184,20 @@ public class RyglService {
 			}
 		}
 		return ryglDao.zyglscdy(pn,ps,map);
+	}
+	public List<Map<String,Object>> zyglscdy(int rylx,String where,int pJgid) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ryglDao.zyglscdy(rylx,map,pJgid);
 	}
 }
