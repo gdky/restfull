@@ -66,7 +66,7 @@ public class ZzsdService {
 	 * @param sdyy 锁定原因
 	 * @param jgId 一组机构id
 	 */
-	public void addJgZzsd(User user, String sdyy, List<String> jgId) {
+	public void addJgZzsd(User user, String sdyy, List<String> jgId,Integer lx) {
 		String sdtime = Common.getCurrentTime2MysqlDateTime();
 		List<Role> role = authDao.getRolesByUser(user.getUsername());
 		String roleName = role.get(0).getDescription();
@@ -75,7 +75,7 @@ public class ZzsdService {
 		for (int i = 0; i < jgId.size(); i++) {
 			Long jid =  HashIdUtil.decode(jgId.get(i));
 			Object[] arg = new Object[] { jid, sdyy, user.getUsername(),
-					roleName, sdtime, 1 };
+					roleName, sdtime,lx, 1 };
 			batchArgs.add(arg);
 		}
 		zzsdDao.addJgZzsd(batchArgs);
@@ -88,14 +88,14 @@ public class ZzsdService {
 	 * @param sdyy 锁定原因
 	 * @param jgId 机构id
 	 */
-	public void addJgZzsd(User user, String sdyy, Integer jgId) {
+	public void addJgZzsd(User user, String sdyy, Integer jgId, Integer lx) {
 		String sdtime = Common.getCurrentTime2MysqlDateTime();
 		List<Role> role = authDao.getRolesByUser(user.getUsername());
 		String roleName = role.get(0).getDescription();
 		List<Object[]> batchArgs = new ArrayList<Object[]>();
 
 		Object[] arg = new Object[] { jgId, sdyy, user.getUsername(),
-				roleName, sdtime, 1 };
+				roleName, sdtime, lx, 1 };
 		batchArgs.add(arg);
 
 		zzsdDao.addJgZzsd(batchArgs);
