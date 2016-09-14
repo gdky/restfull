@@ -63,8 +63,8 @@ public class ZzsdDao extends BaseDao {
 
 	public void addJgZzsd(List<Object[]>batchArgs) {
 		StringBuffer sb =  new StringBuffer();
-		sb.append(" insert into zs_sdjl_jg (jg_id,sdyy,sdr,sdr_role,sdtime,yxbz) ");
-		sb.append(" values(?,?,?,?,?,?) ");
+		sb.append(" insert into zs_sdjl_jg (jg_id,sdyy,sdr,sdr_role,sdtime,lx,yxbz) ");
+		sb.append(" values(?,?,?,?,?,?,?) ");
 		this.jdbcTemplate.batchUpdate(sb.toString(), batchArgs);
 		
 	}
