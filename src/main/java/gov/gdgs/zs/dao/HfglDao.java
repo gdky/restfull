@@ -1,10 +1,13 @@
 package gov.gdgs.zs.dao;
 
+import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,6 +23,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.hashids.Hashids;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,7 +60,7 @@ public class HfglDao extends BaseDao{
 		params.add((pn-1)*ps);
 		params.add(ps);
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select  SQL_CALC_FOUND_ROWS g.* from (select   @rownum:=@rownum+1 as 'key',b.dwmc,'"+lyear+"' as nd,");
+		sb.append("		select  SQL_CALC_FOUND_ROWS g.* from (select   @rownum:=@rownum+1 as 'key',b.dwmc,'"+lyear+"' as nd,b.id,");
 		sb.append("		(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
 		sb.append("		f_yjtt(b.id, '"+lyear+"')+");
 		sb.append("		(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ) as yjz,");
@@ -102,7 +107,7 @@ public class HfglDao extends BaseDao{
 		}
 		sb.append("		    LIMIT ?, ? ");
 		sb.append("		union");
-		sb.append("		select  '' as 'key','当前页统计：' as dwmc,h.nd,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
+		sb.append("		select  '' as 'key','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
 		sb.append("		sum(h.yftt) as yftt,sum(h.qjtt) as qjtt,sum(h.yjgr) as yjgr,sum(h.yfgr) as yfgr,");
 		sb.append("		sum(h.qjgr) as qjgr from (select   b.dwmc,'"+lyear+"' as nd,");
 		sb.append("			(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
@@ -119,7 +124,27 @@ public class HfglDao extends BaseDao{
 		sb.append("					c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ),b.id,'"+lyear+"') as qjgr ");
 		sb.append("			from zs_jg b");
 		sb.append("		"+condition.getSql()+"	and b.yxbz=1 LIMIT ?, ? ) h ");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		List<Map<String,Object>> ls = this.jdbcTemplate.query(sb.toString(),params.toArray(),
+				new RowMapper<Map<String,Object>>() {
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				String id = hashids.encode(rs.getLong("id"));
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("jgid", id);
+				map.put("dwmc", rs.getObject("dwmc"));
+				map.put("jyzsr", rs.getObject("jyzsr"));
+				map.put("key", rs.getObject("key"));
+				map.put("nd", rs.getObject("nd"));
+				map.put("qjgr", rs.getObject("qjgr"));
+				map.put("qjtt", rs.getObject("qjtt"));
+				map.put("yfgr", rs.getObject("yfgr"));
+				map.put("yftt", rs.getObject("yftt"));
+				map.put("yjgr", rs.getObject("yjgr"));
+				map.put("yjtt", rs.getObject("yjtt"));
+				map.put("yjz", rs.getObject("yjz"));
+				return map;
+			}
+		});
 	     int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 			Map<String,Object> ob = new HashMap<>();
 			ob.put("data", ls);

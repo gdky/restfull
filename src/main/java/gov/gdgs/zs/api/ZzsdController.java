@@ -59,7 +59,7 @@ public class ZzsdController {
 			HttpServletRequest request){ 
 		User user =  accountService.getUserFromHeaderToken(request);
 		String sdyy = (String)rqbody.get("sdyy");
-		List<String> jgId = (List<String>) rqbody.get("jgId");
+		List<String> jgId = (List<String>) rqbody.get("jgId");//jgId:['wrwer','34423','dsa3d']
 		zzsdService.addJgZzsd(user,sdyy,jgId);
 		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
 		return new ResponseEntity<>(rm,HttpStatus.OK);
