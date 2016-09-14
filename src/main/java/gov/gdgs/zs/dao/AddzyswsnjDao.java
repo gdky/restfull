@@ -104,8 +104,8 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao{
 //		obj.put("xz", xz);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_zcswsnj");
-		sb.append(" ( ZSJG_ID, ND,ZSJGXZ_ID,ZJWGDM, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,  ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ZJSJ,ztdm,GDBDQKZJ,GDBDQKJS,FZRSJ) "
-				+ "VALUES (:jg_id,:nd,:xz,:wg,:NJZJ, :sz, :zczj, :zrs, :zyrs, :yjyrs, :sjjyrs, :wjyrs, :ZJ, :FZR, :ZCSWSBZJ,:ZCSWSBJS,:BAFS,:FSS,now(),now(),:ztbj,:GDBDQKZJ,:GDBDQKJS,:qzrq ) ");
+		sb.append(" ( ZSJG_ID,ND,ZJWGDM, NJZJ,SWSFZRYJ,SWSFZRSJ,SWSFZR) "
+				+ "VALUES (:jg_id,:ND,:wg,:NJZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR ) ");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		
