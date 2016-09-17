@@ -131,4 +131,31 @@ public class ZzsdService {
 		}
 		
 	}
+
+	public Map<String, Object> getJgZzsdwx(int page, int pagesize, String whereParam) {
+		HashMap<String, Object> where = new HashMap<String, Object>();
+		if (whereParam != null) {
+			try {
+				whereParam = java.net.URLDecoder.decode(whereParam, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				where = mapper.readValue(whereParam,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+			}
+		}
+		// 拼接查询条件
+		Condition condition = new Condition();
+		condition.add("jl.sdyy", "FUZZY", where.get("sdyy"));
+		condition.add("jl.sdr_role", "FUZZY", where.get("sdr_role"));
+		condition.add("jl.jsr_role", "FUZZY", where.get("jsr_role"));
+		condition.add("jl.sdr", "FUZZY", where.get("sdr"));
+		condition.add("jl.jsr", "FUZZY", where.get("jsr"));
+		condition.add("jl.sdtime", "DATE_BETWEEN", where.get("sdtime"));
+		condition.add("jl.jstime", "DATE_BETWEEN", where.get("jstime"));
+		condition.add("j.dwmc", "FUZZY", where.get("swsmc"));
+
+		Map<String, Object> rs = zzsdDao.getJgZzsdwx(page, pagesize, condition);
+		return rs;
+	}
 }

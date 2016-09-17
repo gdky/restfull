@@ -51,6 +51,18 @@ public class ZzsdController {
 		Map<String,Object> obj = zzsdService.getJgZzsd(page,pagesize,where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
+	/**
+	 * 获取失效的机构锁定记录（机构资质锁定无效）
+	 */
+	@RequestMapping(value = "/jgzzsdwx", method = RequestMethod.GET)
+	public  ResponseEntity<Map<String,Object>> getJgZzsdwx(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value="where", required=false) String where){ 
+
+		Map<String,Object> obj = zzsdService.getJgZzsdwx(page,pagesize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
 	
 	/*
 	 * 添加机构锁定记录
