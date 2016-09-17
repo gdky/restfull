@@ -91,4 +91,19 @@ public class ZzsdDao extends BaseDao {
 		}
 	}
 
+	public List<Integer> getSdJGByLx(Integer lx) {
+		String sql = "select jg_id as jgId from zs_sdjl_jg where yxbz = 1 and lx = ? ";
+		List<Integer>  ls  = this.jdbcTemplate.query(sql, new Object[]{lx},new sdJGIDRowMapper());
+		return ls;
+	}
+
+	public class sdJGIDRowMapper implements RowMapper<Integer> {
+
+		@Override
+		public Integer mapRow(ResultSet rs, int arg1)
+				throws SQLException {
+			return rs.getInt("jgId");
+
+		}
+	}
 }

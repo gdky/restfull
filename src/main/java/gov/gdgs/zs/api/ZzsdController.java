@@ -3,6 +3,7 @@ package gov.gdgs.zs.api;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.ZzsdService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -66,5 +67,19 @@ public class ZzsdController {
 		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/zzsdhave", method = RequestMethod.POST)
+	public  ResponseEntity<?> zzsdhave(
+			@RequestParam Integer lx,
+			@RequestBody Map<String,Object> rqbody){ 
+		List<Integer> jgId = (List<Integer>) rqbody.get("jgId");
+		List<Integer> ls = zzsdService.getSdJGByLx(lx);
+		ArrayList<Integer> rs = new ArrayList<Integer>();
+		for(Integer id : jgId){
+			if(!ls.contains(id)) {
+				rs.add(id);
+			}
+		}
+		return new ResponseEntity<>(rs,HttpStatus.OK);
+	}
 	
 }

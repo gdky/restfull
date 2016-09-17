@@ -1,6 +1,7 @@
 package gov.gdgs.zs.service;
 
 import gov.gdgs.zs.dao.ZzsdDao;
+import gov.gdgs.zs.entity.SdjlJG;
 import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
@@ -70,16 +71,21 @@ public class ZzsdService {
 		String sdtime = Common.getCurrentTime2MysqlDateTime();
 		List<Role> role = authDao.getRolesByUser(user.getUsername());
 		String roleName = role.get(0).getDescription();
+
 		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		List<Integer> usedJgId = getSdJGByLx(lx);
 
 		for (int i = 0; i < jgId.size(); i++) {
 			Long jid =  HashIdUtil.decode(jgId.get(i));
-			Object[] arg = new Object[] { jid, sdyy, user.getUsername(),
-					roleName, sdtime,lx, 1 };
-			batchArgs.add(arg);
+			if(!usedJgId.contains(jid)){
+				Object[] arg = new Object[] { jid, sdyy, user.getUsername(),
+						roleName, sdtime,lx, 1 };
+				batchArgs.add(arg);
+			}
 		}
-		zzsdDao.addJgZzsd(batchArgs);
-
+		if(batchArgs.size()>0){
+			zzsdDao.addJgZzsd(batchArgs);
+		}
 	}
 
 	/**
@@ -92,13 +98,21 @@ public class ZzsdService {
 		String sdtime = Common.getCurrentTime2MysqlDateTime();
 		List<Role> role = authDao.getRolesByUser(user.getUsername());
 		String roleName = role.get(0).getDescription();
+		
 		List<Object[]> batchArgs = new ArrayList<Object[]>();
-
-		Object[] arg = new Object[] { jgId, sdyy, user.getUsername(),
-				roleName, sdtime, lx, 1 };
-		batchArgs.add(arg);
-
-		zzsdDao.addJgZzsd(batchArgs);
-
+		List<Integer> usedJgId = getSdJGByLx(lx);
+		if(!usedJgId.contains(jgId)){
+			Object[] arg = new Object[] { jgId, sdyy, user.getUsername(),
+					roleName, sdtime, lx, 1 };
+			batchArgs.add(arg);
+		}
+		if(batchArgs.size()>0){
+			zzsdDao.addJgZzsd(batchArgs);
+		}
+	}
+	
+	public List<Integer> getSdJGByLx(Integer lx){
+		List<Integer> ls = zzsdDao.getSdJGByLx(lx);
+		return ls;
 	}
 }
