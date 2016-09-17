@@ -115,4 +115,20 @@ public class ZzsdService {
 		List<Integer> ls = zzsdDao.getSdJGByLx(lx);
 		return ls;
 	}
+
+	public void updateJgZzsd(User user, List<Integer> id) {
+		String jstime = Common.getCurrentTime2MysqlDateTime();
+		List<Role> role = authDao.getRolesByUser(user.getUsername());
+		String roleName = role.get(0).getDescription();
+		
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		for(Integer sdId : id){
+			Object[] arg = new Object[] { user.getUsername(),roleName, jstime, 0, sdId };
+			batchArgs.add(arg);
+		}
+		if(batchArgs.size()>0){
+			zzsdDao.updateJgZzsd(batchArgs);
+		}
+		
+	}
 }

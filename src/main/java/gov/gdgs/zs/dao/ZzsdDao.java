@@ -22,9 +22,11 @@ public class ZzsdDao extends BaseDao {
 	public Map<String, Object> getJgZzsd(int page, int pagesize,
 			Condition condition) {
 		condition.add(" AND jl.jg_id = j.id ");
+		condition.add(" AND jl.yxbz = 1 ");
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select @rownum:=@rownum + 1 AS 'rownum', v.*, j.dwmc ");
-		sb.append(" from zs_sdjl_jg v, (select @rownum:=?) tmp, zs_jg j, ");
+		sb.append(" select @rownum:=@rownum + 1 AS 'rownum', t.* from ( ");
+		sb.append(" select v.*, j.dwmc ");
+		sb.append(" from zs_sdjl_jg v, zs_jg j, ");
 		
 		// <=== 查询条件集合
 		sb.append(" ( "
@@ -35,14 +37,15 @@ public class ZzsdDao extends BaseDao {
 		
 		sb.append(" WHERE v.id = sub.id  ");
 		sb.append(" AND v.jg_id = j.id  ");
-		sb.append(" ORDER BY v.sdtime desc ");
+		sb.append(" ORDER BY v.sdtime desc) as t, ");
+		sb.append(" (SELECT @rownum:=?) tmp ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
 		params.add(startIndex);
-		params.add(startIndex);
 		params.add(pagesize);
+		params.add(startIndex);
 
 		// 获取符合条件的记录
 		List<Map<String,Object>> ls = jdbcTemplate.query(sb.toString(),params.toArray(),new jgsdjl());
@@ -69,6 +72,19 @@ public class ZzsdDao extends BaseDao {
 		
 	}
 	
+
+
+	public List<Integer> getSdJGByLx(Integer lx) {
+		String sql = "select jg_id as jgId from zs_sdjl_jg where yxbz = 1 and lx = ? ";
+		List<Integer>  ls  = this.jdbcTemplate.query(sql, new Object[]{lx},new sdJGIDRowMapper());
+		return ls;
+	}
+	
+	public void updateJgZzsd(List<Object[]> batchArgs) {
+		String sql = "update zs_sdjl_jg set jsr = ?, jsr_role = ?, jstime = ?,yxbz = ? where id = ? ";
+		this.jdbcTemplate.batchUpdate(sql, batchArgs);
+	}
+
 	public class jgsdjl implements RowMapper<Map<String, Object>> {
 
 		@Override
@@ -90,13 +106,7 @@ public class ZzsdDao extends BaseDao {
 			return map;
 		}
 	}
-
-	public List<Integer> getSdJGByLx(Integer lx) {
-		String sql = "select jg_id as jgId from zs_sdjl_jg where yxbz = 1 and lx = ? ";
-		List<Integer>  ls  = this.jdbcTemplate.query(sql, new Object[]{lx},new sdJGIDRowMapper());
-		return ls;
-	}
-
+	
 	public class sdJGIDRowMapper implements RowMapper<Integer> {
 
 		@Override
@@ -106,4 +116,6 @@ public class ZzsdDao extends BaseDao {
 
 		}
 	}
+
+	
 }

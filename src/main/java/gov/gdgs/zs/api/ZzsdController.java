@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +40,7 @@ public class ZzsdController {
 	private AccountService accountService;
 	
 	/**
-	 * 获取有效的业务报备
+	 * 获取有效的机构锁定记录
 	 */
 	@RequestMapping(value = "/jgzzsd", method = RequestMethod.GET)
 	public  ResponseEntity<Map<String,Object>> getJgZzsd(
@@ -63,6 +64,20 @@ public class ZzsdController {
 		String sdyy = (String)rqbody.get("sdyy");
 		List<String> jgId = (List<String>) rqbody.get("jgId");
 		zzsdService.addJgZzsd(user,sdyy,jgId,lx);
+		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
+		return new ResponseEntity<>(rm,HttpStatus.OK);
+	}
+	
+	/*
+	 * 修改机构锁定记录
+	 */
+	@RequestMapping(value = "/jgzzsd", method = RequestMethod.PUT)
+	public  ResponseEntity<?> updateJgZzsd(
+			@RequestBody Map<String,Object> rqbody,
+			HttpServletRequest request){ 
+		User user =  accountService.getUserFromHeaderToken(request);
+		List<Integer> id = (List<Integer>) rqbody.get("id");
+		zzsdService.updateJgZzsd(user,id);
 		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
 		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
