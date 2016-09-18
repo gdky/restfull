@@ -39,6 +39,17 @@ public class CheckingDao extends BaseJdbcDao{
 		return true;
 	}
 	/**
+	 * 判断事务所设立审批中
+	 * @param jgid
+	 * @return false--审批中
+	 */
+	public boolean checkSLing(int jgid){
+		if(this.jdbcTemplate.queryForList("select id from zs_jg where JGZT_DM in(5,8,12) and jg_id =?",new Object[]{jgid}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	/**
 	 * 判断执业税务师审批中
 	 * @param jgid
 	 * @return false--审批中
