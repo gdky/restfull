@@ -20,6 +20,13 @@ public class SdjlJG implements Serializable {
 	private String jsr;
 	private String jsrRole;
 	private Timestamp jsTime;
+	private Integer lx;
+	public Integer getLx() {
+		return lx;
+	}
+	public void setLx(Integer lx) {
+		this.lx = lx;
+	}
 	private Boolean yxbz;
 	public Integer getId() {
 		return id;
