@@ -54,13 +54,8 @@ public class HfglDao extends BaseDao{
 		 ArrayList<Object> params = condition.getParams();
 		params.add((pn-1)*ps);
 		params.add(ps);
-		for(Object rec:condition.getParams()){
-			params.add(rec);
-		}
-		params.add((pn-1)*ps);
-		params.add(ps);
 		StringBuffer sb = new StringBuffer();
-		sb.append("		(select  SQL_CALC_FOUND_ROWS g.* from (select   @rownum:=@rownum+1 as 'key',b.dwmc,'"+lyear+"' as nd,b.id,");
+		sb.append("		select  SQL_CALC_FOUND_ROWS g.* from (select   @rownum:=@rownum+1 as 'key',b.dwmc,'"+lyear+"' as nd,b.id,");
 		sb.append("		(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
 		sb.append("		f_yjtt(b.id, '"+lyear+"')+");
 		sb.append("		(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ) as yjz,");
@@ -106,25 +101,7 @@ public class HfglDao extends BaseDao{
 				break;
 			}
 		}
-		sb.append("		    LIMIT ?, ? )");
-		sb.append("		union");
-		sb.append("		(select  '' as 'key','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
-		sb.append("		sum(h.yftt) as yftt,sum(h.qjtt) as qjtt,sum(h.yjgr) as yjgr,sum(h.yfgr) as yfgr,");
-		sb.append("		sum(h.qjgr) as qjgr,'1' as issd from (select   b.dwmc,'"+lyear+"' as nd,");
-		sb.append("			(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
-		sb.append("			f_yjtt(b.id, '"+lyear+"')+");
-		sb.append("			(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1 ");
-		sb.append("			and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ) as yjz,");
-		sb.append("			f_yjtt(b.id, '"+lyear+"') as yjtt,");
-		sb.append("			(select sum(e.YJTTHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yftt,");
-		sb.append("			f_qjtt(f_yjtt(b.id, '"+lyear+"'),b.id,'"+lyear+"') as qjtt,");
-		sb.append("			(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1 ");
-		sb.append("			and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') )as yjgr,");
-		sb.append("			(select sum(e.YJGRHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yfgr,");
-		sb.append("			f_qjgr((select count(c.RY_ID)*800 as yjgr from zs_zysws c where");
-		sb.append("					c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ),b.id,'"+lyear+"') as qjgr ");
-		sb.append("			from zs_jg b");
-		sb.append("		"+condition.getSql()+"	and b.yxbz=1 LIMIT ?, ? ) h )");
+		sb.append("		    LIMIT ?, ? ");
 		List<Map<String,Object>> ls = this.jdbcTemplate.query(sb.toString(),params.toArray(),
 				new RowMapper<Map<String,Object>>() {
 			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
@@ -148,15 +125,69 @@ public class HfglDao extends BaseDao{
 			}
 		});
 	     int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
-			Map<String,Object> ob = new HashMap<>();
-			ob.put("data", ls);
-			Map<String, Object> meta = new HashMap<>();
-			meta.put("pageNum", pn);
-			meta.put("pageSize", ps);
-			meta.put("pageTotal",total);
-			meta.put("total",new BigDecimal(total).divide(new BigDecimal(ps)).doubleValue()*(ps+1));
-			ob.put("page", meta);
-			return ob;
+		StringBuffer ub = new StringBuffer();
+		ub.append("		select  '' as 'key','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
+		ub.append("		sum(h.yftt) as yftt,sum(h.qjtt) as qjtt,sum(h.yjgr) as yjgr,sum(h.yfgr) as yfgr,");
+		ub.append("		sum(h.qjgr) as qjgr,'1' as issd from (select g.* from (select   b.dwmc,'"+lyear+"' as nd,");
+		ub.append("			(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
+		ub.append("			f_yjtt(b.id, '"+lyear+"')+");
+		ub.append("			(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1 ");
+		ub.append("			and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ) as yjz,");
+		ub.append("			f_yjtt(b.id, '"+lyear+"') as yjtt,");
+		ub.append("			(select sum(e.YJTTHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yftt,");
+		ub.append("			f_qjtt(f_yjtt(b.id, '"+lyear+"'),b.id,'"+lyear+"') as qjtt,");
+		ub.append("			(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1 ");
+		ub.append("			and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') )as yjgr,");
+		ub.append("			(select sum(e.YJGRHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yfgr,");
+		ub.append("			f_qjgr((select count(c.RY_ID)*800 as yjgr from zs_zysws c where");
+		ub.append("					c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ),b.id,'"+lyear+"') as qjgr ");
+		ub.append("			from zs_jg b");
+		ub.append("		"+condition.getSql()+"	and b.yxbz=1) as g  ");
+		if(qury.containsKey("sorder")){
+			Boolean asc = qury.get("sorder").toString().equals("ascend");
+			switch (qury.get("sfield").toString()) {
+			case "dwmc":
+				if(asc){
+					ub.append("		    order by convert( g.dwmc USING gbk) COLLATE gbk_chinese_ci ");
+				}else{
+					ub.append("		    order by convert( g.dwmc USING gbk) COLLATE gbk_chinese_ci desc");
+				}
+				break;
+			case "jyzsr":
+				if(asc){
+					ub.append("		    order by g.jyzsr ");
+				}else{
+					ub.append("		    order by g.jyzsr desc");
+				}
+				break;
+			case "qjtt":
+				if(asc){
+					ub.append("		    order by g.qjtt ");
+				}else{
+					ub.append("		    order by g.qjtt desc");
+				}
+				break;
+			case "qjgr":
+				if(asc){
+					ub.append("		    order by g.qjgr ");
+				}else{
+					ub.append("		    order by g.qjgr desc");
+				}
+				break;
+			}
+		}
+		ub.append("		    LIMIT ?, ? ) h");
+		Map<String, Object> tj = this.jdbcTemplate.queryForMap(ub.toString(),params.toArray());
+		ls.add(tj);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		meta.put("total",new BigDecimal(total).divide(new BigDecimal(ps),5,BigDecimal.ROUND_HALF_DOWN).doubleValue()*(ps+1));
+		ob.put("page", meta);
+		return ob;
 	}
 	/**
 	 * 发票打印查询
@@ -341,28 +372,27 @@ public class HfglDao extends BaseDao{
             	continue;
             }else{
             	Map<String, Object> jgs = jg.get(0);
-            	if((jgs.get("yjtt")+"").equals("null")){
-            		j+=1;
-                	fls.add(params.get(3)+""+"（未上报报表）");
-                	continue;
-            	}
             	String uuid = new Common().newUUID();
             	String yftt = params.get(5)+"";
             	String yfgr = params.get(6)+"";
             	if((params.get(5)+"").equals("")&&(params.get(6)+"").equals("")){
-            		double syz = new BigDecimal(params.get(4)+"").subtract(new BigDecimal(jgs.get("yjtt")+"")).doubleValue();
-            		if(syz>0){
-            			int zys = (int)new BigDecimal(syz).divide(new BigDecimal("800"),1,BigDecimal.ROUND_HALF_EVEN).doubleValue();
-            			for(Map<String, Object> k:this.jdbcTemplate.queryForList("select ry_id from zs_zysws a where a.jg_id=? and a.yxbz=1 and a.ry_id not in(select b.ry_id from zs_hyhfjfryls b where b.nd=? and b.JG_ID=? and b.yxbz=1) limit ?",
-            					new Object[]{jgs.get("id"),nd,jgs.get("id"),zys})){
-            				this.jdbcTemplate.update("insert into zs_hyhfjfryls (ID,ND,RY_ID,JG_ID,JF_ID,SCJLID,LRRQ,YXBZ) values(?,?,?,?,?,?,sysdate(),1)",new Object[]{new Common().newUUID(),nd,k.get("ry_id"),jgs.get("id"),uuid,uuid2});
-            			}
-            			yftt=(String) jgs.get("yjtt");
-            			yfgr=syz+"";
-            		}else{
+            		if((jgs.get("yjtt")+"").equals("null")){
             			yftt=params.get(4)+"";
-            			yfgr="0";
-            		}
+                	}else{
+	            		double syz = new BigDecimal(params.get(4)+"").subtract(new BigDecimal(jgs.get("yjtt")+"")).doubleValue();
+	            		if(syz>0){
+	            			int zys = (int)new BigDecimal(syz).divide(new BigDecimal("800"),1,BigDecimal.ROUND_HALF_EVEN).doubleValue();
+	            			for(Map<String, Object> k:this.jdbcTemplate.queryForList("select ry_id from zs_zysws a where a.jg_id=? and a.yxbz=1 and a.ry_id not in(select b.ry_id from zs_hyhfjfryls b where b.nd=? and b.JG_ID=? and b.yxbz=1) limit ?",
+	            					new Object[]{jgs.get("id"),nd,jgs.get("id"),zys})){
+	            				this.jdbcTemplate.update("insert into zs_hyhfjfryls (ID,ND,RY_ID,JG_ID,JF_ID,SCJLID,LRRQ,YXBZ) values(?,?,?,?,?,?,sysdate(),1)",new Object[]{new Common().newUUID(),nd,k.get("ry_id"),jgs.get("id"),uuid,uuid2});
+	            			}
+	            			yftt=(String) jgs.get("yjtt");
+	            			yfgr=syz+"";
+	            		}else{
+	            			yftt=params.get(4)+"";
+	            			yfgr="0";
+	            		}
+                	}
             	}else{
             		if(yftt.equals("")){
             			yftt="0";
