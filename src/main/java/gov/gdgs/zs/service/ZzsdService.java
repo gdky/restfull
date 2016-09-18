@@ -1,6 +1,7 @@
 package gov.gdgs.zs.service;
 
 import gov.gdgs.zs.dao.ZzsdDao;
+import gov.gdgs.zs.entity.SdjlJG;
 import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
@@ -70,16 +71,21 @@ public class ZzsdService {
 		String sdtime = Common.getCurrentTime2MysqlDateTime();
 		List<Role> role = authDao.getRolesByUser(user.getUsername());
 		String roleName = role.get(0).getDescription();
+
 		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		List<Integer> usedJgId = getSdJGByLx(lx);
 
 		for (int i = 0; i < jgId.size(); i++) {
 			Long jid =  HashIdUtil.decode(jgId.get(i));
-			Object[] arg = new Object[] { jid, sdyy, user.getUsername(),
-					roleName, sdtime,lx, 1 };
-			batchArgs.add(arg);
+			if(!usedJgId.contains(jid)){
+				Object[] arg = new Object[] { jid, sdyy, user.getUsername(),
+						roleName, sdtime,lx, 1 };
+				batchArgs.add(arg);
+			}
 		}
-		zzsdDao.addJgZzsd(batchArgs);
-
+		if(batchArgs.size()>0){
+			zzsdDao.addJgZzsd(batchArgs);
+		}
 	}
 
 	/**
@@ -92,13 +98,77 @@ public class ZzsdService {
 		String sdtime = Common.getCurrentTime2MysqlDateTime();
 		List<Role> role = authDao.getRolesByUser(user.getUsername());
 		String roleName = role.get(0).getDescription();
+		
 		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		List<Integer> usedJgId = getSdJGByLx(lx);
+		if(!usedJgId.contains(jgId)){
+			Object[] arg = new Object[] { jgId, sdyy, user.getUsername(),
+					roleName, sdtime, lx, 1 };
+			batchArgs.add(arg);
+		}
+		if(batchArgs.size()>0){
+			zzsdDao.addJgZzsd(batchArgs);
+		}
+	}
+	
+	public List<Integer> getSdJGByLx(Integer lx){
+		List<Integer> ls = zzsdDao.getSdJGByLx(lx);
+		return ls;
+	}
 
-		Object[] arg = new Object[] { jgId, sdyy, user.getUsername(),
-				roleName, sdtime, lx, 1 };
-		batchArgs.add(arg);
+	public void unlockJgZzsd(User user, List<Integer> id) {
+		String jstime = Common.getCurrentTime2MysqlDateTime();
+		List<Role> role = authDao.getRolesByUser(user.getUsername());
+		String roleName = role.get(0).getDescription();
+		
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		for(Integer sdId : id){
+			Object[] arg = new Object[] { user.getUsername(),roleName, jstime, 0, sdId };
+			batchArgs.add(arg);
+		}
+		if(batchArgs.size()>0){
+			zzsdDao.unlockJgZzsd(batchArgs);
+		}
+	}
+	public void lockJgZzsd(User user, List<Integer> id) {
+		String jstime = Common.getCurrentTime2MysqlDateTime();
+		List<Role> role = authDao.getRolesByUser(user.getUsername());
+		String roleName = role.get(0).getDescription();
+		
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		for(Integer sdId : id){
+			Object[] arg = new Object[] { 1, sdId };
+			batchArgs.add(arg);
+		}
+		if(batchArgs.size()>0){
+			zzsdDao.lockJgZzsd(batchArgs);
+		}
+	}
 
-		zzsdDao.addJgZzsd(batchArgs);
+	public Map<String, Object> getJgZzsdwx(int page, int pagesize, String whereParam) {
+		HashMap<String, Object> where = new HashMap<String, Object>();
+		if (whereParam != null) {
+			try {
+				whereParam = java.net.URLDecoder.decode(whereParam, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				where = mapper.readValue(whereParam,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+			}
+		}
+		// 拼接查询条件
+		Condition condition = new Condition();
+		condition.add("jl.sdyy", "FUZZY", where.get("sdyy"));
+		condition.add("jl.sdr_role", "FUZZY", where.get("sdr_role"));
+		condition.add("jl.jsr_role", "FUZZY", where.get("jsr_role"));
+		condition.add("jl.sdr", "FUZZY", where.get("sdr"));
+		condition.add("jl.jsr", "FUZZY", where.get("jsr"));
+		condition.add("jl.sdtime", "DATE_BETWEEN", where.get("sdtime"));
+		condition.add("jl.jstime", "DATE_BETWEEN", where.get("jstime"));
+		condition.add("j.dwmc", "FUZZY", where.get("swsmc"));
 
+		Map<String, Object> rs = zzsdDao.getJgZzsdwx(page, pagesize, condition);
+		return rs;
 	}
 }
