@@ -80,8 +80,13 @@ public class ZzsdDao extends BaseDao {
 		return ls;
 	}
 	
-	public void updateJgZzsd(List<Object[]> batchArgs) {
+	public void unlockJgZzsd(List<Object[]> batchArgs) {
 		String sql = "update zs_sdjl_jg set jsr = ?, jsr_role = ?, jstime = ?,yxbz = ? where id = ? ";
+		this.jdbcTemplate.batchUpdate(sql, batchArgs);
+	}
+	
+	public void lockJgZzsd(List<Object[]> batchArgs) {
+		String sql = "update zs_sdjl_jg  set yxbz = ? where id = ? ";
 		this.jdbcTemplate.batchUpdate(sql, batchArgs);
 	}
 

@@ -116,7 +116,7 @@ public class ZzsdService {
 		return ls;
 	}
 
-	public void updateJgZzsd(User user, List<Integer> id) {
+	public void unlockJgZzsd(User user, List<Integer> id) {
 		String jstime = Common.getCurrentTime2MysqlDateTime();
 		List<Role> role = authDao.getRolesByUser(user.getUsername());
 		String roleName = role.get(0).getDescription();
@@ -127,9 +127,22 @@ public class ZzsdService {
 			batchArgs.add(arg);
 		}
 		if(batchArgs.size()>0){
-			zzsdDao.updateJgZzsd(batchArgs);
+			zzsdDao.unlockJgZzsd(batchArgs);
 		}
+	}
+	public void lockJgZzsd(User user, List<Integer> id) {
+		String jstime = Common.getCurrentTime2MysqlDateTime();
+		List<Role> role = authDao.getRolesByUser(user.getUsername());
+		String roleName = role.get(0).getDescription();
 		
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		for(Integer sdId : id){
+			Object[] arg = new Object[] { 1, sdId };
+			batchArgs.add(arg);
+		}
+		if(batchArgs.size()>0){
+			zzsdDao.lockJgZzsd(batchArgs);
+		}
 	}
 
 	public Map<String, Object> getJgZzsdwx(int page, int pagesize, String whereParam) {

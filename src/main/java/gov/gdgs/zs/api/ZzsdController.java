@@ -23,90 +23,106 @@ import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.service.AccountService;
 
-
 /**
  * 资质锁定api
+ * 
  * @author admin
- *
+ * 
  */
 @RestController
 @RequestMapping(value = Config.URL_PROJECT)
 public class ZzsdController {
-	
+
 	@Autowired
 	private ZzsdService zzsdService;
-	
+
 	@Autowired
 	private AccountService accountService;
-	
+
 	/**
 	 * 获取有效的机构锁定记录
 	 */
 	@RequestMapping(value = "/jgzzsd", method = RequestMethod.GET)
-	public  ResponseEntity<Map<String,Object>> getJgZzsd(
+	public ResponseEntity<Map<String, Object>> getJgZzsd(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pagesize,
-			@RequestParam(value="where", required=false) String where){ 
+			@RequestParam(value = "where", required = false) String where) {
 
-		Map<String,Object> obj = zzsdService.getJgZzsd(page,pagesize,where);
-		return new ResponseEntity<>(obj,HttpStatus.OK);
+		Map<String, Object> obj = zzsdService.getJgZzsd(page, pagesize, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
+
 	/**
 	 * 获取失效的机构锁定记录（机构资质锁定无效）
 	 */
 	@RequestMapping(value = "/jgzzsdwx", method = RequestMethod.GET)
-	public  ResponseEntity<Map<String,Object>> getJgZzsdwx(
+	public ResponseEntity<Map<String, Object>> getJgZzsdwx(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pagesize,
-			@RequestParam(value="where", required=false) String where){ 
+			@RequestParam(value = "where", required = false) String where) {
 
-		Map<String,Object> obj = zzsdService.getJgZzsdwx(page,pagesize,where);
-		return new ResponseEntity<>(obj,HttpStatus.OK);
+		Map<String, Object> obj = zzsdService
+				.getJgZzsdwx(page, pagesize, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
-	
+
 	/*
 	 * 添加机构锁定记录
 	 */
 	@RequestMapping(value = "/jgzzsd", method = RequestMethod.POST)
-	public  ResponseEntity<?> addJgZzsd(
-			@RequestBody Map<String,Object> rqbody,
-			HttpServletRequest request){ 
-		User user =  accountService.getUserFromHeaderToken(request);
-		Integer lx = (Integer)rqbody.get("lx");
-		String sdyy = (String)rqbody.get("sdyy");
+	public ResponseEntity<?> addJgZzsd(@RequestBody Map<String, Object> rqbody,
+			HttpServletRequest request) {
+		User user = accountService.getUserFromHeaderToken(request);
+		Integer lx = (Integer) rqbody.get("lx");
+		String sdyy = (String) rqbody.get("sdyy");
 		List<String> jgId = (List<String>) rqbody.get("jgId");
-		zzsdService.addJgZzsd(user,sdyy,jgId,lx);
-		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
-		return new ResponseEntity<>(rm,HttpStatus.OK);
+		zzsdService.addJgZzsd(user, sdyy, jgId, lx);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
+				"200", "更新成功");
+		return new ResponseEntity<>(rm, HttpStatus.OK);
 	}
-	
+
 	/*
-	 * 修改机构锁定记录
+	 * 解除机构锁定记录
 	 */
 	@RequestMapping(value = "/jgzzsd", method = RequestMethod.PUT)
-	public  ResponseEntity<?> updateJgZzsd(
-			@RequestBody Map<String,Object> rqbody,
-			HttpServletRequest request){ 
-		User user =  accountService.getUserFromHeaderToken(request);
+	public ResponseEntity<?> unlockJgZzsd(
+			@RequestBody Map<String, Object> rqbody, HttpServletRequest request) {
+		User user = accountService.getUserFromHeaderToken(request);
 		List<Integer> id = (List<Integer>) rqbody.get("id");
-		zzsdService.updateJgZzsd(user,id);
-		ResponseMessage rm  = new ResponseMessage(ResponseMessage.Type.success, "200", "更新成功");
-		return new ResponseEntity<>(rm,HttpStatus.OK);
+		zzsdService.unlockJgZzsd(user, id);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
+				"200", "更新成功");
+		return new ResponseEntity<>(rm, HttpStatus.OK);
 	}
-	
+
+	/*
+	 * 恢复机构锁定记录
+	 */
+	@RequestMapping(value = "/jgzzsdwx", method = RequestMethod.PUT)
+	public ResponseEntity<?> lockJgZzsd(
+			@RequestBody Map<String, Object> rqbody, HttpServletRequest request) {
+		User user = accountService.getUserFromHeaderToken(request);
+		List<Integer> id = (List<Integer>) rqbody.get("id");
+		zzsdService.lockJgZzsd(user, id);
+
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
+				"200", "更新成功");
+		return new ResponseEntity<>(rm, HttpStatus.OK);
+	}
+
 	@RequestMapping(value = "/zzsdhave", method = RequestMethod.POST)
-	public  ResponseEntity<?> zzsdhave(
-			@RequestParam Integer lx,
-			@RequestBody Map<String,Object> rqbody){ 
+	public ResponseEntity<?> zzsdhave(@RequestParam Integer lx,
+			@RequestBody Map<String, Object> rqbody) {
 		List<Integer> jgId = (List<Integer>) rqbody.get("jgId");
 		List<Integer> ls = zzsdService.getSdJGByLx(lx);
 		ArrayList<Integer> rs = new ArrayList<Integer>();
-		for(Integer id : jgId){
-			if(!ls.contains(id)) {
+		for (Integer id : jgId) {
+			if (!ls.contains(id)) {
 				rs.add(id);
 			}
 		}
-		return new ResponseEntity<>(rs,HttpStatus.OK);
+		return new ResponseEntity<>(rs, HttpStatus.OK);
 	}
-	
+
 }
