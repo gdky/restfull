@@ -49,6 +49,7 @@ public class SWSDao extends BaseDao{
 		sb.append("		(select count(id) from zs_zysws where jg_id=a.id)+");
 		sb.append("(select count(id) from zs_cyry where jg_id=a.id and CYRYZT_DM=1) as zrs,");
 		sb.append("		DATE_FORMAT(a.swszsclsj,'%Y-%m-%d') AS clsj");
+		sb.append("		,(select v.id from zs_sdjl_jg v where v.jg_id=a.id and v.lx=1 and v.yxbz=1 limit 1) as issd");
 		sb.append("		FROM	zs_jg a,	dm_cs c,dm_jgxz d,(SELECT @rownum:=?) zs_jg ");
 		sb.append(condition.getSql());
 		sb.append("		and a.jgxz_dm = d.id ");
@@ -122,6 +123,7 @@ public class SWSDao extends BaseDao{
 				map.put("DZHI", rs.getObject("DZHI"));
 				map.put("YYZZHM", rs.getObject("YYZZHM"));
 				map.put("JYFW", rs.getObject("JYFW"));
+				map.put("issd", rs.getObject("issd"));
 				return map;
 				}
 			});
