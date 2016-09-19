@@ -97,15 +97,19 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao{
 	}
     @Override
 	public String addZyswsnjb( Map <String,Object> obj){
-		String uuid = UUID.randomUUID().toString().replace("-", "");
-		obj.put("id", uuid);
+	String uuid = UUID.randomUUID().toString().replace("-", "");
+	obj.put("id", uuid);
+		String sql="select max(a.ID)+1 from zs_zcswsnj a";
+		String id1=this.jdbcTemplate.queryForObject(sql,String.class);
+	    obj.put("id1", id1);
+	    
 //		String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
 //		String xz =this.jdbcTemplate.queryForObject(sql,new Object[]{obj.get("jg_id")},String.class);
 //		obj.put("xz", xz);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_zcswsnj");
-		sb.append(" ( ZSJG_ID,ND,ZJWGDM, NJZJ,SWSFZRYJ,SWSFZRSJ,SWSFZR) "
-				+ "VALUES (:jg_id,:ND,:wg,:NJZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR ) ");
+		sb.append(" (ZSJG_ID,ID,ND,SWS_ID,ZJWGDM,NJZJ,SWSFZRYJ,SWSFZRSJ,SWSFZR,ZDSJ,ZTDM) "
+				+ "VALUES (:jg_id,:id1,:ND,:sws_id,:wg,:ZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),'2' ) ");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		
@@ -114,21 +118,20 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao{
 	}else {
 		return uuid;
 	}
-		//更新事务所年检表
+		//更新执业税务师年检表
 	}
     @Override
 	public void updateZyswsnjb(Map <String,Object> obj) {
-		String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
-		String xz =this.jdbcTemplate.queryForObject(sql,new Object[]{obj.get("jg_id")},String.class);
-		obj.put("xz", xz);
+//		String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
+//		String xz =this.jdbcTemplate.queryForObject(sql,new Object[]{obj.get("jg_id")},String.class);
+//		obj.put("xz", xz);
+    	String sql="select max(a.ID)+1 from zs_zcswsnj a";
+		String id1=this.jdbcTemplate.queryForObject(sql,String.class);
+	    obj.put("id1", id1);
 		StringBuffer sb = new StringBuffer("update "
-				+ Config.PROJECT_SCHEMA + "zs_jg_njb ");
+				+ Config.PROJECT_SCHEMA + "zs_zcswsnj ");
 		
-		sb.append(" set ZSJG_ID=:jg_id,ZSJGXZ_ID=:xz,ND =:nd,ZJWGDM=:wg,NJZJ=:NJZJ,GDBDQKZJ=:GDBDQKZJ,"
-				+ "GDBDQKJS=:GDBDQKJS,ZRS=:ZRS,ZYRS=:zyrs,YJYRS=:yjyrs,SJJYRS=:sjjyrs, "
-				+ "WJYRS=:wjyrs,ZJ=:ZJ,FZR=:FZR,ZCSWSBZJ=:ZCSWSBZJ, "
-				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS,"
-				+ "ztdm='2'where id=:id ");
+		sb.append(" set ZSJG_ID=:jg_id,ID=:id1,ND=:nd,SWS_ID=:sws_id,ZJWGDM=:wg,NJZJ=:ZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM='2' where sws_id=:sws_id ");
 		
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);

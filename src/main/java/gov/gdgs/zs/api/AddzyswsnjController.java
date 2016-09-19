@@ -53,10 +53,12 @@ public ResponseEntity<Map<String, Object>> getZyswsnjById(
 Map<String, Object> obj = addzyswsnjService.getzyswsnjbById(id);
 return new ResponseEntity<>(obj, HttpStatus.OK);
 }
-
+//执业税务师姓名的选择
+//@RequestMapping(value="/add/zyswsxm",method=RequestMethod.GET)
+//public ResponseEntity<T>
 //执业税务师年检表增加
 @RequestMapping(value = "/addzyswsnjb", method = RequestMethod.POST)
-	public ResponseEntity<Map<String,Object>> addSwsnjb(@RequestBody  Map<String ,Object> obj,HttpServletRequest request)
+	public ResponseEntity<Map<String,Object>> addZyswsnjb(@RequestBody  Map<String ,Object> obj,HttpServletRequest request)
 	throws Exception{
 		 try{
 			 User user =  accountService.getUserFromHeaderToken(request);
