@@ -222,7 +222,7 @@ public class HfglController {
 		
 	}
 	/**
-	 * 发票打印累加
+	 * 上传管理操作
 	 * @param jlid
 	 * @param fptj
 	 * @param request

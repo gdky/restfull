@@ -49,6 +49,7 @@ public class SWSDao extends BaseDao{
 		sb.append("		(select count(id) from zs_zysws where jg_id=a.id)+");
 		sb.append("(select count(id) from zs_cyry where jg_id=a.id and CYRYZT_DM=1) as zrs,");
 		sb.append("		DATE_FORMAT(a.swszsclsj,'%Y-%m-%d') AS clsj");
+		sb.append("		,(select v.id from zs_sdjl_jg v where v.jg_id=a.id and v.lx=1 and v.yxbz=1 limit 1) as issd");
 		sb.append("		FROM	zs_jg a,	dm_cs c,dm_jgxz d,(SELECT @rownum:=?) zs_jg ");
 		sb.append(condition.getSql());
 		sb.append("		and a.jgxz_dm = d.id ");
@@ -122,6 +123,7 @@ public class SWSDao extends BaseDao{
 				map.put("DZHI", rs.getObject("DZHI"));
 				map.put("YYZZHM", rs.getObject("YYZZHM"));
 				map.put("JYFW", rs.getObject("JYFW"));
+				map.put("issd", rs.getObject("issd"));
 				return map;
 				}
 			});
@@ -307,7 +309,11 @@ public class SWSDao extends BaseDao{
 		ob.put("page", meta);
 		return ob;
 	}
-	
+	/**
+	 * 添加机构
+	 * @param jgtj
+	 * @return
+	 */
 	public Object insertjg(Map<String, Object> jgtj){
 		if(this.jdbcTemplate.queryForList("select id from zs_jg where dwmc=? ",jgtj.get("dwmc")).size()!=0){
 			return null;
@@ -324,5 +330,23 @@ public class SWSDao extends BaseDao{
 		}
 		String sql ="insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,SBCLSJ,YXBZ) values(?,?,5,5,sysdate(),0)";
 		return this.insertAndGetKeyByJdbc(sql,new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
+	}
+	/**
+	 * 当前用户分所
+	 * @param pid
+	 * @return
+	 */
+	public List<Map<String, Object>> chilchenJG(Object pid){
+		return this.jdbcTemplate.query("select ID,DWMC from zs_jg where PARENTJGID=? and jgzt_dm=11",new Object[]{pid},
+				new RowMapper<Map<String,Object>>() {
+					public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+						Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+						String id = hashids.encode(rs.getLong("id"));
+						Map<String,Object> map = new HashMap<String,Object>();
+						map.put("ID", id);
+						map.put("DWMC", rs.getObject("DWMC"));
+						return map;
+					}
+				});
 	}
 }
