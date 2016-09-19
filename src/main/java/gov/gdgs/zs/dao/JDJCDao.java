@@ -3,11 +3,15 @@ package gov.gdgs.zs.dao;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.untils.Condition;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hashids.Hashids;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -145,25 +149,47 @@ public class JDJCDao extends BaseDao{
 		arr.add("zs_cwbb_xjll");
 		arr.add("zs_cwbb_zcmx");
 		Condition condition = new Condition();
-		condition.add("b.dwmc",Condition.FUZZY,where.get("dwmc"));
+		condition.add("d.dwmc",Condition.FUZZY,where.get("dwmc"));
 		StringBuffer sb = new StringBuffer();
-		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM (select a.id,a.nd,b.DWMC,c.MC as cs,b.DHUA,");
-		sb.append(" '未上报' as ZTBJ,DATE_FORMAT(a.JSSJ,'%Y-%m-%d') AS TJSJ");
-		sb.append(" FROM "+arr.get(Integer.parseInt(where.get("bblx").toString()))+" a,zs_jg b,dm_cs c,(SELECT @rownum:=?) temp");
+		sb.append(" 	SELECT sql_calc_found_rows	 @rownum:=@rownum+1 as 'key','"+where.get("nd")+"' as nd,'未上报' as sbzt,d.id,d.dwmc,");
+		sb.append(" 	d.JGZCH as zsbh,c.mc as cs, d.DHUA as dhhm,d.TXYXMING as txyxm,d.XTYPHONE as txyyddh");
+		sb.append("		,(select v.id from zs_sdjl_jg v where v.jg_id=d.id and v.lx=3 and v.yxbz=1 limit 1) as issd ");
+		sb.append(" 	FROM zs_jg d,dm_cs c,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());//相当元 where x.xx like '%%'
-		sb.append(" and b.CS_DM=c.ID and a.nd = '"+where.get("nd")+"' AND a.JG_ID=b.ID AND a.ZTBJ=0) as t");
+		sb.append("     AND d.CS_DM=c.ID  ");
+		sb.append(" 	AND d.ID not in(select a.JG_ID from "+arr.get(Integer.parseInt(where.get("bblx").toString()))+" a where a.nd = ? AND a.ZTBJ=1)");
+		sb.append(" 	and d.YXBZ=1");
 		sb.append("    LIMIT ?, ? ");
 		// 装嵌传值数组
 		int startIndex = pageSize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
 		params.add(0, pageSize * (page - 1));
+		params.add(where.get("nd"));
 		params.add(startIndex);
 		params.add(pageSize);
 
 		// 获取符合条件的记录
-		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
-				params.toArray());
+		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),
+				params.toArray(),
+				new RowMapper<Map<String,Object>>() {
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				String id = hashids.encode((int)rs.getObject("id"));
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("jgid", id);
+				map.put("dwmc", rs.getObject("dwmc"));
+				map.put("zsbh", rs.getObject("zsbh"));
+				map.put("key", rs.getObject("key"));
+				map.put("cs", rs.getObject("cs"));
+				map.put("dhhm", rs.getObject("dhhm"));
+				map.put("txyxm", rs.getObject("txyxm"));
+				map.put("txyyddh", rs.getObject("txyyddh"));
+				map.put("nd", rs.getObject("nd"));
+				map.put("sbzt", rs.getObject("sbzt"));
+				map.put("issd", rs.getObject("issd"));
+				return map;
+			}
+		});
 
 		// 获取符合条件的记录数
 

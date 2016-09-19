@@ -378,6 +378,7 @@ public class HfglDao extends BaseDao{
             	if((params.get(5)+"").equals("")&&(params.get(6)+"").equals("")){
             		if((jgs.get("yjtt")+"").equals("null")){
             			yftt=params.get(4)+"";
+            			yfgr="0";
                 	}else{
 	            		double syz = new BigDecimal(params.get(4)+"").subtract(new BigDecimal(jgs.get("yjtt")+"")).doubleValue();
 	            		if(syz>0){
