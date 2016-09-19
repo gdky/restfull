@@ -77,7 +77,7 @@ public class ZzsdService {
 
 		for (int i = 0; i < jgId.size(); i++) {
 			Long jid =  HashIdUtil.decode(jgId.get(i));
-			if(!usedJgId.contains(jid)){
+			if(!usedJgId.contains(jid.intValue())){
 				Object[] arg = new Object[] { jid, sdyy, user.getUsername(),
 						roleName, sdtime,lx, 1 };
 				batchArgs.add(arg);

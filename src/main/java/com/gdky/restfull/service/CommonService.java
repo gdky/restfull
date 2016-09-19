@@ -42,13 +42,17 @@ public class CommonService implements ICommonService {
 
 	@Override
 	public Map<String, Object> addMenu(Map<String, Object> node) {
-		String path = asideMenuDao.getPathById((Integer) node.get("pid"));
-
-		path = path == null ? String.format("%03d", (Integer) node.get("pid"))
-				: path + "-" + String.format("%03d", (Integer) node.get("pid"));
+		Integer pid = (Integer) node.get("pid");
+		String path ;
+		if (pid == 0){
+			path = String.format("%03d", pid);
+		}else {
+			path = asideMenuDao.getPathById(pid);
+			path = path + "-" + String.format("%03d", pid);
+		}
 
 		AsideMenu item = new AsideMenu();
-		item.setPid((Integer) node.get("pid"));
+		item.setPid(pid);
 		// 0 代表前面补充0
 		// 3 代表长度为3
 		// d 代表参数为正数型
