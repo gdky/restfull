@@ -1,12 +1,17 @@
 package gov.gdgs.zs.dao;
 
+import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.untils.Condition;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hashids.Hashids;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -144,21 +149,43 @@ public class SDSCBBDao  extends BaseDao{
 		Condition condition = new Condition();
 		condition.add("d.dwmc", Condition.FUZZY, qury.get("dwmc"));
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select 	sql_calc_found_rows	 @rownum:=@rownum+1 as 'key','"+qury.get("nd")+"' as nd,'未上报' as sbzt,d.dwmc,d.JGZCH as zsbh,c.mc as cs, d.DHUA as dhhm,d.TXYXMING as txyxm,d.XTYPHONE as txyyddh");
+		sb.append("		select 	sql_calc_found_rows	 @rownum:=@rownum+1 as 'key','"+qury.get("nd")
+				+"' as nd,'未上报' as sbzt,d.id,d.dwmc,d.JGZCH as zsbh,c.mc as cs, d.DHUA as dhhm,d.TXYXMING as txyxm,d.XTYPHONE as txyyddh");
+		sb.append("		,(select v.id from zs_sdjl_jg v where v.jg_id=d.id and v.lx=4 and v.yxbz=1 limit 1) as issd ");
 		sb.append("		FROM zs_jg d,dm_cs c,(SELECT @rownum:=?) zs_jg");
 		sb.append("		 "+condition.getSql()+" ");
 		sb.append("		and d.ID NOT IN (");
-		sb.append("		SELECT d.id");
+		sb.append("		SELECT b.jg_id");
 		sb.append("		FROM "+arr.get(Integer.parseInt(qury.get("bblx").toString()))+" b");
-		sb.append("		where d.ID =b.jg_id and b.nd = '"+qury.get("nd")+"' ) ");
+		sb.append("		where  b.nd = ? and b.ZTBJ=2) ");
 		sb.append("		AND d.YXBZ = '1'");
 		sb.append("		and d.CS_DM = c.ID");
 		sb.append("		    LIMIT ?, ? ");
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
+		params.add(qury.get("nd"));
 		params.add((pn-1)*ps);
 		params.add(ps);
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		List<Map<String,Object>> ls = this.jdbcTemplate.query(sb.toString(),params.toArray(),
+				new RowMapper<Map<String,Object>>() {
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				String id = hashids.encode(rs.getLong("id"));
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("jgid", id);
+				map.put("dwmc", rs.getObject("dwmc"));
+				map.put("zsbh", rs.getObject("zsbh"));
+				map.put("key", rs.getObject("key"));
+				map.put("cs", rs.getObject("cs"));
+				map.put("dhhm", rs.getObject("dhhm"));
+				map.put("txyxm", rs.getObject("txyxm"));
+				map.put("txyyddh", rs.getObject("txyyddh"));
+				map.put("nd", rs.getObject("nd"));
+				map.put("sbzt", rs.getObject("sbzt"));
+				map.put("issd", rs.getObject("issd"));
+				return map;
+			}
+		});
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();
 		ob.put("data", ls);
