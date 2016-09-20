@@ -24,6 +24,15 @@ public class Common {
 		String currentTime = sdf.format(dt);
 		return currentTime;
 	}
+	
+	public static String getDate2MysqlDateTime(Date date) {
+
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+				"yyyy-MM-dd HH:mm:ss");
+
+		String dt = sdf.format(date);
+		return dt;
+	}
 
 	public static String getTime2MysqlDateTime(String date) {
 

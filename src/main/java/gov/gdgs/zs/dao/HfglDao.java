@@ -17,9 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;  
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -360,8 +363,23 @@ public class HfglDao extends BaseDao{
         int i=0,j=0;
         for (Row row : sheet1) {  
         	ArrayList<Object> params =new ArrayList<Object>();  
-            for (Cell cell : row) {  
-            	params.add(cell);  
+            for (Cell cell : row) {
+            	switch (cell.getCellType()) {  
+            	case XSSFCell.CELL_TYPE_NUMERIC :
+            		if(DateUtil.isCellDateFormatted(cell)){
+                		Date date = cell.getDateCellValue();
+                		params.add(Common.getDate2MysqlDateTime(date));
+                	}else {
+                		params.add(cell);  
+                	}
+            		break;
+            	case XSSFCell.CELL_TYPE_STRING:
+            		params.add(cell.getStringCellValue());  
+            		break;
+            	case XSSFCell.CELL_TYPE_BLANK:
+            		params.add("");
+            		break;
+            	}
             }
             String nd = (params.get(1)+"").substring(0,4);
             List<Map<String, Object>> jg = this.jdbcTemplate.queryForList("select a.id,f_yjtt(a.id,'"+nd+"') as yjtt,(select count(b.id) from zs_zysws b where b.JG_ID=a.ID and yxbz=1) as yjrs from zs_jg a where a.dwmc=? and a.yxbz=1",
