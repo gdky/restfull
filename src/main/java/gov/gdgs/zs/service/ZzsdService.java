@@ -219,4 +219,47 @@ public class ZzsdService {
 		
 	}
 
+	public Map<String, Object> getSWSsdjl(int page, int pagesize, String whereParam) {
+		HashMap<String, Object> where = new HashMap<String, Object>();
+		if (whereParam != null) {
+			try {
+				whereParam = java.net.URLDecoder.decode(whereParam, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				where = mapper.readValue(whereParam,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+			}
+		}
+		// 拼接查询条件
+		Condition condition = new Condition();
+		condition.add("s.sdyy", "FUZZY", where.get("sdyy"));
+		condition.add("s.sdr_role", "FUZZY", where.get("sdr_role"));
+		condition.add("s.jsr_role", "FUZZY", where.get("jsr_role"));
+		condition.add("s.sdr", "FUZZY", where.get("sdr"));
+		condition.add("s.jsr", "FUZZY", where.get("jsr"));
+		condition.add("s.sdtime", "DATE_BETWEEN", where.get("sdtime"));
+		condition.add("s.jstime", "DATE_BETWEEN", where.get("jstime"));
+		condition.add("r.xming", "FUZZY", where.get("xming"));
+
+		Map<String, Object> rs = zzsdDao.getSWSsdjl(page, pagesize, condition);
+		return rs;
+	}
+
+	public void unlockSWSZzsd(User user, List<Integer> id) {
+		String jstime = Common.getCurrentTime2MysqlDateTime();
+		List<Role> role = authDao.getRolesByUser(user.getUsername());
+		String roleName = role.get(0).getDescription();
+		
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		for(Integer sdId : id){
+			Object[] arg = new Object[] { user.getUsername(),roleName, jstime, 0, sdId };
+			batchArgs.add(arg);
+		}
+		if(batchArgs.size()>0){
+			zzsdDao.unlockSWSZzsd(batchArgs);
+		}
+		
+	}
+
 }

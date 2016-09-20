@@ -113,6 +113,26 @@ public class ZzsdDao extends BaseDao {
 			return map;
 		}
 	}
+	public class swssdjl implements RowMapper<Map<String, Object>> {
+
+		@Override
+		public Map<String, Object> mapRow(ResultSet rs, int arg1)
+				throws SQLException {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", rs.getObject("id"));
+			map.put("xming", rs.getObject("xming"));
+			map.put("sdyy", rs.getObject("sdyy"));
+			map.put("sdr", rs.getObject("sdr"));
+			map.put("sdr_role", rs.getObject("sdr_role"));
+			map.put("sdtime", rs.getDate("sdtime"));
+			map.put("jsr", rs.getObject("jsr"));
+			map.put("jsr_role", rs.getObject("jsr_role"));
+			map.put("jstime", rs.getDate("jstime"));
+			map.put("yxbz", rs.getBoolean("yxbz"));
+	
+			return map;
+		}
+	}
 	
 	public class sdJGIDRowMapper implements RowMapper<Integer> {
 
@@ -128,7 +148,7 @@ public class ZzsdDao extends BaseDao {
 		@Override
 		public Integer mapRow(ResultSet rs, int arg1)
 				throws SQLException {
-			return rs.getInt("zysws_id");
+			return rs.getInt("swsid");
 
 		}
 	}
@@ -216,6 +236,41 @@ public class ZzsdDao extends BaseDao {
 		sb.append(" insert into zs_sdjl_zysws (zysws_id,sdyy,sdr,sdr_role,sdtime,yxbz) ");
 		sb.append(" values(?,?,?,?,?,?) ");
 		this.jdbcTemplate.batchUpdate(sb.toString(), batchArgs);
+	}
+
+	public Map<String, Object> getSWSsdjl(int page, int pagesize,
+			Condition condition) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select SQL_CALC_FOUND_ROWS s.id,s.sdyy,s.sdr,s.sdr_role,s.sdtime,s.jsr,s.jsr_role,s.jstime,s.yxbz, ");
+		sb.append(" r.XMING from zs_sdjl_zysws s,zs_zysws z,zs_ryjbxx r ");
+		sb.append(condition.getSql());
+		sb.append(" and s.ZYSWS_ID = z.ID ");
+		sb.append(" and z.RY_ID = r.ID ");
+		sb.append(" order by s.yxbz desc, s.sdtime desc ");
+		sb.append(" limit ?,? ");
+		
+		int startIndex = pagesize * (page - 1);
+		ArrayList<Object> params = condition.getParams();
+		params.add(startIndex);
+		params.add(pagesize);
+		
+		List<Map<String,Object>> ls = jdbcTemplate.query(sb.toString(),params.toArray(),new swssdjl());
+		
+		String sql = "select FOUND_ROWS()";
+		Integer total = jdbcTemplate.queryForObject(sql,  Integer.class);
+		
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+		
+		return obj;
+	}
+
+	public void unlockSWSZzsd(List<Object[]> batchArgs) {
+		String sql = "update zs_sdjl_zysws set jsr = ?, jsr_role = ?, jstime = ?,yxbz = ? where id = ? ";
+		this.jdbcTemplate.batchUpdate(sql, batchArgs);
 	}
 
 

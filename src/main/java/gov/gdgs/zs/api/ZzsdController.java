@@ -139,5 +139,32 @@ public class ZzsdController {
 				"200", "更新成功");
 		return new ResponseEntity<>(rm, HttpStatus.OK);
 	}
+	
+	/**
+	 * 获取资质被锁税务师名单
+	 */
+	@RequestMapping(value = "/swszzsdjl", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getSWSsdjl(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where) {
+
+		Map<String, Object> obj = zzsdService.getSWSsdjl(page, pagesize, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	/*
+	 * 解除税务师资质锁定
+	 */
+	@RequestMapping(value = "/swszzsdjl", method = RequestMethod.PUT)
+	public ResponseEntity<?> unlockSWSZzsd(
+			@RequestBody Map<String, Object> rqbody, HttpServletRequest request) {
+		User user = accountService.getUserFromHeaderToken(request);
+		List<Integer> id = (List<Integer>) rqbody.get("id");
+		zzsdService.unlockSWSZzsd(user, id);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
+				"200", "更新成功");
+		return new ResponseEntity<>(rm, HttpStatus.OK);
+	}
 
 }
