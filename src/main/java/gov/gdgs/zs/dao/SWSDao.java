@@ -177,7 +177,7 @@ public class SWSDao extends BaseDao{
 	 */
 	public List<Map<String,Object>> zyryxx(int id){
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select @rownum:=@rownum+1 as 'key',@rownum AS xh,c.xming, ");
+		sb.append("		select @rownum:=@rownum+1 as 'key',@rownum AS xh,c.xming,c.id, ");
 		sb.append("	case a.czr_dm when 1 then '是'  when 2 then '否' else null end as czr,");
 		sb.append("	case a.fqr_dm when 1 then '是'  when 2 then '否' else null end as fqr,");
 		sb.append("	case a.sz_dm when 1 then '是'  when 2 then '否' else null end as sz ");
@@ -185,7 +185,22 @@ public class SWSDao extends BaseDao{
 		sb.append("	where a.jg_id=?");
 		sb.append("	 and a.ry_id = c.id");
 		sb.append("	 and a.ZYZT_DM=1");
-		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
+		return this.jdbcTemplate.query(sb.toString(),new Object[]{id},
+				new RowMapper<Map<String,Object>>() {
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				String id = hashids.encode(rs.getLong("id"));
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("zyid", id);
+				map.put("key", rs.getObject("key"));
+				map.put("xh", rs.getObject("xh"));
+				map.put("xming", rs.getObject("xming"));
+				map.put("czr", rs.getObject("czr"));
+				map.put("fqr", rs.getObject("fqr"));
+				map.put("sz", rs.getObject("sz"));
+				return map;
+			}
+		});
 	}
 	/**
 	 * 
@@ -194,7 +209,7 @@ public class SWSDao extends BaseDao{
 	 */
 	public List<Map<String,Object>> cyryxx(int id){
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select @rownum:=@rownum+1 as 'key', c.xming, ");
+		sb.append("		select @rownum:=@rownum+1 as 'key', c.xming,c.id, ");
 		sb.append("			 d.mc as xl, c.sfzh,");
 		sb.append("			e.mc as zc from zs_cyry a,");
 		sb.append("			zs_ryjbxx c,dm_xl d,");
@@ -204,7 +219,21 @@ public class SWSDao extends BaseDao{
 		sb.append("			and c.xl_dm = d.id ");
 		sb.append("			and a.zw_dm = e.id");
 		sb.append("			and a.CYRYZT_DM=1");
-		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
+		return this.jdbcTemplate.query(sb.toString(),new Object[]{id},
+				new RowMapper<Map<String,Object>>() {
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				String id = hashids.encode(rs.getLong("id"));
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("cyid", id);
+				map.put("key", rs.getObject("key"));
+				map.put("xl", rs.getObject("xl"));
+				map.put("xming", rs.getObject("xming"));
+				map.put("sfzh", rs.getObject("sfzh"));
+				map.put("zc", rs.getObject("zc"));
+				return map;
+			}
+		});
 	}
 	/**
 	 * 
