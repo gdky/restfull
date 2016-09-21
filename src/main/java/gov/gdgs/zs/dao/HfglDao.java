@@ -594,7 +594,22 @@ public class HfglDao extends BaseDao{
         for (Row row : sheet1) {  
         	ArrayList<Object> params =new ArrayList<Object>();  
             for (Cell cell : row) {  
-            	params.add(cell);  
+            	switch (cell.getCellType()) {  
+            	case XSSFCell.CELL_TYPE_NUMERIC :
+            		if(DateUtil.isCellDateFormatted(cell)){
+                		Date date = cell.getDateCellValue();
+                		params.add(Common.getDate2MysqlDateTime(date));
+                	}else {
+                		params.add(cell);  
+                	}
+            		break;
+            	case XSSFCell.CELL_TYPE_STRING:
+            		params.add(cell.getStringCellValue());  
+            		break;
+            	case XSSFCell.CELL_TYPE_BLANK:
+            		params.add("");
+            		break;
+            	} 
             }
             String nd ="";
             String sfzh=params.get(2)+"";
