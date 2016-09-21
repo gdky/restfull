@@ -17,9 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;  
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -126,7 +129,7 @@ public class HfglDao extends BaseDao{
 		});
 	     int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		StringBuffer ub = new StringBuffer();
-		ub.append("		select  '' as 'key','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
+		ub.append("		select  'dqytjkey' as 'jgid','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
 		ub.append("		sum(h.yftt) as yftt,sum(h.qjtt) as qjtt,sum(h.yjgr) as yjgr,sum(h.yfgr) as yfgr,");
 		ub.append("		sum(h.qjgr) as qjgr,'1' as issd from (select g.* from (select   b.dwmc,'"+lyear+"' as nd,");
 		ub.append("			(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
@@ -360,15 +363,30 @@ public class HfglDao extends BaseDao{
         int i=0,j=0;
         for (Row row : sheet1) {  
         	ArrayList<Object> params =new ArrayList<Object>();  
-            for (Cell cell : row) {  
-            	params.add(cell);  
+            for (Cell cell : row) {
+            	switch (cell.getCellType()) {  
+            	case XSSFCell.CELL_TYPE_NUMERIC :
+            		if(DateUtil.isCellDateFormatted(cell)){
+                		Date date = cell.getDateCellValue();
+                		params.add(Common.getDate2MysqlDateTime(date));
+                	}else {
+                		params.add(cell);  
+                	}
+            		break;
+            	case XSSFCell.CELL_TYPE_STRING:
+            		params.add(cell.getStringCellValue());  
+            		break;
+            	case XSSFCell.CELL_TYPE_BLANK:
+            		params.add("");
+            		break;
+            	}
             }
             String nd = (params.get(1)+"").substring(0,4);
             List<Map<String, Object>> jg = this.jdbcTemplate.queryForList("select a.id,f_yjtt(a.id,'"+nd+"') as yjtt,(select count(b.id) from zs_zysws b where b.JG_ID=a.ID and yxbz=1) as yjrs from zs_jg a where a.dwmc=? and a.yxbz=1",
             		params.get(3)+"");
             if(jg.size()==0){
             	j+=1;
-            	fls.add(params.get(3)+""+"（请检查事务所状态及名称）");
+            	fls.add("第 "+row.getRowNum()+"行："+params.get(3)+""+"（请检查事务所状态及名称）");
             	continue;
             }else{
             	Map<String, Object> jgs = jg.get(0);
@@ -576,7 +594,22 @@ public class HfglDao extends BaseDao{
         for (Row row : sheet1) {  
         	ArrayList<Object> params =new ArrayList<Object>();  
             for (Cell cell : row) {  
-            	params.add(cell);  
+            	switch (cell.getCellType()) {  
+            	case XSSFCell.CELL_TYPE_NUMERIC :
+            		if(DateUtil.isCellDateFormatted(cell)){
+                		Date date = cell.getDateCellValue();
+                		params.add(Common.getDate2MysqlDateTime(date));
+                	}else {
+                		params.add(cell);  
+                	}
+            		break;
+            	case XSSFCell.CELL_TYPE_STRING:
+            		params.add(cell.getStringCellValue());  
+            		break;
+            	case XSSFCell.CELL_TYPE_BLANK:
+            		params.add("");
+            		break;
+            	} 
             }
             String nd ="";
             String sfzh=params.get(2)+"";
