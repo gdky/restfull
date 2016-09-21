@@ -1,17 +1,16 @@
 package gov.gdgs.zs.api;
 
-import java.util.Map;
-
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.SwsService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.configuration.Constants;
@@ -41,7 +40,9 @@ public class SummaryController {
 		//获取出资人信息
 		Map<String,Object> czrxx = swsService.getCzrxx(jid);
 		
-		return new ResponseEntity<>();
+		Map<String,Object> summary = new HashMap<String,Object>();
+		
+		return ResponseEntity.ok(summary);
 
 	}
 }
