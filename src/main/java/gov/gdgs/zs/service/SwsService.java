@@ -92,4 +92,16 @@ public class SwsService {
 	public Object chilchenJG(Object pid){
 		return swsDao.chilchenJG(pid);
 	}
+	public Map<String, Object> getSzxx(Long jid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public Map<String, Object> getFqrxx(Long jid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public Map<String, Object> getCzrxx(Long jid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
