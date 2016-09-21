@@ -422,4 +422,78 @@ public class YwglService {
 		return rs;
 	}
 
+	/**
+	 * 业务报备数据分析
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjfx(String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjfx(map);
+	}
+
+	/**
+	 * 业务报备数据分析
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjfxDq(String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjfxDq(map);
+	}
+
+	public Map<String, Object> getYwbbsjfxSws(String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjfxSws(map);
+	}
+
+	public Map<String, Object> getYwbbsjfxYwlx(String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if(where != null){
+			try{
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjfxYwlx(map);
+	}
+
 }

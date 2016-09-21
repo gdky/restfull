@@ -110,19 +110,61 @@ public class ZzsdController {
 				"200", "更新成功");
 		return new ResponseEntity<>(rm, HttpStatus.OK);
 	}
+	
+	/**
+	 * 获取注册税务师资质状态总列表
+	 */
+	@RequestMapping(value = "/swszzzt", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getSWSzzzt(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where) {
 
-	@RequestMapping(value = "/zzsdhave", method = RequestMethod.POST)
-	public ResponseEntity<?> zzsdhave(@RequestParam Integer lx,
-			@RequestBody Map<String, Object> rqbody) {
-		List<Integer> jgId = (List<Integer>) rqbody.get("jgId");
-		List<Integer> ls = zzsdService.getSdJGByLx(lx);
-		ArrayList<Integer> rs = new ArrayList<Integer>();
-		for (Integer id : jgId) {
-			if (!ls.contains(id)) {
-				rs.add(id);
-			}
-		}
-		return new ResponseEntity<>(rs, HttpStatus.OK);
+		Map<String, Object> obj = zzsdService.getSWSzzzt(page, pagesize, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	
+	/*
+	 * 添加税务师资质锁定记录
+	 */
+	@RequestMapping(value = "/swszzzt", method = RequestMethod.POST)
+	public ResponseEntity<?> addSwszzsd(@RequestBody Map<String, Object> rqbody,
+			HttpServletRequest request) {
+		User user = accountService.getUserFromHeaderToken(request);
+		String sdyy = (String) rqbody.get("sdyy");
+		List<Integer> swsId = (List<Integer>) rqbody.get("swsId");
+		zzsdService.addSwszzsd(user, sdyy, swsId);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
+				"200", "更新成功");
+		return new ResponseEntity<>(rm, HttpStatus.OK);
+	}
+	
+	/**
+	 * 获取资质被锁税务师名单
+	 */
+	@RequestMapping(value = "/swszzsdjl", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getSWSsdjl(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where) {
+
+		Map<String, Object> obj = zzsdService.getSWSsdjl(page, pagesize, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	/*
+	 * 解除税务师资质锁定
+	 */
+	@RequestMapping(value = "/swszzsdjl", method = RequestMethod.PUT)
+	public ResponseEntity<?> unlockSWSZzsd(
+			@RequestBody Map<String, Object> rqbody, HttpServletRequest request) {
+		User user = accountService.getUserFromHeaderToken(request);
+		List<Integer> id = (List<Integer>) rqbody.get("id");
+		zzsdService.unlockSWSZzsd(user, id);
+		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
+				"200", "更新成功");
+		return new ResponseEntity<>(rm, HttpStatus.OK);
 	}
 
 }

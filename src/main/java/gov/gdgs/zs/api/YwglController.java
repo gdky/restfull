@@ -142,5 +142,52 @@ public class YwglController {
 		return new ResponseEntity<>(obj,HttpStatus.CREATED);
 	}
 
+	 /**
+	  * 业务报备数据分析
+	  * @param where
+	  * @return
+	  */
+	 @RequestMapping(value = "/ywgl/ywbbsjfx", method = RequestMethod.GET )
+	 public ResponseEntity<?> getYwbbsjfx(
+				@RequestParam(value = "where", required = false) String where){
+		Map<String,Object> map=ywglService.getYwbbsjfx(where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	 
+	 /**
+	  * 业务报备数据分析
+	  * @param where
+	  * @return
+	  */
+	 @RequestMapping(value = "/ywgl/ywbbsjfx/dq", method = RequestMethod.GET )
+	 public ResponseEntity<?> getYwbbsjfxDq(
+				@RequestParam(value = "where", required = false) String where){
+		Map<String,Object> map=ywglService.getYwbbsjfxDq(where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	
+	 /**
+	  * 业务报备数据分析
+	  * @param where
+	  * @return
+	  */
+	 @RequestMapping(value = "/ywgl/ywbbsjfx/sws", method = RequestMethod.GET )
+	 public ResponseEntity<?> getYwbbsjfxSws(
+				@RequestParam(value = "where", required = false) String where){
+		Map<String,Object> map=ywglService.getYwbbsjfxSws(where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	 
+	 /**
+	  * 业务报备数据分析
+	  * @param where
+	  * @return
+	  */
+	 @RequestMapping(value = "/ywgl/ywbbsjfx/ywlx", method = RequestMethod.GET )
+	 public ResponseEntity<?> getYwbbsjfxYwlx(
+				@RequestParam(value = "where", required = false) String where){
+		Map<String,Object> map=ywglService.getYwbbsjfxYwlx(where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}  
 
 }

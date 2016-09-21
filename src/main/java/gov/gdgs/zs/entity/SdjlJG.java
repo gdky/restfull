@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
- * 机构锁定记录
+ * 机构资质锁定记录
  * @author ming
  *
  */
