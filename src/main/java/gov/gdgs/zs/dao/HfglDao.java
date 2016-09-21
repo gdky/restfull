@@ -386,7 +386,7 @@ public class HfglDao extends BaseDao{
             		params.get(3)+"");
             if(jg.size()==0){
             	j+=1;
-            	fls.add(row.getRowNum()+""+params.get(3)+""+"（请检查事务所状态及名称）");
+            	fls.add("第 "+row.getRowNum()+"行："+params.get(3)+""+"（请检查事务所状态及名称）");
             	continue;
             }else{
             	Map<String, Object> jgs = jg.get(0);
