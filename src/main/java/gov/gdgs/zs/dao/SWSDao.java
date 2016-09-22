@@ -349,4 +349,32 @@ public class SWSDao extends BaseDao{
 					}
 				});
 	}
+
+	public List<Map<String, Object>> getCzrxx(Long jgId) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select r.xming,if(r.XB_DM=1 ,'男','女')as xb,z.zyzgzsbh,z.zyzsbh,xl.MC as xl,zw.MC as zw ");
+		sb.append(" from zs_zysws z , zs_jg j , zs_ryjbxx r,dm_xl xl,dm_zw zw ");
+		sb.append(" where z.JG_ID = j.ID ");
+		sb.append(" and r.ID = z.RY_ID ");
+		sb.append(" and r.XL_DM = xl.ID ");
+		sb.append(" and z.ZW_DM = zw.ID ");
+		sb.append(" and j.id = ? ");
+		sb.append(" and z.CZR_DM = 1 ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId});
+		return ls;
+	}
+
+	public List<Map<String, Object>> getFqrxx(Long jgId) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select r.xming,if(r.XB_DM=1 ,'男','女')as xb,z.zyzgzsbh,z.zyzsbh,xl.MC as xl,zw.MC as zw ");
+		sb.append(" from zs_zysws z , zs_jg j , zs_ryjbxx r,dm_xl xl,dm_zw zw ");
+		sb.append(" where z.JG_ID = j.ID ");
+		sb.append(" and r.ID = z.RY_ID ");
+		sb.append(" and r.XL_DM = xl.ID ");
+		sb.append(" and z.ZW_DM = zw.ID ");
+		sb.append(" and j.id = ? ");
+		sb.append(" and z.FQR_DM = 1 ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId});
+		return ls;
+	}
 }

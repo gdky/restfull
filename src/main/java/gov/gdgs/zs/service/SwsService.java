@@ -4,6 +4,7 @@ import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.dao.SWSDao;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -92,16 +93,18 @@ public class SwsService {
 	public Object chilchenJG(Object pid){
 		return swsDao.chilchenJG(pid);
 	}
-	public Map<String, Object> getSzxx(Long jid) {
-		// TODO Auto-generated method stub
-		return null;
+	public Map<String, Object> getSzxx(Map<String,Object> swsxx) {
+		Map<String,Object> obj = new HashMap<String,Object>();
+		Map<String,Object> data = (Map<String,Object>)swsxx.get("data");
+		obj.put("xming", (String)data.get("fddbr"));
+		obj.put("szphone", (String)data.get("szphone"));
+		obj.put("szyx", (String)data.get("szyx"));
+		return obj;
 	}
-	public Map<String, Object> getFqrxx(Long jid) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Map<String, Object>> getFqrxx(Long jgId) {
+		return swsDao.getFqrxx(jgId);
 	}
-	public Map<String, Object> getCzrxx(Long jid) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Map<String, Object>> getCzrxx(Long jgId) {
+		return swsDao.getCzrxx(jgId);
 	}
 }
