@@ -101,10 +101,20 @@ public class SwsService {
 		obj.put("szyx", (String)data.get("szyx"));
 		return obj;
 	}
+	
 	public List<Map<String, Object>> getFqrxx(Long jgId) {
 		return swsDao.getFqrxx(jgId);
 	}
+	
 	public List<Map<String, Object>> getCzrxx(Long jgId) {
 		return swsDao.getCzrxx(jgId);
+	}
+	
+	public Map<String, Object> getSumZysws(Long jgId, int page, int pagesize) {
+		return swsDao.getSumZysws(jgId,page,pagesize);
+	}
+	
+	public Map<String, Object> getSumCyry(Long jgId, int page, int pagesize) {
+		return swsDao.getSumCyry(jgId,page,pagesize);
 	}
 }

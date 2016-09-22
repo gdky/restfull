@@ -377,4 +377,62 @@ public class SWSDao extends BaseDao{
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId});
 		return ls;
 	}
+
+	public Map<String, Object> getSumZysws(Long jgId, int page, int pagesize) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT sql_calc_found_rows r.XMING,xb.MC AS xb,r.sri, YEAR(FROM_DAYS(DATEDIFF(NOW(),r.SRI))) AS age, xl.mc AS xl,  ");
+		sb.append(" z.CZE , concat(round((z.cze/j.zczj)*100,2),'%')  as bl ");
+		sb.append(" FROM zs_zysws z, zs_ryjbxx r, dm_xb xb, dm_xl xl, zs_jg j ");
+		sb.append(" WHERE z.JG_ID = ?  ");
+		sb.append(" AND z.JG_ID = j.ID  ");
+		sb.append(" AND z.RY_ID = r.ID  ");
+		sb.append(" AND r.XB_DM = xb.ID  ");
+		sb.append(" AND r.XL_DM = xl.ID  ");
+		sb.append(" AND z.yxbz = 1  ");
+		sb.append(" AND z.ZYZT_DM = 1 ");
+		sb.append(" limit ?,? ");
+		
+		int startIndex = pagesize * (page - 1);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId,startIndex,pagesize});
+		
+		String sql = "select FOUND_ROWS()";
+		Integer total = jdbcTemplate.queryForObject(sql,  Integer.class);
+		
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+		
+		return obj;
+	}
+	
+	public Map<String, Object> getSumCyry(Long jgId, int page, int pagesize) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT r.XMING,xb.MC AS xb,r.sri, YEAR(FROM_DAYS(DATEDIFF(NOW(),r.SRI))) AS age, xl.mc AS xl,  ");
+		sb.append(" z.ZGXLZYMC,z.XZSNGZGW ");
+		sb.append(" FROM zs_cyry z, zs_ryjbxx r, dm_xb xb, dm_xl xl, zs_jg j ");
+		sb.append(" WHERE z.JG_ID = ? ");
+		sb.append(" AND z.JG_ID = j.ID  ");
+		sb.append(" AND z.RY_ID = r.ID  ");
+		sb.append(" AND r.XB_DM = xb.ID  ");
+		sb.append(" AND r.XL_DM = xl.ID  ");
+		sb.append(" AND z.yxbz = 1  ");
+		sb.append(" and z.CYRYZT_DM = 1 ");
+		sb.append(" limit ?,? ");
+		
+		int startIndex = pagesize * (page - 1);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId,startIndex,pagesize});
+		
+		String sql = "select FOUND_ROWS()";
+		Integer total = jdbcTemplate.queryForObject(sql,  Integer.class);
+		
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+		
+		return obj;
+	}
 }
