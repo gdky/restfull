@@ -12,7 +12,9 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
@@ -54,5 +56,23 @@ public class BaseJdbcDao {
 		}, keyHolder);
 		return keyHolder.getKey();
 	}
+	
+	/**
+	 * 插入一条记录并返回主键ID
+	 * 
+	 * @param sqlStatement  sql语句
+	 * @param paramObj           sql使用的变量
+	 * @param idColumnName  要返回的id列名
+	 * @return 
+	 * @return
+	 */
+	public  Number insertAndGetKeyByNamedJdbc(final String sqlStatement, final Map<String,Object> paramObj,
+			final String[] idColumnName) {
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		 SqlParameterSource ps=new BeanPropertySqlParameterSource(paramObj); 
+		namedParameterJdbcTemplate.update(sqlStatement,ps,keyHolder,idColumnName);
+		return keyHolder.getKey();
+	}
+
 
 }
