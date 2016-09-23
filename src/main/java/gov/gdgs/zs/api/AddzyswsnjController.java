@@ -46,6 +46,16 @@ public class AddzyswsnjController {
 				
 		return new ResponseEntity<>(obj,HttpStatus.OK); 
 	}
+//姓名下拉框选择显示信息
+@RequestMapping(value = "/add/zyswsnj1/{sws_id}", method = RequestMethod.GET)
+public ResponseEntity<Map<String, Object>> getZyswsnjBySwsId(
+	@PathVariable("sws_id") String sws_id) {
+
+Map<String, Object> obj = addzyswsnjService.getzyswsnjbBySwsId(sws_id);
+return new ResponseEntity<>(obj, HttpStatus.OK);
+}
+
+//点击查看时显示信息
 @RequestMapping(value = "/add/zyswsnj/{id}", method = RequestMethod.GET)
 public ResponseEntity<Map<String, Object>> getZyswsnjById(
 	@PathVariable("id") String id) {
@@ -53,9 +63,38 @@ public ResponseEntity<Map<String, Object>> getZyswsnjById(
 Map<String, Object> obj = addzyswsnjService.getzyswsnjbById(id);
 return new ResponseEntity<>(obj, HttpStatus.OK);
 }
+
+
 //执业税务师姓名的选择
-//@RequestMapping(value="/add/zyswsxm",method=RequestMethod.GET)
-//public ResponseEntity<T>
+@RequestMapping(value="/add/zyswsxm",method=RequestMethod.GET)
+public ResponseEntity<Map<String,Object>> getZyswsxm(
+		@RequestParam(value = "page", required = true) int page, 
+		@RequestParam(value = "pageSize", required = true) int pageSize,
+		@RequestParam(value="where", required=false) String where,HttpServletRequest request)
+		throws Exception{ 
+    User user =  accountService.getUserFromHeaderToken(request);
+	Map<String,Object> obj = addzyswsnjService.getzyswsxm(page, pageSize,user.getJgId(), where);
+			
+	return new ResponseEntity<>(obj,HttpStatus.OK); 
+}
+
+//报备份数（bafs）
+@RequestMapping(value = "/add/zyswsnj2", method = RequestMethod.GET)
+public ResponseEntity<Map<String, Object>> getZyswsnjBafs(
+		@RequestParam(value="nd", required=false) String nd,
+		@RequestParam(value="sws_id", required=false) String sws_id,
+		HttpServletRequest request)
+	 {
+	
+Map<String, Object> obj = addzyswsnjService.getzyswsnjBafs(nd, sws_id);
+return new ResponseEntity<>(obj, HttpStatus.OK);
+
+}
+
+
+
+
+
 //执业税务师年检表增加
 @RequestMapping(value = "/addzyswsnjb", method = RequestMethod.POST)
 	public ResponseEntity<Map<String,Object>> addZyswsnjb(@RequestBody  Map<String ,Object> obj,HttpServletRequest request)

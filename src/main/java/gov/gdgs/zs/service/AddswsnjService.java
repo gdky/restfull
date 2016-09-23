@@ -26,7 +26,7 @@ public class AddswsnjService implements IAddswsnjService{
 	@Resource
 	private IAddswsnjDao iaddswsnjdao;
 	@Override
-	public Map<String, Object> addSwsnjb (Map<String, Object> obj) {
+	public Map<String, Object> addSwsnjb (Map<String, Object> obj) throws Exception {
 		
 		
 		
