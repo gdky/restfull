@@ -50,6 +50,29 @@ public class AddswsnjController {
 				
 		return new ResponseEntity<>(obj,HttpStatus.OK); 
 	}
+//事务所报备份数查询
+@RequestMapping(value = "/add/swsnj2", method = RequestMethod.GET) 
+public  ResponseEntity<Map<String,Object>> getSwsBafs(  
+		@RequestParam(value="where", required=false) String where,HttpServletRequest request)
+		throws Exception{ 
+User user =  accountService.getUserFromHeaderToken(request);
+
+	Map<String,Object> obj = addswsnjService.getswsbafs(user.getJgId(), where);
+			
+	return new ResponseEntity<>(obj,HttpStatus.OK); 
+}
+//事务所已年检年度查询
+@RequestMapping(value = "/add/swsnj3", method = RequestMethod.GET) 
+public  ResponseEntity<Map<String,Object>> getSwsnjnd(  
+		@RequestParam(value="where", required=false) String where,HttpServletRequest request)
+		throws Exception{ 
+User user =  accountService.getUserFromHeaderToken(request);
+
+	Map<String,Object> obj = addswsnjService.getswsnjnd(user.getJgId(), where);
+			
+	return new ResponseEntity<>(obj,HttpStatus.OK); 
+}
+
 
    @RequestMapping(value = "/add/swsnj/{id}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getSwsnjById(
