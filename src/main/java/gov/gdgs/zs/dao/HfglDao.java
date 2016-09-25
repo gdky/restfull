@@ -386,7 +386,7 @@ public class HfglDao extends BaseDao{
             		params.get(3)+"");
             if(jg.size()==0){
             	j+=1;
-            	fls.add("第 "+row.getRowNum()+"行："+params.get(3)+""+"（请检查事务所状态及名称）");
+            	fls.add("第 "+row.getRowNum()+" 行："+params.get(3)+""+"（请检查事务所状态及名称）");
             	continue;
             }else{
             	Map<String, Object> jgs = jg.get(0);
@@ -594,7 +594,22 @@ public class HfglDao extends BaseDao{
         for (Row row : sheet1) {  
         	ArrayList<Object> params =new ArrayList<Object>();  
             for (Cell cell : row) {  
-            	params.add(cell);  
+            	switch (cell.getCellType()) {  
+            	case XSSFCell.CELL_TYPE_NUMERIC :
+            		if(DateUtil.isCellDateFormatted(cell)){
+                		Date date = cell.getDateCellValue();
+                		params.add(Common.getDate2MysqlDateTime(date));
+                	}else {
+                		params.add(cell);  
+                	}
+            		break;
+            	case XSSFCell.CELL_TYPE_STRING:
+            		params.add(cell.getStringCellValue());  
+            		break;
+            	case XSSFCell.CELL_TYPE_BLANK:
+            		params.add("");
+            		break;
+            	} 
             }
             String nd ="";
             String sfzh=params.get(2)+"";
@@ -602,18 +617,18 @@ public class HfglDao extends BaseDao{
             	 nd = (params.get(0)+"").substring(0,4);
 			} catch (Exception e) {
 				j+=1;
-            	fls.add(params.get(1)+""+"   "+sfzh+"（请检查年份格式）");
+            	fls.add("第 "+row.getRowNum()+" 行："+params.get(1)+""+"   "+sfzh+"（请检查年份格式）");
 				continue;
 			}
             List<Map<String, Object>> ls = this.jdbcTemplate.queryForList("select a.ry_id from zs_fzysws a,zs_ryjbxx b where a.ry_id=b.id and b.sfzh=?  and a.fzyzt_dm=1",sfzh);
             if(ls.size()==0){
             	j+=1;
-            	fls.add(params.get(1)+""+"   "+sfzh+"（请检查身份证号码）");
+            	fls.add("第 "+row.getRowNum()+" 行："+params.get(1)+""+"   "+sfzh+"（请检查身份证号码）");
             	continue;
     		}
             if(this.jdbcTemplate.queryForList("select id from zs_hyhffzyjfb where ry_id=? and nd=? and yxbz=1",new Object[]{ls.get(0).get("ry_id"),nd}).size()!=0){
             	j+=1;
-            	fls.add(params.get(1)+""+"   "+sfzh+"（该年度缴费记录已存在，请使用修改操作修改）");
+            	fls.add("第 "+row.getRowNum()+" 行："+params.get(1)+""+"   "+sfzh+"（该年度缴费记录已存在，请使用修改操作修改）");
             	continue;
     		}
             String sql="insert into zs_hyhffzyjfb (ID,ND,RY_ID,JE,BZ,LRR,SCJLID,JFRQ,LRRQ,YXBZ) values(?,?,?,?,?,?,?,?,sysdate(),1)";

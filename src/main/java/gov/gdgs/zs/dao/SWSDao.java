@@ -148,22 +148,20 @@ public class SWSDao extends BaseDao{
 	 */
 	public Map<String,Object> swsxx(int id){
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select a.dwmc,c.mc as cs,	a.fddbr,a.dzhi,a.sjlzxsbwh,a.zcdz, ");
+		sb.append("		select a.dwmc,ifnull(a.CS_DM,(select c.mc from dm_cs c where c.ID=a.CS_DM)) as cs,	a.fddbr,a.dzhi,a.sjlzxsbwh,a.zcdz, ");
 		sb.append("		date_format(a.sglzxsbsj,'%Y-%m-%d') as sglzxsbsj,date_format(a.zjpzsj,'%Y-%m-%d')");
 		sb.append("		as zjpzsj,a.yzbm,a.zjpzwh,a.czhen,a.dhua,a.szyx, ");
-		sb.append("		a.txyxming,a.xtyyx,a.xtyphone,a.JGZCH as zsbh,	a.zczj,a.jyfw,");
+		sb.append("		a.txyxming,a.xtyyx,a.xtyphone,a.JGZCH as zsbh,	a.zczj,a.jyfw,a.GZ_DM as isgz,");
 		sb.append("		(select count(id) from zs_zysws where jg_id=a.id)+");
 		sb.append("		(select count(id) from zs_cyry where jg_id=a.id and CYRYZT_DM=1) as zrs, ");
-		sb.append("		b.mc as swsxz,a.szphone,a.gsyhmcbh,a.dzyj,a.yhdw,date_format(a.yhsj,'%Y-%m-%d') as yhsj, ");
+		sb.append("		ifnull(a.JGXZ_DM,(select b.mc from dm_jgxz b where b.ID=a.JGXZ_DM)) as swsxz,a.szphone,a.gsyhmcbh,a.dzyj,a.yhdw,date_format(a.yhsj,'%Y-%m-%d') as yhsj, ");
 		sb.append("		a.gzbh,a.gzdw,a.gzry,date_format(a.gzsj,'%Y-%m-%d') as gzsj,a.yzbh,a.yzdw,");
-		sb.append("		a.yzry,date_format(a.yzsj,'%Y-%m-%d') as yzsj, ");
+		sb.append("		a.yzry,date_format(a.yzsj,'%Y-%m-%d') as yzsj, a.tgzt_dm as tgzt,");
 		sb.append("		a.tthybh,date_format(a.rhsj,'%Y-%m-%d') as rhsj,a.khh,a.khhzh,a.fj,a.swdjhm,a.jbqk, ");
 		sb.append("		a.glzd,a.gddh,a.bgcszczm,a.yyzzhm,DATE_FORMAT(a.swszsclsj,'%Y-%m-%d') AS clsj,");
 		sb.append("		a.jgdmzh,a.wangzhi,a.CS_DM as csdm,a.JGXZ_DM as jgxzdm from		"); 
-		sb.append("		 zs_jg a,dm_jgxz b,dm_cs c ");
-		sb.append("		WHERE	a.JGXZ_DM = b.ID  ");
-		sb.append("		AND a.CS_DM = c.ID   ");
-		sb.append("		and a.YXBZ = 1	and a.id =?");
+		sb.append("		 zs_jg a ");
+		sb.append("		WHERE a.id =?");
 		String sql = "SELECT @rownum:=@rownum+1 AS 'key',b.* FROM zs_nbjgsz b,(SELECT @rownum:=0) zs_jg WHERE  b.jg_id=? ";
 		List<Map<String, Object>> tl = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 		Map<String,Object> ll =tl.get(0);
@@ -354,10 +352,10 @@ public class SWSDao extends BaseDao{
 			}
 		}
 		if(is){
-			return this.insertAndGetKeyByJdbc("insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,PARENTJGID,SBCLSJ,YXBZ) values(?,?,5,5,0,sysdate(),0)",
+			return this.insertAndGetKeyByJdbc("insert into zs_jg (DWMC,CS_DM,jgzt_dm,PARENTJGID,SBCLSJ,YXBZ) values(?,?,5,0,sysdate(),0)",
 					new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
 		}
-		String sql ="insert into zs_jg (DWMC,CS_DM,jgzt_dm,tgzt_dm,SBCLSJ,YXBZ) values(?,?,5,5,sysdate(),0)";
+		String sql ="insert into zs_jg (DWMC,CS_DM,jgzt_dm,SBCLSJ,YXBZ) values(?,?,5,sysdate(),0)";
 		return this.insertAndGetKeyByJdbc(sql,new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
 	}
 	/**
