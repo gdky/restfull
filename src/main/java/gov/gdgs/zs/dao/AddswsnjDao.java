@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -24,6 +26,9 @@ import com.gdky.restfull.dao.BaseJdbcDao;
 @Repository
 public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 
+	@Resource
+	private SPDao spDao;
+	
 	public Map<String, Object> getswsnjb(int page, int pageSize, int Jgid,
 			Map<String, Object> where) {
 		Condition condition = new Condition();
@@ -198,6 +203,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("        c.yzbm, ");
 		sql.append("        c.DZHI AS bgdz, ");
 		sql.append("        c.DHUA AS dhhm, ");
+		sql.append("        a.ID,");
 		sql.append("        ifnull(a.ZCSWSB,0) ZCSWSB ,");
 		sql.append("        ifnull(a.GDBDQK,0) GDBDQK,");
 		//sql.append("       ifnull() ");
@@ -206,6 +212,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("  a.ND,");
 		sql.append("  a.FZR,");
 		sql.append("  a.NJZJ,");
+		sql.append("  a.ZJWGDM,   "     );
 		sql.append(" ifnull( a.ZRS,0) ZRS,");
 		sql.append("  ifnull(a.BAFS,0) BAFS,");
 		sql.append(" ifnull (a.ZCZJ,0) ZCZJ,");
@@ -309,14 +316,14 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 					spsq.put("lclx", "40288087233c611801234b71cfc801b6");
 				}
 				spsq.put("jgid", jgid);
-				new SPDao().swsSPqq(spsq);// 生成审批表记录
+				spDao.swsSPqq(spsq);// 生成审批表记录
 			}
 			return njid.toString();
 		}
 	}
 
 	@Override
-	public void updateSwsnjb(Map<String, Object> obj) throws Exception {
+	public void updateSwsnjb(Map<String, Object> obj) throws Exception  {
 		Integer njid=(Integer) obj.get("id");
 		Integer jgid=(Integer) obj.get("jg_id");
 		String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
@@ -329,11 +336,12 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sb.append(" set ZSJG_ID=:jg_id,ZSJGXZ_ID=:xz,ND =:nd,ZJWGDM=:wg,NJZJ=:NJZJ,GDBDQKZJ=:GDBDQKZJ,"
 				+ "GDBDQKJS=:GDBDQKJS,ZRS=:ZRS,ZYRS=:zyrs,YJYRS=:yjyrs,SJJYRS=:sjjyrs, "
 				+ "WJYRS=:wjyrs,ZJ=:ZJ,FZR=:FZR,ZCSWSBZJ=:ZCSWSBZJ, "
-				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS," + "ztdm=:'ztbj' where id=:id ");
+				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS," + "ztdm=:ztbj where id=:id ");
 
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());
-		named.update(sb.toString(), obj);
+		int count=named.update(sb.toString(), obj);
+		if(count==1){
 		if ("2".equals(obj.get("ztbj"))) {
 			Map<String, Object> spsq = new HashMap<>();// 设置生成审批表方法参数
 			spsq.put("sid", njid);
@@ -346,9 +354,9 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 				spsq.put("lclx", "40288087233c611801234b71cfc801b6");
 			}
 			spsq.put("jgid", jgid);
-			new SPDao().swsSPqq(spsq);// 生成审批表记录
+			spDao.swsSPqq(spsq);// 生成审批表记录
 		}
-
+		}
 	}
 
 }

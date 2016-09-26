@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.annotation.Resource;
+
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +19,8 @@ import com.gdky.restfull.dao.BaseJdbcDao;
 //进入页面时最先显示的数据
 @Repository
 public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
+	@Resource
+	private SPDao spDao;
 
 	// 执业税务师年检
 	public Map<String, Object> getZyswsnjb(int page, int pageSize, int Jgid,
@@ -181,7 +185,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 			}
 			
 			spsq.put("jgid", jgid);
-			new SPDao().swsSPqq(spsq);//生成审批表记录
+			spDao.swsSPqq(spsq);//生成审批表记录
 			}
 			return uuid;
 		}
@@ -217,7 +221,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 			}
 			
 			spsq.put("jgid", jgid);
-			new SPDao().swsSPqq(spsq);//生成审批表记录
+			spDao.swsSPqq(spsq);//生成审批表记录
 			}
 	}
 }
