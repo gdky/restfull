@@ -3,11 +3,15 @@ package gov.gdgs.zs.dao;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.untils.Condition;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hashids.Hashids;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -26,23 +30,34 @@ public class JDJCDao extends BaseDao{
 		condition.add("a.zjsj", Condition.GREATER_EQUAL, qury.get("sbsj"));
 		condition.add("a.zjsj", Condition.LESS_EQUAL, qury.get("sbsj2"));
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select  SQL_CALC_FOUND_ROWS  @rownum:=@rownum+1 AS 'key',v.* from ( SELECT ");
-		sb.append("		c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,");
-		sb.append("		case a.ztdm when 3 then '已年检' when 2 then '已自检'  "
-				+ " else null end as njzt, CASE a.WGCL_DM WHEN 1 THEN '年检予以通过' WHEN 2 THEN '年检不予通过，"
-				+ "责令2个月整改' WHEN 6 THEN '年检不予以通过' WHEN 7 THEN '资料填写有误，请重新填写' ELSE NULL END AS njcl,"
-				+ "DATE_FORMAT(a.zjsj,'%Y-%m-%d') AS zjrq,DATE_FORMAT(c.SWSZSCLSJ ,'%Y-%m-%d') AS clsj,"
-				+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
-		sb.append("	 FROM  zs_jg_njb a,zs_jg c,dm_jgxz d");
-		sb.append("		"+condition.getSql()+" ");
-		sb.append("	and a.ZSJG_ID = c.ID and a.ztdm in (2,3)  and d.ID = c.JGXZ_DM");
-		sb.append("	group by a.zsjg_id,nd order by a.ND desc");
-		sb.append("	 ) as v ,(SELECT @rownum:=?) zs_jg");
+		sb.append("		SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',v.*,");
+		sb.append("		case v.ztdm when 3 then '已年检' when 2 then '已自检' else null end as njzt,");
+		sb.append("		 if(v.WGCL_DM is not null,(select b.CLMC from dm_jgwgcl b where b.ID=v.WGCL_DM),null)  as njcl,");
+		sb.append("		if((SELECT e.ID FROM zs_spzx e,zs_spxx f WHERE e.sjid=v.id AND e.ID=f.SPID limit 1),");
+		sb.append("		(SELECT CONCAT_WS(',', IF(f.SPSJ IS NULL,'',DATE_FORMAT(f.SPSJ,'%Y-%m-%d')), IF(f.SPYJ IS NULL,'',f.SPYJ), ");
+		sb.append("		IF(f.SPRNAME IS NULL,'',f.SPRNAME)) AS njcl");
+		sb.append("		FROM zs_spzx e,zs_spxx f");
+		sb.append("		WHERE e.sjid=v.id AND e.ID=f.SPID");
+		sb.append("		ORDER BY e.TJSJ DESC");
+		sb.append("		LIMIT 1),null");
+		sb.append("		) as spcl");
+		sb.append("		FROM (");
+		sb.append("		SELECT 		c.dwmc,c.JGZCH AS zsbh,d.mc AS jgxz,c.yzbm,c.DZHI AS bgdz,c.DHUA AS dhhm,a.*,");
+		sb.append("		  DATE_FORMAT(a.zjsj,'%Y-%m-%d') AS zjrq,");
+		sb.append("		DATE_FORMAT(c.SWSZSCLSJ,'%Y-%m-%d') AS clsj, ");
+		sb.append("		DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq");
+		sb.append("		FROM zs_jg_njb a,zs_jg c,dm_jgxz d");
+		sb.append(condition.getSql());
+		sb.append("		 AND a.ZSJG_ID = c.ID AND a.ztdm IN (2,3) AND d.ID = c.JGXZ_DM");
+		sb.append("		GROUP BY a.zsjg_id,nd");
+		sb.append("		ORDER BY a.ND DESC	");
 		sb.append("		    LIMIT ?, ? ");
+		sb.append("		) AS v,(");
+		sb.append("		SELECT @rownum:=?) zs_jg");
 		ArrayList<Object> params = condition.getParams();
 		params.add((pn-1)*ps);
-		params.add((pn-1)*ps);
 		params.add(ps);
+		params.add((pn-1)*ps);
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();
@@ -119,6 +134,13 @@ public class JDJCDao extends BaseDao{
 			 
 			 return ob;
 		}
+    /**
+     * 未交报表
+     * @param page
+     * @param pageSize
+     * @param where
+     * @return
+     */
     public Map<String, Object> getWsbbb(int page, int pageSize, Map<String,Object> where) {    	
     	List<String> arr = new ArrayList<String>();
     	arr.add("zs_cwbb_lrgd");
@@ -127,28 +149,47 @@ public class JDJCDao extends BaseDao{
 		arr.add("zs_cwbb_xjll");
 		arr.add("zs_cwbb_zcmx");
 		Condition condition = new Condition();
-		condition.add("b.dwmc",Condition.FUZZY,where.get("dwmc"));
-
-		
-		
+		condition.add("d.dwmc",Condition.FUZZY,where.get("dwmc"));
 		StringBuffer sb = new StringBuffer();
-		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM (select a.id,a.nd,b.DWMC,c.MC as cs,b.DHUA,");
-		sb.append(" '未上报' as ZTBJ,DATE_FORMAT(a.JSSJ,'%Y-%m-%d') AS TJSJ");
-		sb.append(" FROM "+arr.get(Integer.parseInt(where.get("bblx").toString()))+" a,zs_jg b,dm_cs c,(SELECT @rownum:=?) temp");
+		sb.append(" 	SELECT sql_calc_found_rows	 @rownum:=@rownum+1 as 'key','"+where.get("nd")+"' as nd,'未上报' as sbzt,d.id,d.dwmc,");
+		sb.append(" 	d.JGZCH as zsbh,c.mc as cs, d.DHUA as dhhm,d.TXYXMING as txyxm,d.XTYPHONE as txyyddh");
+		sb.append("		,(select v.id from zs_sdjl_jg v where v.jg_id=d.id and v.lx=3 and v.yxbz=1 limit 1) as issd ");
+		sb.append(" 	FROM zs_jg d,dm_cs c,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());//相当元 where x.xx like '%%'
-		sb.append(" and b.CS_DM=c.ID and a.nd = '"+where.get("nd")+"' AND a.JG_ID=b.ID AND a.ZTBJ=0) as t");
+		sb.append("     AND d.CS_DM=c.ID  ");
+		sb.append(" 	AND d.ID not in(select a.JG_ID from "+arr.get(Integer.parseInt(where.get("bblx").toString()))+" a where a.nd = ? AND a.ZTBJ=1)");
+		sb.append(" 	and d.YXBZ=1");
 		sb.append("    LIMIT ?, ? ");
 		// 装嵌传值数组
 		int startIndex = pageSize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
 		params.add(0, pageSize * (page - 1));
+		params.add(where.get("nd"));
 		params.add(startIndex);
 		params.add(pageSize);
 
 		// 获取符合条件的记录
-		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
-				params.toArray());
+		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),
+				params.toArray(),
+				new RowMapper<Map<String,Object>>() {
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				String id = hashids.encode((int)rs.getObject("id"));
+				Map<String,Object> map = new HashMap<String,Object>();
+				map.put("jgid", id);
+				map.put("dwmc", rs.getObject("dwmc"));
+				map.put("zsbh", rs.getObject("zsbh"));
+				map.put("key", rs.getObject("key"));
+				map.put("cs", rs.getObject("cs"));
+				map.put("dhhm", rs.getObject("dhhm"));
+				map.put("txyxm", rs.getObject("txyxm"));
+				map.put("txyyddh", rs.getObject("txyyddh"));
+				map.put("nd", rs.getObject("nd"));
+				map.put("sbzt", rs.getObject("sbzt"));
+				map.put("issd", rs.getObject("issd"));
+				return map;
+			}
+		});
 
 		// 获取符合条件的记录数
 

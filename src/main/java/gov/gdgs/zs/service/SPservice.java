@@ -25,6 +25,9 @@ public class SPservice {
 		return spDao.wspcx(uid);
 	}
 	
+	public List<Map<String,Object>> swswspcx(int uid){
+		return spDao.swswspcx(uid);
+	}
 	public List<Map<String,Object>> cklc(int lid){
 		return spDao.cklc(lid);
 	}
@@ -98,6 +101,10 @@ public class SPservice {
 		switch (splx) {
 		case "jgbgsq"://机构变更申请
 			this.spDao.swsbgsq(sqxm);break;
+		case "swsslzltb"://设立资料填报申请
+			this.spDao.swsslzltb(sqxm);break;
+		case "swsfsslsq"://机构分所设立申请
+			this.spDao.swsfsslsq(sqxm);break;
 		case"jgzxsq"://机构注销申请
 			this.spDao.swszxsq(sqxm);break;
 		case"jghbsq"://机构合并申请
@@ -106,14 +113,22 @@ public class SPservice {
 			this.spDao.zyswsbgsq(sqxm);break;
 		case"zyzjsq"://执业转籍申请
 			this.spDao.zyzjsq(sqxm);break;
-		case"zyzfzysq"://执业注销申请
+		case"zyzfzysq"://执业转非执业申请
 			this.spDao.zyzfzysq(sqxm);break;
 		case"zyzxsq"://执业注销申请
 			this.spDao.zyzxsq(sqxm);break;
+		case"zyzcsq"://执业转出申请
+			this.spDao.zyzcsq(sqxm);break;
+		case"zyzssq"://执业转所申请
+			this.spDao.zyzssq(sqxm);break;
+		case"zydrsq"://执业转入申请
+			this.spDao.zydrsq(sqxm);break;
 		case"fzyswsbasq"://非执业备案申请
 			this.spDao.fzyswsba(sqxm);break;
 		case"fzyswszjsq"://非执业转籍申请
 			this.spDao.fzyzjsq(sqxm);break;
+		case"fzyzzysq"://非执业转执业申请
+			this.spDao.fzyzzysq(sqxm);break;
 		}
 	}
 	/**
@@ -125,7 +140,15 @@ public class SPservice {
 	public void fspsq(Map<String,Object> ptxm,String splx)throws Exception {
 		 switch (splx) {
 			case "jgbgsq":
-		 this.spDao.updatePTXM(ptxm);
+				this.spDao.updatePTXM(ptxm);
+			case "zyzrfs":
+				this.spDao.zyzrfssq(ptxm);
+			case "cydrsq":
+				this.spDao.cydrsq(ptxm);
+			case "zydrzssq":
+				this.spDao.zydrzssq(ptxm);
+			case "cydrzssq":
+				this.spDao.cydrzssq(ptxm);
 		 }
 	}
 
@@ -169,5 +192,21 @@ public class SPservice {
 			rm.put("spsj",obj.get("SPSJ"));
 		}
 		return rm;
+	}
+	
+	public Map<String, Object> splsjlcx(int pn, int ps, String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return spDao.splsjlcx(pn, ps, map);
 	}
 }

@@ -4,15 +4,13 @@ import gov.gdgs.zs.service.CheckingService;
 import gov.gdgs.zs.service.RyglService;
 import gov.gdgs.zs.service.SPservice;
 import gov.gdgs.zs.service.SwsService;
+import gov.gdgs.zs.service.YwglService;
 
 import java.util.Map;
-
-import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +41,8 @@ public class PubApiController {
 	private AuthService authService;
 	@Autowired
 	private RyglService ryglService;
+	@Autowired
+	private YwglService ywglService;
 	
 
 	//机构查询
@@ -106,8 +106,16 @@ public class PubApiController {
 				ResponseMessage.Type.success, "转籍申请提交成功");
 		return new ResponseEntity<>(rm,HttpStatus.CREATED);
 	}
-	//执业转非执业进度查询
+
 	//报备号码查询
+	@RequestMapping(value = "/ywbb", method = RequestMethod.GET)
+	public ResponseEntity<?> fzyzjcx (
+			@RequestParam String bbhm,
+			@RequestParam String yzm) throws Exception{
+		Map<String,Object> rs = ywglService.getYwbbByYzmAndBbhm(bbhm,yzm);
+		
+		return  ResponseEntity.ok(rs);
+	}
 	
 	
 

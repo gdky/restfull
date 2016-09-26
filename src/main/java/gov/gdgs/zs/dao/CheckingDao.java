@@ -1,10 +1,40 @@
 package gov.gdgs.zs.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Repository;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
 @Repository
 public class CheckingDao extends BaseJdbcDao{
+	/**
+	 * 判断事务所审批中
+	 * @param jgid
+	 * @return false--审批中
+	 */
+	public boolean checkJGSPing(int jgid){
+		if(this.jdbcTemplate.queryForList("select id from zs_jg where tgzt_dm = 5 and id =?",new Object[]{jgid}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * 判断事务所是否可以设立分所
+	 * @param jgid
+	 * @return false--不满足设立条件
+	 */
+	public boolean checkJGFssl(int jgid){
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				"	select if((select count(b.id) from zs_zysws b where b.JG_ID=a.id and b.yxbz=1)-"
+				+ "(select count(id)*3+10 from zs_jg c where c.PARENTJGID=a.id and c.JGZT_DM not in (9,10))<0,"
+				+ "'false','true') as rypd from zs_jg a where a.TGZT_DM<>5 and a.YXBZ=1 and a.id =?",new Object[]{jgid});
+		String rypd=ls.get(0).get("rypd")+"";
+		if(ls.size()!=0&&rypd.equals("true")){
+			return true;
+		}
+		return false;
+	}
 	/**
 	 * 判断事务所变更审批中
 	 * @param jgid
@@ -34,6 +64,17 @@ public class CheckingDao extends BaseJdbcDao{
 	 */
 	public boolean checkHBing(int jgid){
 		if(this.jdbcTemplate.queryForList("select id from zs_jghb where HBZT = 1 and jg_id =?",new Object[]{jgid}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * 判断事务所设立审批中
+	 * @param jgid
+	 * @return false--审批中
+	 */
+	public boolean checkSLing(int jgid){
+		if(this.jdbcTemplate.queryForList("select id from zs_jg where JGZT_DM in(5,8,12) and jg_id =?",new Object[]{jgid}).size()!=0){
 			return false;
 		}
 		return true;

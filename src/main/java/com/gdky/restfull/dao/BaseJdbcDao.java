@@ -34,12 +34,12 @@ public class BaseJdbcDao {
 	 * 插入一条记录并返回主键ID
 	 * 
 	 * @param sqlStatement  sql语句
-	 * @param obj           sql使用的变量
+	 * @param paramObj           sql使用的变量
 	 * @param idColumnName  要返回的id列名
 	 * @return 
 	 * @return
 	 */
-	public  Number insertAndGetKeyByJdbc(final String sqlStatement, final Object[] obj,
+	public  Number insertAndGetKeyByJdbc(final String sqlStatement, final Object[] paramObj,
 			final String[] idColumnName) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbcTemplate.update(new PreparedStatementCreator() {
@@ -48,8 +48,8 @@ public class BaseJdbcDao {
 				PreparedStatement ps = connection.prepareStatement(
 						sqlStatement, idColumnName);
 
-				for (int i = 0; i < obj.length; i++) {
-					ps.setObject(i + 1, obj[i]);
+				for (int i = 0; i < paramObj.length; i++) {
+					ps.setObject(i + 1, paramObj[i]);
 				}
 				return ps;
 			}

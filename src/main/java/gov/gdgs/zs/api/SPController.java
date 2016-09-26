@@ -42,6 +42,17 @@ public class SPController {
 		User user =  accountService.getUserFromHeaderToken(request);
 		return new ResponseEntity<>(spPservice.wspcx(user.getId()),HttpStatus.OK);
 	}
+	/**
+	 * 事务所端未审批查询
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/spapi/swswspcx", method = RequestMethod.GET)
+	public ResponseEntity<?> swswspcx(HttpServletRequest request ) throws Exception{
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(spPservice.swswspcx(user.getId()),HttpStatus.OK);
+	}
 	
 	/**
 	 * 未审批类型明细查询
@@ -114,6 +125,12 @@ public class SPController {
 	@RequestMapping(value = "/spapi/fspsq/{splx}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updatePTXM(@PathVariable(value = "splx") String splx,
 			@RequestBody Map<String,Object> ptxm,HttpServletRequest request)throws Exception {
+		try {
+			User user =  accountService.getUserFromHeaderToken(request);
+			ptxm.put("uid", user.getId());
+			ptxm.put("jgid", user.getJgId());
+		} catch (Exception e) {
+		}
 		spPservice.fspsq(ptxm,splx);
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
 	}
@@ -130,10 +147,33 @@ public class SPController {
 		User user =  accountService.getUserFromHeaderToken(request);
 		return new ResponseEntity<>(spPservice.sptj(sptj,spid, user.getId(), user.getNames()),HttpStatus.OK);
 	}
-	
+	/**
+	 * 上级驳回意见
+	 * @param spid
+	 * @param lcbz
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/spapi/sjbhyj/{spid}/{lcbz}", method = RequestMethod.GET)
 	public ResponseEntity<?> sjbhyj(@PathVariable(value = "spid") String spid,
 			@PathVariable(value = "lcbz") int lcbz) throws Exception{
 		return new ResponseEntity<>(spPservice.sjbhyj(spid,lcbz),HttpStatus.OK);
+	}
+	
+	/**
+	 * 历史审批记录查询
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/spapi/lsspjlcx", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> splsjlcx(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where)  {
+		
+		return new ResponseEntity<>(spPservice.splsjlcx(pn, ps, where),HttpStatus.OK);
+
 	}
 }

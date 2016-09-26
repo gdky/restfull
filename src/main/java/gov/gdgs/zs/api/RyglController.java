@@ -1,5 +1,6 @@
 package gov.gdgs.zs.api;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -74,5 +75,60 @@ public class RyglController {
 		return new ResponseEntity<>(ryglService.kzxx(xqTab, gid),HttpStatus.OK);
 		
 	}
+	/**
+	 * 税务师转籍统计
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/xttjbb/zyswszjtj", method = RequestMethod.GET )
+	public ResponseEntity<Map<String, Object>> zyswszjtj(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where)  {
 		
+		return new ResponseEntity<>(ryglService.zyswszjtj(pn, ps, where),HttpStatus.OK);
+		
+	}	
+	/**
+	 * 税务师转出统计
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/xttjbb/zyswszctj", method = RequestMethod.GET )
+	public ResponseEntity<Map<String, Object>> zyswszctj(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where)  {
+		
+		return new ResponseEntity<>(ryglService.zyswszctj(pn, ps, where),HttpStatus.OK);
+		
+	}	
+	/**
+	 * 执业管理手册打印
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/zzdygl/zyglscdy", method = RequestMethod.GET )
+	public ResponseEntity<Map<String, Object>> zyglscdy(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where)  {
+		
+		return new ResponseEntity<>(ryglService.zyglscdy(pn, ps, where),HttpStatus.OK);
+		
+	}	
+	@RequestMapping(value = "/swsrycx/zyglscdy/{rylx}", method = RequestMethod.GET )
+	public ResponseEntity<List<Map<String, Object>>> zyglscdy(
+			@RequestParam(value="where", required=true) String where,
+			@PathVariable(value = "rylx") int rylx,HttpServletRequest request)  {
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(ryglService.zyglscdy(rylx,where,user.getJgId()),HttpStatus.OK);
+		
+	}
 }

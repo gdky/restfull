@@ -2,6 +2,7 @@ package gov.gdgs.zs.dao;
 
 import gov.gdgs.zs.untils.Condition;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,39 +17,81 @@ public class XttjbbDao extends BaseJdbcDao {
 	public Map<String, Object> getXttjbb(int page, int pageSize, HashMap<String, Object> where) {
 		// TODO Auto-generated method stub
 		Condition condition = new Condition();
-		condition.add(" and g.ID = s.JG_ID ");
-		Object year = where.get("year");
-		Object jgmc = where.get("dwmc");
-		if(year == null){
-			condition.add(" and s.ND = if((date_format(now(),'%m')>3),(date_format(now(),'%Y')-1),(date_format(now(),'%Y')-2)) ");
-		}else{
-			//condition.add("s.ND", Condition.EQUAL, year);
-			condition.add(" and s.ND ="+year+" ");
-		}
-		if(jgmc != null){
-			//condition.add("g.DWMC", Condition.FUZZY, jgmc);
-			condition.add(" and g.DWMC like '%"+jgmc+"%' ");
-		}
-		//获取count查询语句
-		String sqlCount = condition.getCountSql("s.id",
-				" zs_sdsb_swsjbqk s,zs_jg g,(SELECT @rownum:=0) temp ");
-		condition.add(" limit ?,? ");
-		//获取查询语句
-		String sql = condition.getSelectSql(" zs_sdsb_swsjbqk s,zs_jg g ",
-				new String[] { "SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'KEY'","g.DWMC", "s.DWXZ", "s.FRDBXM", "s.CZRS",
-						"s.HHRS", "s.RYZS", "s.ZYZCSWSRS",
-						"(s.RYZS - s.ZYZCSWSRS) as CYRS", "s.ZCZJ", "s.YYSR",
-						"s.ZCZE", "s.SRZE", "s.LRZE", "s.JGSZD" });
-		int total = this.jdbcTemplate.queryForObject(sqlCount, Integer.class);
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql , new Object[] {
-				pageSize * (page - 1), pageSize });
-		Map<String,Object> obj = new HashMap<String,Object>();
-		obj.put("data", ls);
-		obj.put("total", total);
-		obj.put("pageSize", pageSize);
-		obj.put("current", page);
+		condition.add("jg.DWMC", Condition.EQUAL, where.get("dwmc")); 
+		StringBuffer sql=new StringBuffer(" SELECT SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 AS 'KEY', xj.* ");
+		sql.append("   FROM (SELECT jg.ID id, ");
+		sql.append("                jg.DWMC DWMC, ");
+		sql.append("                xz.MC DWXZ, ");
+		sql.append("                jg.FDDBR FRDBXM, ");
+		sql.append("                (IFNULL(cy.gdrs, 0) + IFNULL(zy.gdrs, 0) + IFNULL(f.gdrs, 0) + IFNULL(q.gdrs, 0)) CZRS, ");
+		sql.append("                (IFNULL(cy.hhrs, 0) + IFNULL(zy.hhrs, 0) + IFNULL(f.hhrs, 0) + IFNULL(q.hhrs, 0)) HHRS, ");
+		sql.append("                (IFNULL(cy.rs, 0) + IFNULL(zy.rs, 0) + IFNULL(f.rs, 0) + IFNULL(q.rs, 0)) RYZS, ");
+		sql.append("                IFNULL(zy.rs, 0) ZYZCSWSRS, ");
+		sql.append("                IFNULL(cy.rs, 0) CYRS, ");
+		sql.append("                IFNULL(jg.ZCZJ, 0) ZCZJ, ");
+		sql.append("                0 YYSR, ");
+		sql.append("                NULL ZCZE, ");
+		sql.append("                NULL SRZE, ");
+		sql.append("                NULL LRZE, ");
+		sql.append("                cs.MC JGSZD ");
+		sql.append("           FROM zs_jg jg ");
+		sql.append("           LEFT JOIN dm_jgxz xz ");
+		sql.append("             ON jg.JGXZ_DM = xz.ID ");
+		sql.append("           LEFT JOIN dm_cs cs ");
+		sql.append("             ON jg.CS_DM = cs.ID ");
+		sql.append("           LEFT JOIN (SELECT cy.JG_ID, ");
+		sql.append("                            COUNT(cy.JG_ID) rs, ");
+		sql.append("                            SUM(IF(cy.CZR_DM = '1', 1, 0)) gdrs, ");
+		sql.append("                            SUM(IF(cy.FQR_DM = '1', 1, 0)) hhrs ");
+		sql.append("                       FROM zs_cyry cy ");
+		sql.append("                      WHERE cy.yxbz = '1' ");
+		sql.append("                      GROUP BY cy.JG_ID) cy ");
+		sql.append("             ON jg.ID = cy.JG_ID ");
+		sql.append("           LEFT JOIN (SELECT zy.JG_ID, ");
+		sql.append("                            COUNT(zy.JG_ID) rs, ");
+		sql.append("                            SUM(IF(zy.CZR_DM = '1', 1, 0)) gdrs, ");
+		sql.append("                            SUM(IF(zy.FQR_DM = '1', 1, 0)) hhrs ");
+		sql.append("                       FROM zs_zysws zy ");
+		sql.append("                      WHERE zy.yxbz = '1' ");
+		sql.append("                      GROUP BY zy.JG_ID) zy ");
+		sql.append("             ON jg.ID = zy.JG_ID ");
+		sql.append("           LEFT JOIN (SELECT f.ZSJGID, ");
+		sql.append("                            COUNT(f.ZSJGID) rs, ");
+		sql.append("                            SUM(IF(f.CZR_DM = '1', 1, 0)) gdrs, ");
+		sql.append("                            SUM(IF(f.FQR_DM = '1', 1, 0)) hhrs ");
+		sql.append("                       FROM zs_fzysws f ");
+		sql.append("                      WHERE f.yxbz = '1' ");
+		sql.append("                      GROUP BY f.ZSJGID) f ");
+		sql.append("             ON jg.ID = f.ZSJGID ");
+		sql.append("           LEFT JOIN (SELECT q.JG_ID, ");
+		sql.append("                            COUNT(q.JG_ID) rs, ");
+		sql.append("                            SUM(IF(q.CZR_DM = '1', 1, 0)) gdrs, ");
+		sql.append("                            SUM(IF(q.FQR_DM = '1', 1, 0)) hhrs ");
+		sql.append("                       FROM zs_qtry q ");
+		sql.append("                      WHERE q.qtryzt_dm = '1' ");
+		sql.append("                      GROUP BY q.JG_ID) q ");
+		sql.append("             ON jg.ID = q.JG_ID ");
+		sql.append("           "+condition.getSql());
+		sql.append("            AND jg.YXBZ = '1' ");
+		sql.append("          ORDER BY jg.ID) xj, ");
+		sql.append("        (SELECT @rownum := ?) xh  ");
+		sql.append("        LIMIT ?,? ");
 		
-		return obj;
+		ArrayList<Object> params = condition.getParams();
+		params.add((page-1)*pageSize);
+		params.add((page-1)*pageSize);
+		params.add(pageSize);
+		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", page);
+		meta.put("pageSize", pageSize);
+		meta.put("pageTotal",total);
+		meta.put("pageAll",(total + pageSize - 1) / pageSize);
+		ob.put("page", meta);
+		return ob;
 	}
 
 	public Map<String, Object> getHyryqktj(int page, int pageSize,
@@ -135,6 +178,435 @@ public class XttjbbDao extends BaseJdbcDao {
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql.toString());
 		Map<String,Object> obj = new HashMap<String,Object>();
 		obj.put("data", ls);
+		return obj;
+	}
+
+	public Map<String, Object> getHynlsjfx(int page, int pageSize,
+			HashMap<String, Object> map) {
+		List<Map<String, Object>> ls=this.getHynlsjfx(null);
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		for(int i=0;i<ls.size();i++){
+			this.getHynlsjfxbTree(ls.get(i));
+		}
+		Map<String,Object> obj = new HashMap<String,Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pageSize", pageSize);
+		obj.put("current", page);
+		return obj;
+		
+//		// TODO Auto-generated method stub
+//		StringBuffer sb = new StringBuffer();
+//		sb.append(" select cs.ID, ");
+//		sb.append("        cs.PARENT_ID, ");
+//		sb.append("        cs.mc, ");
+//		sb.append("        date_format(now(),'%Y') as nd, ");
+//		sb.append("       ifnull( (select count(id) from zs_ryjbxx where yxbz = '1' and (year(now())-year(sri)-1) > 60),0) zrs_60,  ");
+//		sb.append("       ifnull(  (select count(id) ");
+//		sb.append("           from zs_ryjbxx ");
+//		sb.append("          where yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60),0) zrs_50,  ");
+//		sb.append("       ifnull(  (select count(id) ");
+//		sb.append("           from zs_ryjbxx ");
+//		sb.append("          where yxbz = '1' ");
+//		sb.append("           and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50),0) zrs_36,  ");
+//		sb.append("      ifnull(   (select count(id) ");
+//		sb.append("           from zs_ryjbxx ");
+//		sb.append("          where yxbz = '1' ");
+//		sb.append("           and  (year(now())-year(sri)-1) <=35),0) zrs_35,  ");
+//		sb.append("     ");
+//		sb.append("       ifnull(  (select count(zy.id) ");
+//		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) > 60),0) zy_zrs_60,  ");
+//		sb.append("       ifnull(  (select count(zy.id) ");
+//		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60),0) zy_zrs_50,  ");
+//		sb.append("        ifnull( (select count(zy.id) ");
+//		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50),0) zy_zrs_36,  ");
+//		sb.append("        ifnull( (select count(zy.id) ");
+//		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) <=35),0) zy_zrs_35,  ");
+//		sb.append("         ");
+//		sb.append("       ");
+//		sb.append("       ifnull(  (select count(zy.id) ");
+//		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) > 60),0) fzy_zrs_60,  ");
+//		sb.append("       ifnull(  (select count(zy.id) ");
+//		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60),0) fzy_zrs_50,  ");
+//		sb.append("      ifnull(   (select count(zy.id) ");
+//		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50),0) fzy_zrs_36,  ");
+//		sb.append("       ifnull(  (select count(zy.id) ");
+//		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) <=35),0) fzy_zrs_35,  ");
+//		sb.append("         ");
+//		sb.append("        ");
+//		sb.append("       ifnull(  (select count(zy.id) ");
+//		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("             and (year(now())-year(sri)-1) > 60),0) cy_zrs_60,  ");
+//		sb.append("      ifnull(   (select count(zy.id) ");
+//		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60),0) cy_zrs_50,   ");
+//		sb.append("       ifnull(  (select count(zy.id) ");
+//		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50),0) cy_zrs_36,  ");
+//		sb.append("      ifnull(   (select count(zy.id) ");
+//		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
+//		sb.append("          where zy.ry_id = jb.id ");
+//		sb.append("            and jb.yxbz = '1' ");
+//		sb.append("            and (year(now())-year(sri)-1) <=35),0) cy_zry_35  ");
+//		sb.append("   from dm_cs cs ");
+//		sb.append("  where cs.parent_id is null ");
+//		sb.append(" union all ");
+//		sb.append("  ");
+//		sb.append(" select cs.ID, ");
+//		sb.append("        cs.PARENT_ID, ");
+//		sb.append("        cs.mc, ");
+//		sb.append("        date_format(now(),'%Y') as nd, ");
+//		sb.append("       ifnull( sum(case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) > 60 then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and ");
+//		sb.append("               (year(now())-year(sri)-1) > 60 then ");
+//		sb.append("          1 ");
+//		sb.append("          else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("      ifnull( sum( case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60 then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60 then ");
+//		sb.append("          1 ");
+//		sb.append("          else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("       ifnull( sum(case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50 then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50 then ");
+//		sb.append("           1 ");
+//		sb.append("          else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("       ifnull(sum( case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) <=35 then ");
+//		sb.append("          1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and ");
+//		sb.append("               (year(now())-year(sri)-1) <=35 then ");
+//		sb.append("          1 ");
+//		sb.append("          else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("       ifnull( sum(case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) > 60 and id_2 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and id_2 is not null  and ");
+//		sb.append("               (year(now())-year(sri)-1) > 60 then ");
+//		sb.append("           1 ");
+//		sb.append("           else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("       ifnull( sum(case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60  and id_2 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null  and id_2 is not null  and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60 then ");
+//		sb.append("           1 ");
+//		sb.append("           else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("      ifnull(  sum(case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50  and id_2 is not null  then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null  and id_2 is not null and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50 then ");
+//		sb.append("          1 else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("      ifnull( sum( case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) <=35  and id_2 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null  and id_2 is not null and ");
+//		sb.append("               (year(now())-year(sri)-1) <=35 then ");
+//		sb.append("          1 else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("       ifnull( sum(case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) > 60 and id_3 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and id_3 is not null and ");
+//		sb.append("               (year(now())-year(sri)-1) > 60 then ");
+//		sb.append("           1 ");
+//		sb.append("         else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("      ifnull( sum( case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60 and id_3 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60 and id_3 is not null then ");
+//		sb.append("          1 else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("     ifnull(  sum( case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50  and id_3 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50 and id_3 is not null then ");
+//		sb.append("          1 else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("     ifnull(   sum(case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) <=35  and id_3 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and id_3 is not null and ");
+//		sb.append("               (year(now())-year(sri)-1) <=35 then ");
+//		sb.append("           1 else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("         ");
+//		sb.append("         ");
+//		sb.append("        ");
+//		sb.append("     ifnull(  sum( case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) > 60  and id_4 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and ");
+//		sb.append("               (year(now())-year(sri)-1) > 60  and id_4 is not null then ");
+//		sb.append("           1 else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("     ifnull( sum(  case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60 and id_4 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and (year(now())-year(sri)-1) >= 51 and (year(now())-year(sri)-1) <=60 and id_4 is not null then ");
+//		sb.append("          1 else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("     ifnull(  sum( case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50 and id_4 is not null then ");
+//		sb.append("           1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and (year(now())-year(sri)-1) >= 36 and (year(now())-year(sri)-1) <=50 and id_4 is not null then ");
+//		sb.append("          1 else 0 ");
+//		sb.append("        end),0), ");
+//		sb.append("     ifnull(   sum(case ");
+//		sb.append("          when parent_id = '0' and (year(now())-year(sri)-1) <=35  and id_4 is not null then ");
+//		sb.append("          1 ");
+//		sb.append("          when parent_id <> '0' and parent_id is not null and ");
+//		sb.append("               (year(now())-year(sri)-1) <=35 and id_4 is not null then ");
+//		sb.append("          1 else 0 ");
+//		sb.append("        end),0) ");
+//		sb.append("  ");
+//		sb.append("   from (select jb.id    id_1, ");
+//		sb.append("                zy.id    id_2, ");
+//		sb.append("                fz.id    id_3, ");
+//		sb.append("                cy.id    id_4, ");
+//		sb.append("                jb.sri, ");
+//		sb.append("                jb.cs_dm ");
+//		sb.append("           from zs_ryjbxx jb ");
+//		sb.append("           left join zs_zysws zy ");
+//		sb.append("             on jb.id = zy.ry_id ");
+//		sb.append("           left join zs_fzysws fz ");
+//		sb.append("             on jb.id = fz.ry_id ");
+//		sb.append("           left join zs_cyry cy ");
+//		sb.append("             on jb.id = cy.ry_id ");
+//		sb.append("          where jb.yxbz = '1') jg ");
+//		sb.append("  right join dm_cs cs ");
+//		sb.append("     on jg.CS_DM = cs.id ");
+//		sb.append("  where cs.parent_id is not null ");
+//		sb.append("  group by cs.ID, cs.PARENT_ID, cs.mc ");
+//		/*StringBuffer sbCount = new StringBuffer(" select count(*) from ( ");
+//		sbCount.append(sb).append(" )t ");
+//		int total = this.jdbcTemplate.queryForObject(sbCount.toString(), Integer.class);*/
+//		sb.append("limit "+pageSize * (page - 1)+","+pageSize);
+//		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString());
+//		StringBuffer sbCount = new StringBuffer(" select count(*) from ( ");
+//			sbCount.append(" select cs.ID from dm_cs cs where cs.parent_id is null ")
+//				.append(" union all ")
+//				.append(" select cs.ID from ")
+//				.append(" ( ")
+//				.append(" select distinct jb.cs_dm ")
+//				.append(" from zs_ryjbxx jb ")
+//				.append(" left join zs_zysws zy ")
+//				.append(" on jb.id = zy.ry_id ")
+//				.append(" left join zs_fzysws fz ")
+//				.append(" on jb.id = fz.ry_id ")
+//				.append(" left join zs_cyry cy ")
+//				.append(" on jb.id = cy.ry_id ")
+//				.append(" where jb.yxbz = '1' ")
+//				.append(" ) jg ")
+//				.append("  right join dm_cs cs ")
+//				.append(" on jg.CS_DM = cs.id ")
+//				.append(" where cs.parent_id is not null ")
+//				.append(" )t ")
+//			;
+//		int total = this.jdbcTemplate.queryForObject(sbCount.toString(), Integer.class);
+//		Map<String,Object> obj = new HashMap<String,Object>();
+//		obj.put("data", ls);
+//		obj.put("total", total);
+//		obj.put("pageSize", pageSize);
+//		obj.put("current", page);
+//		return obj;
+	}
+	
+	/**
+	 * 递归树
+	 * @param parent
+	 */
+	private void getHynlsjfxbTree(Map parent){
+		Integer id=((Number) parent.get("ID")).intValue();
+		String idStr=id.toString();
+		List<Map<String,Object>> children=this.getHynlsjfx(idStr);
+		for(int i=0;i<children.size();i++){
+			this.getHynlsjfxbTree(children.get(i));
+		}
+		if(children.size()>0)
+		parent.put("children", children);
+	}
+	
+	/**
+	 * 数据查询
+	 * @param pid
+	 * @return
+	 */
+	private List<Map<String,Object>> getHynlsjfx(String pid){
+		List<Map<String, Object>> ls=new ArrayList<>();
+		if(null==pid){
+			StringBuffer sql=new StringBuffer(" select c.mc, ");
+			sql.append("        t.nd, ");
+			sql.append("        t.cs_dm, ");
+			sql.append("        t.cs_dm ID, ");
+			sql.append("        t.zrs_60, ");
+			sql.append("        t.zrs_50, ");
+			sql.append("        t.zrs_36, ");
+			sql.append("        t.zrs_35, ");
+			sql.append("        t.zy_zrs_60, ");
+			sql.append("        t.zy_zrs_50, ");
+			sql.append("        t.zy_zrs_36, ");
+			sql.append("        t.zy_zrs_35, ");
+			sql.append("        t.fzy_zrs_60, ");
+			sql.append("        t.fzy_zrs_50, ");
+			sql.append("        t.fzy_zrs_36, ");
+			sql.append("        t.fzy_zrs_35, ");
+			sql.append("        t.cy_zrs_60, ");
+			sql.append("        t.cy_zrs_50, ");
+			sql.append("        t.cy_zrs_36, ");
+			sql.append("        t.cy_zrs_35, ");
+			sql.append("        t.gxsj ");
+			sql.append("   from zs_hynlsjfxb_jg t, dm_cs c ");
+			sql.append("  where t.cs_dm = c.ID ");
+			sql.append("    and c.PARENT_ID is null ");
+			ls=jdbcTemplate.queryForList(sql.toString());
+		}else{
+			StringBuffer sql=new StringBuffer(" select c.mc, ");
+			sql.append("        t.nd, ");
+			sql.append("        t.cs_dm, ");
+			sql.append("        t.cs_dm ID, ");
+			sql.append("        t.zrs_60, ");
+			sql.append("        t.zrs_50, ");
+			sql.append("        t.zrs_36, ");
+			sql.append("        t.zrs_35, ");
+			sql.append("        t.zy_zrs_60, ");
+			sql.append("        t.zy_zrs_50, ");
+			sql.append("        t.zy_zrs_36, ");
+			sql.append("        t.zy_zrs_35, ");
+			sql.append("        t.fzy_zrs_60, ");
+			sql.append("        t.fzy_zrs_50, ");
+			sql.append("        t.fzy_zrs_36, ");
+			sql.append("        t.fzy_zrs_35, ");
+			sql.append("        t.cy_zrs_60, ");
+			sql.append("        t.cy_zrs_50, ");
+			sql.append("        t.cy_zrs_36, ");
+			sql.append("        t.cy_zrs_35, ");
+			sql.append("        t.gxsj ");
+			sql.append("   from zs_hynlsjfxb_jg t, dm_cs c ");
+			sql.append("  where t.cs_dm = c.ID ");
+			sql.append("    and c.PARENT_ID = ? ");
+			sql.append(" 	order by c.ID ");
+			ls=jdbcTemplate.queryForList(sql.toString(),new Object[]{pid});
+		}
+		return ls;
+	}
+
+	public Map<String, Object> getRyztsjfx(int page, int pageSize,
+			HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select cs.ID, ");
+		sb.append("        cs.PARENT_ID, ");
+		sb.append("        cs.mc, ");
+		sb.append("        date_format(now(),'%Y') nd, ");
+		sb.append("        ifnull((select count(id) from zs_ryjbxx where yxbz = '1'),0) zrs,  ");
+		sb.append("       ifnull( (select count(id) ");
+		sb.append("           from zs_ryjbxx ");
+		sb.append("          where yxbz = '1' ");
+		sb.append("            and xb_dm = '1') ,0)zrs_n,  ");
+		sb.append("        ifnull((select count(id) ");
+		sb.append("           from zs_ryjbxx ");
+		sb.append("          where yxbz = '1' ");
+		sb.append("            and xb_dm = '2'),0) zrs_v,  ");
+		sb.append("         ");
+		sb.append("        ifnull((select count(zy.id) ");
+		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1'),0) zy_zrs, ");
+		sb.append("        ifnull((select count(zy.id) ");
+		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1' ");
+		sb.append("            and jb.xb_dm = '1'),0) zy_zrs_n,  ");
+		sb.append("        ifnull((select count(zy.id) ");
+		sb.append("           from zs_zysws zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1' ");
+		sb.append("            and jb.xb_dm = '2'),0) zy_zrs_v,  ");
+		sb.append("         ");
+		sb.append("        ifnull((select count(zy.id) ");
+		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1'),0) fzy_zrs,  ");
+		sb.append("       ifnull( (select count(zy.id) ");
+		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1' ");
+		sb.append("            and jb.xb_dm = '1'),0) fzy_zrs_n,  ");
+		sb.append("       ifnull( (select count(zy.id) ");
+		sb.append("           from zs_fzysws zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1' ");
+		sb.append("            and jb.xb_dm = '2'),0) fzy_zrs_v,  ");
+		sb.append("         ");
+		sb.append("       ifnull( (select count(zy.id) ");
+		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1'),0) cy_zrs,  ");
+		sb.append("        ifnull((select count(zy.id) ");
+		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1' ");
+		sb.append("            and jb.xb_dm = '1'),0) cy_zrs_n,  ");
+		sb.append("       ifnull( (select count(zy.id) ");
+		sb.append("           from zs_cyry zy, zs_ryjbxx jb ");
+		sb.append("          where zy.ry_id = jb.id ");
+		sb.append("            and jb.yxbz = '1' ");
+		sb.append("            and jb.xb_dm = '2'),0) cy_zrs_v  ");
+		sb.append("  ");
+		sb.append("   from dm_cs cs ");
+		sb.append("  where cs.parent_id is null ");
+		//sb.append("limit "+pageSize * (page - 1)+","+pageSize);
+		//StringBuffer sqlCount = new StringBuffer("select count(*) from dm_cs cs where cs.parent_id is null");
+		//int total = this.jdbcTemplate.queryForObject(sqlCount.toString(), Integer.class);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString());
+		Map<String,Object> obj = new HashMap<String,Object>();
+		obj.put("data", ls);
+		//obj.put("total", total);
+		//obj.put("pageSize", pageSize);
+		//obj.put("current", page);
 		return obj;
 	}
 

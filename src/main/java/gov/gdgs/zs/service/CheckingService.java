@@ -29,6 +29,31 @@ public class CheckingService {
 		return true;
 	}
 	
+	/**
+	 * 判断机构审批状态
+	 * 无审批返回空字符串""
+	 * @param jgid
+	 * @return
+	 */
+	public String checkJGSPing(Integer jgid){
+		if(!chDao.checkBGing(jgid)){
+			return "变更审批中";
+		}else if(!chDao.checkZXing(jgid)){
+			return "注销审批中";
+		}else if(!chDao.checkHBing(jgid)){
+			return "合并审批中";
+		}else if(!chDao.checkSLing(jgid)){
+			return "设立审批中";
+		}
+		return "";
+	}
+	
+	public boolean checkJGSPingSelf(Integer jgid){
+		return this.chDao.checkJGSPing(jgid);
+	}
+	public boolean checkJGFssl(Integer jgid){
+		return this.chDao.checkJGFssl(jgid);
+	}
 	public boolean checkIsBH(String spid){
 		return this.chDao.checkIsBH(spid);
 	}

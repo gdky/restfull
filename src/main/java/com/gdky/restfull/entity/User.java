@@ -21,8 +21,23 @@ public class User implements Serializable {
 	private Integer jgId;
 	private String uname;
 	private Timestamp createTime;
+	private String idcard;
+	private String phone;
+	private String email;
 	
 	
+	public String getIdcard() {
+		return idcard;
+	}
+	public void setIdcard(String idcard) {
+		this.idcard = idcard;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 	public Timestamp getCreateTime() {
 		return createTime;
 	}
@@ -110,6 +125,12 @@ public class User implements Serializable {
 	}
 	public User(){
 		
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	
 }

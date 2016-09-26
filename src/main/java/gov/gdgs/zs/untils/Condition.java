@@ -22,37 +22,21 @@ import com.google.common.base.Objects;
 
 public class Condition {
 
-	/**
-	 * 相等
-	 */
+
 	public static final String EQUAL = "EQUAL"; // 相等
-	/**
-	 * 不相等
-	 */
+
 	public static final String NOT_EQUAL = "NOT_EQUAL"; // 不相等
-	/**
-	 * 小于
-	 */
+
 	public static final String LESS_THEN = "LESS_THEN"; // 小于
-	/**
-	 * 小于等于
-	 */
+
 	public static final String LESS_EQUAL = "LESS_EQUAL"; // 小于等于
-	/**
-	 *  大于等于
-	 */
+
 	public static final String GREATER_EQUAL = "GREATER_EQUAL"; // 大于等于
-	/**
-	 * 大于
-	 */
+
 	public static final String GREATER_THEN = "GREATER_THEN"; // 大于
-	/**
-	 * 模糊匹配 %xxx%
-	 */
+
 	public static final String FUZZY = "FUZZY"; // 模糊匹配 %xxx%
-	/**
-	 * 左模糊 %xxx
-	 */
+
 	public static final String FUZZY_LEFT = "FUZZY_LEFT"; // 左模糊 %xxx
 
 	public static final String FUZZY_RIGHT = "FUZZY_RIGHT"; // 右模糊 xxx%
@@ -64,6 +48,10 @@ public class Condition {
 	public static final String IN = "IN"; // 在范围内
 
 	public static final String NOT_IN = "NOT_IN"; // 不在范围内
+	
+	public static final String BETWEEN = "BETWEEN"; //在区间内
+	
+	public static final String DATE_BETWEEN = "DATE_BETWEEN"; //在日期区间内
 
 	private final StringBuffer sb;
 
@@ -123,6 +111,14 @@ public class Condition {
 			} else if (FUZZY_LEFT.equals(type)) {
 				sb.append(" AND ").append(colName).append(" like  ? ");
 				this.params.add("%"+ param );
+			} else if (BETWEEN.equals(type)){
+				sb.append(" AND ").append(colName).append(" between ? and ? ");
+				this.params.add(((ArrayList)param).get(0));
+				this.params.add(((ArrayList)param).get(1));
+			} else if (DATE_BETWEEN.equals(type)){
+				sb.append(" AND ").append(colName).append(" between ? and date_add( ? ,INTERVAL 1 DAY) ");
+				this.params.add(((ArrayList)param).get(0));
+				this.params.add(((ArrayList)param).get(1));
 			}
 		}
 		return this;
@@ -153,6 +149,14 @@ public class Condition {
 			} else if (FUZZY_LEFT.equals(type)) {
 				sb.append(" OR ").append(colName).append(" like  ? ");
 				this.params.add("%"+ param );
+			}else if (BETWEEN.equals(type)){
+				sb.append(" AND ").append(colName).append(" between ? and ? ");
+				this.params.add(((ArrayList)param).get(0));
+				this.params.add(((ArrayList)param).get(1));
+			} else if (DATE_BETWEEN.equals(type)){
+				sb.append(" AND ").append(colName).append(" between ? and date_add( ? ,INTERVAL 1 DAY) ");
+				this.params.add(((ArrayList)param).get(0));
+				this.params.add(((ArrayList)param).get(1));
 			}
 		}
 		return this;
