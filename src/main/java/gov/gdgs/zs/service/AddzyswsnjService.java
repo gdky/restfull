@@ -38,7 +38,7 @@ public class AddzyswsnjService implements IAddzyswsnjService {
 
 	}
 	@Override
-	public void updateZyswsnjb(Map<String, Object> obj) {
+	public void updateZyswsnjb(Map<String, Object> obj) throws Exception {
 		iaddzyswsnjdao.updateZyswsnjb(obj);
 	}
 	

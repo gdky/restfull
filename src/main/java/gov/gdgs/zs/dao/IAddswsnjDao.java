@@ -9,7 +9,8 @@ public interface IAddswsnjDao {
 	/**
 	 * 更新事务所年检表
 	 * @param obj
+	 * @throws Exception 
 	 */
-	public void updateSwsnjb(Map <String,Object >obj);
+	public void updateSwsnjb(Map <String,Object >obj) throws Exception;
 	
 }

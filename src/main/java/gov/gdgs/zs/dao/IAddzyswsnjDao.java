@@ -4,6 +4,6 @@ import java.util.Map;
 public interface IAddzyswsnjDao {
 	
 	public String addZyswsnjb( Map <String,Object >obj) throws Exception;
-	public void updateZyswsnjb(Map <String,Object >obj);
+	public void updateZyswsnjb(Map <String,Object >obj) throws Exception;
 	
 }

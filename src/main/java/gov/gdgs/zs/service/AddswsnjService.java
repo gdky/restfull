@@ -37,7 +37,7 @@ public class AddswsnjService implements IAddswsnjService{
 
 	}
 	@Override
-	public void updateSwsnjb(Map<String, Object> obj) {
+	public void updateSwsnjb(Map<String, Object> obj) throws Exception {
 		iaddswsnjdao.updateSwsnjb(obj);
         
 	}
@@ -98,6 +98,8 @@ public class AddswsnjService implements IAddswsnjService{
 				Map<String,Object> obj = addswsnjdao.getswsnjbById(id);
 				return obj;
 			}
+			
+			
 
 			
 			

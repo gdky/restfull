@@ -81,6 +81,12 @@ User user =  accountService.getUserFromHeaderToken(request);
 	Map<String, Object> obj = addswsnjService.getSwsnjById(id);
 	return new ResponseEntity<>(obj, HttpStatus.OK);
 }
+   
+
+
+   
+   
+   
 //事务所年检表增加
    @RequestMapping(value = "/addswsnjb", method = RequestMethod.POST)
 	public ResponseEntity<Map<String,Object>> addSwsnjb(@RequestBody  Map<String ,Object> obj,HttpServletRequest request)

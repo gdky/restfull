@@ -93,9 +93,9 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("            and a.ZSJG_ID = c.ID ");
 		sql.append("            and c.ID = sl.id ");
 		sql.append("            and a.ZSJG_ID = ? ");
-		//sql.append("            and a.ztdm in (2, 3) ");
+		// sql.append("            and a.ztdm in (2, 3) ");
 		sql.append("            and d.ID = c.JGXZ_DM ");
-		sql.append("          group by a.zsjg_id, nd ");
+		// sql.append("          group by a.zsjg_id, nd ");
 		sql.append("          order by a.ND desc) as v, ");
 		sql.append("        (SELECT @rownum := ?) zs_jg  ");
 		sql.append("        LIMIT ?,? ");
@@ -125,7 +125,8 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		return obj;
 
 	}
-//获取事务所报备份数方法
+
+	// 获取事务所报备份数方法
 	public Map<String, Object> getswsbafs(int Jgid, Map<String, Object> where) {
 		Condition condition = new Condition();
 		condition.add("b.nd", "FUZZY", where.get("nd"));
@@ -141,24 +142,23 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		params.add(Jgid);
 
 		// 获取符合条件的记录
-		String ls = jdbcTemplate.queryForObject(sb.toString(), params.toArray(),String.class);
+		String ls = jdbcTemplate.queryForObject(sb.toString(),
+				params.toArray(), String.class);
 
-		
-
-	Map<String, Object> obj = new HashMap<String, Object>();
-	obj.put("data", ls);
-	obj.put("jg_id", Jgid);
-	return obj;
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("jg_id", Jgid);
+		return obj;
 
 	}
-	
-	//获取机构已年检年度（用于校验）
+
+	// 获取机构已年检年度（用于校验）
 	public Map<String, Object> getswsnjnd(int Jgid, Map<String, Object> where) {
-		String nd="0";
+		String nd = "0";
 		Condition condition = new Condition();
 		condition.add("a.nd", "FUZZY", where.get("nd"));
 		StringBuffer sb = new StringBuffer();
-		sb.append("select a.ND from zs_jg_njb a ");
+		sb.append("select a.ND,a.ID from zs_jg_njb a ");
 		sb.append(condition.getSql());
 		sb.append(" and a.ZSJG_ID=? ");
 
@@ -169,36 +169,115 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		params.add(Jgid);
 
 		// 获取符合条件的记录
-		List<String> ls = jdbcTemplate.queryForList(sb.toString(), params.toArray(),String.class);
-		if(ls.size()>0){
-			nd=ls.get(0);
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+		if (ls.size() > 0) {
+			if (null == where.get("njid")) {
+				nd = ((Integer) ls.get(0).get("nd")).toString();
+			} else {
+				Integer njid = (Integer) where.get("njid");
+				Integer dbid = (Integer) ls.get(0).get("ID");
+				if (njid.toString().equals(dbid.toString())) {
+					nd = "0";
+				} else {
+					nd = ((Integer) ls.get(0).get("nd")).toString();
+				}
+			}
 		}
-	Map<String, Object> obj = new HashMap<String, Object>();
-	obj.put("data", nd);
-	obj.put("jg_id", Jgid);
-	return obj;
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", nd);
+		obj.put("jg_id", Jgid);
+		return obj;
 
 	}
-	
-	
-	
-	
-	
-	
 
 	public Map<String, Object> getswsnjbById(String id) {
-		String sql = "select c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,"
-				+ "case a.ztdm when 3 then '已年检' when 2 then '已自检'else null end as njzt,"
-				+ " CASE a.WGCL_DM WHEN 1 THEN '年检予以通过' "
-				+ "WHEN 2 THEN '年检不予通过，责令2个月整改' "
-				+ "WHEN 6 THEN '年检不予以通过' "
-				+ "WHEN 7 THEN '资料填写有误，请重新填写' ELSE NULL END AS njcl,"
-				+ "DATE_FORMAT(a.zjsj,'%Y-%m-%d') AS zjrq,"
-				+ "DATE_FORMAT(c.SWSZSCLSJ ,'%Y-%m-%d') AS clsj,"
-				+ "DATE_FORMAT(a.fzrsj,'%Y-%m-%d') AS qzrq "
-				+ "FROM  zs_jg_njb a,zs_jg c,dm_jgxz d "
-				+ "where 1=1 and d.ID = c.JGXZ_DM and a.ZSJG_ID=c.ID and a.id=?";
-		Map<String, Object> rs = jdbcTemplate.queryForMap(sql, id);
+		StringBuffer sql = new StringBuffer(" SELECT c.dwmc, ");
+		sql.append("        c.JGZCH AS zsbh, ");
+		sql.append("        d.mc AS jgxz, ");
+		sql.append("        c.yzbm, ");
+		sql.append("        c.DZHI AS bgdz, ");
+		sql.append("        c.DHUA AS dhhm, ");
+		sql.append("        ifnull(a.ZCSWSB,0) ZCSWSB ,");
+		sql.append("        ifnull(a.GDBDQK,0) GDBDQK,");
+		//sql.append("       ifnull() ");
+		sql.append(" ifnull(a.ZCZJ,0) ZCZJ,");
+		sql.append("  a.SZ,");
+		sql.append("  a.ND,");
+		sql.append("  a.FZR,");
+		sql.append("  a.NJZJ,");
+		sql.append(" ifnull( a.ZRS,0) ZRS,");
+		sql.append("  ifnull(a.BAFS,0) BAFS,");
+		sql.append(" ifnull (a.ZCZJ,0) ZCZJ,");
+		sql.append(" ifnull( a.ZYRS,0) ZYRS,");
+		sql.append(" ifnull( a.YJYRS,0) YJYRS,");
+		sql.append(" ifnull( a.SJJYRS,0) SJJYRS,");
+		sql.append(" ifnull( a.WJYRS,0) WJYRS,");
+		sql.append(" ifnull( a.FSS,0) FSS,");
+		sql.append(" ifnull( a.ZCZJ,0) ZCZJ,");
+		sql.append(" ifnull( a.ZCSWSBZJ,0) ZCSWSBZJ,");
+		sql.append("  ifnull(a.ZCSWSBJS,0) ZCSWSBJS,");
+		sql.append("  ifnull(a.GDBDQKZJ,0) GDBDQKZJ,");
+		sql.append("  ifnull(a.GDBDQKJS,0) GDBDQKJS,");
+		
+		
+		sql.append("        CASE a.ztdm ");
+		sql.append("          WHEN 3 THEN ");
+		sql.append("           '已年检' ");
+		sql.append("          WHEN 2 THEN ");
+		sql.append("           '已自检' ");
+		sql.append("          ELSE ");
+		sql.append("           NULL ");
+		sql.append("        END AS njzt, ");
+		sql.append("        CASE a.WGCL_DM ");
+		sql.append("          WHEN 1 THEN ");
+		sql.append("           '年检予以通过' ");
+		sql.append("          WHEN 2 THEN ");
+		sql.append("           '年检不予通过，责令2个月整改' ");
+		sql.append("          WHEN 6 THEN ");
+		sql.append("           '年检不予以通过' ");
+		sql.append("          WHEN 7 THEN ");
+		sql.append("           '资料填写有误，请重新填写' ");
+		sql.append("          ELSE ");
+		sql.append("           NULL ");
+		sql.append("        END AS njcl, ");
+		sql.append("        DATE_FORMAT(a.zjsj, '%Y-%m-%d') AS zjrq, ");
+		sql.append("        DATE_FORMAT(c.SWSZSCLSJ, '%Y-%m-%d') AS clsj, ");
+		sql.append("        DATE_FORMAT(a.fzrsj, '%Y-%m-%d') AS qzrq, ");
+		sql.append("        sl.zyrs dqzyrs, ");
+		sql.append("        sl.zrs dqzrs, ");
+		sql.append("        sl.fss dqfss ");
+		sql.append("   FROM zs_jg_njb a, ");
+		sql.append("        zs_jg c, ");
+		sql.append("        dm_jgxz d, ");
+		sql.append("        (SELECT jg.ID, ");
+		sql.append("                count(distinct z.ID) zyrs, ");
+		sql.append("                count(distinct z.ID) + count(distinct f.ID) + ");
+		sql.append("                count(distinct c.ID) + count(distinct q.ID) zrs, ");
+		sql.append("                count(distinct zjg.ID) fss ");
+		sql.append("           FROM zs_jg jg ");
+		sql.append("           LEFT JOIN zs_zysws z ");
+		sql.append("             ON z.JG_ID = jg.ID ");
+		sql.append("            AND z.YXBZ = '1' ");
+		sql.append("           LEFT JOIN zs_fzysws f ");
+		sql.append("             on f.ZSJGID = jg.ID ");
+		sql.append("            and f.YXBZ = '1' ");
+		sql.append("           left join zs_cyry c ");
+		sql.append("             on c.JG_ID = jg.ID ");
+		sql.append("            and c.YXBZ = '1' ");
+		sql.append("           left join zs_qtry q ");
+		sql.append("             on q.JG_ID = jg.ID ");
+		sql.append("            and q.qtryzt_dm = '1' ");
+		sql.append("           left join zs_jg zjg ");
+		sql.append("             on zjg.PARENTJGID = jg.ID ");
+		sql.append("            and zjg.YZBM = '1' ");
+		sql.append("          group by jg.ID) sl ");
+		sql.append("  WHERE 1 = 1 ");
+		sql.append("    AND d.ID = c.JGXZ_DM ");
+		sql.append("    AND a.ZSJG_ID = c.ID ");
+		sql.append("    and c.ID = sl.ID ");
+		sql.append("    AND a.id = ? ");
+		Map<String, Object> rs = jdbcTemplate.queryForMap(sql.toString(), id);
 		return rs;
 	}
 
@@ -218,7 +297,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		if (null == njid) {
 			return null;
 		} else {
-			if("2".equals(obj.get("ztbj"))){
+			if ("2".equals(obj.get("ztbj"))) {
 				Map<String, Object> spsq = new HashMap<>();// 设置生成审批表方法参数
 				spsq.put("sid", njid);
 				if (this.jdbcTemplate
@@ -237,7 +316,9 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 	}
 
 	@Override
-	public void updateSwsnjb(Map<String, Object> obj) {
+	public void updateSwsnjb(Map<String, Object> obj) throws Exception {
+		Integer njid=(Integer) obj.get("id");
+		Integer jgid=(Integer) obj.get("jg_id");
 		String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
 		String xz = this.jdbcTemplate.queryForObject(sql,
 				new Object[] { obj.get("jg_id") }, String.class);
@@ -248,11 +329,25 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sb.append(" set ZSJG_ID=:jg_id,ZSJGXZ_ID=:xz,ND =:nd,ZJWGDM=:wg,NJZJ=:NJZJ,GDBDQKZJ=:GDBDQKZJ,"
 				+ "GDBDQKJS=:GDBDQKJS,ZRS=:ZRS,ZYRS=:zyrs,YJYRS=:yjyrs,SJJYRS=:sjjyrs, "
 				+ "WJYRS=:wjyrs,ZJ=:ZJ,FZR=:FZR,ZCSWSBZJ=:ZCSWSBZJ, "
-				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS," + "ztdm='2'where id=:id ");
+				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS," + "ztdm=:'ztbj' where id=:id ");
 
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
+		if ("2".equals(obj.get("ztbj"))) {
+			Map<String, Object> spsq = new HashMap<>();// 设置生成审批表方法参数
+			spsq.put("sid", njid);
+			if (this.jdbcTemplate
+					.queryForList(
+							"select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",
+							new Object[] { jgid }).size() == 0) {
+				spsq.put("lclx", "40288087233c611801234b6fac3c01b3");
+			} else {
+				spsq.put("lclx", "40288087233c611801234b71cfc801b6");
+			}
+			spsq.put("jgid", jgid);
+			new SPDao().swsSPqq(spsq);// 生成审批表记录
+		}
 
 	}
 

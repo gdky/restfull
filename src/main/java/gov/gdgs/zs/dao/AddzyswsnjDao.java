@@ -87,7 +87,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 	// 前台点击"查看"时显示数据
 	public Map<String, Object> getzyswsnjbById(String id) {
 		StringBuffer sb = new StringBuffer();
-		sb.append("	select max( a.nd),a.nd,a.ID,c.XMING,c.DHHM,d.ZYZSBH,d.ZYZGZSBH,");
+		sb.append("	select max( a.nd),a.nd,a.ID,c.XMING,c.DHHM,d.ZYZSBH,d.ZYZGZSBH,a.sws_id ,");
 		sb.append("	b.dwmc,a.swsfzryj,e1.MC as xb,f1.mc as xl,a.CZBL,DATE_FORMAT(a.SWSFZRSJ,'%Y-%m-%d') AS SWSFZRSJ,a.SWSFZR,");
 		sb.append("	DATE_FORMAT(c.SRI,'%Y-%m-%d') AS SRI,c.SFZH,a.BAFS,a.ZJWGDM,a.NJWGDM,a.ZJ,a.SWSFZRYJ,");
 		sb.append("	CASE a.ZTDM WHEN 1 THEN '保存'  WHEN 2 THEN '未审批' WHEN 0 THEN '退回' WHEN 3 THEN '已年检' ELSE NULL END AS njzt,");
@@ -149,7 +149,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 
 	@Override
 	public String addZyswsnjb(Map<String, Object> obj) throws Exception {
-		String jgid=(String) obj.get("jg_id");
+		Integer jgid= (Integer) obj.get("jg_id");
 		String uuid = UUID.randomUUID().toString().replace("-", "");
 		obj.put("id", uuid);
 		String sql = "select max(a.ID)+1 from zs_zcswsnj a";
@@ -163,7 +163,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_zcswsnj");
 		sb.append(" (ZSJG_ID,ID,ND,SWS_ID,ZJWGDM,NJZJ,SWSFZRYJ,SWSFZRSJ,SWSFZR,ZDSJ,ZTDM,CZBL,BAFS) "
-				+ "VALUES (:jg_id,:id1,:ND,:sws_id,:wg,:ZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),'2',:czbl,:bndbafs) ");
+				+ "VALUES (:jg_id,:id1,:ND,:sws_id,:wg,:ZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),:ztbj,:czbl,:bndbafs) ");
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());
 		int count = named.update(sb.toString(), obj);
@@ -171,6 +171,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		if (count == 0) {
 			return null;
 		} else {
+			if(!"1".equals(obj.get("ztbj"))){
 			Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
 			spsq.put("sid", uuid);
 			if(this.jdbcTemplate.queryForList("select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",new Object[]{jgid}).size()==0){
@@ -178,31 +179,45 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 			}else{
 				spsq.put("lclx", "40288087233c611801234b758fed01be");
 			}
+			
 			spsq.put("jgid", jgid);
 			new SPDao().swsSPqq(spsq);//生成审批表记录
-
+			}
 			return uuid;
 		}
 		// 更新执业税务师年检表
 	}
-
+	
 	@Override
-	public void updateZyswsnjb(Map<String, Object> obj) {
+	public void updateZyswsnjb(Map<String, Object> obj) throws Exception {
+		Integer uuid=(Integer) obj.get("id");
+		Integer jgid=(Integer) obj.get("jg_id");
 		// String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
 		// String xz =this.jdbcTemplate.queryForObject(sql,new
 		// Object[]{obj.get("jg_id")},String.class);
 		// obj.put("xz", xz);
-		String sql = "select max(a.ID)+1 from zs_zcswsnj a";
-		String id1 = this.jdbcTemplate.queryForObject(sql, String.class);
-		obj.put("id1", id1);
+//		String sql = "select max(a.ID)+1 from zs_zcswsnj a";
+//		String id1 = this.jdbcTemplate.queryForObject(sql, String.class);
+//		obj.put("id1", id1);
 		StringBuffer sb = new StringBuffer("update " + Config.PROJECT_SCHEMA
 				+ "zs_zcswsnj ");
 
-		sb.append(" set ZSJG_ID=:jg_id,ID=:id1,ND=:nd,SWS_ID=:sws_id,ZJWGDM=:wg,NJZJ=:ZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM='2' where sws_id=:sws_id ");
+		sb.append(" set ZSJG_ID=:jg_id,ND=:nd,SWS_ID=:sws_id,ZJWGDM=:wg,NJZJ=:ZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM=:ztbj where id=:id ");
 
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
-
+		if(!"1".equals(obj.get("ztbj"))){
+			Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
+			spsq.put("sid", uuid);
+			if(this.jdbcTemplate.queryForList("select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",new Object[]{jgid}).size()==0){
+				spsq.put("lclx", "40288087233c611801234b748bac01bb");
+			}else{
+				spsq.put("lclx", "40288087233c611801234b758fed01be");
+			}
+			
+			spsq.put("jgid", jgid);
+			new SPDao().swsSPqq(spsq);//生成审批表记录
+			}
 	}
 }
