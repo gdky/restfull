@@ -23,8 +23,8 @@ public class JDJCDao extends BaseDao{
 		condition.add("c.cs_dm", Condition.EQUAL, qury.get("cs"));
 		condition.add("a.nd", Condition.EQUAL, qury.get("nd"));
 		condition.add("a.ztdm", Condition.EQUAL, qury.get("bbzt"));
-		condition.add("a.zjrq", Condition.GREATER_EQUAL, qury.get("sbsj"));
-		condition.add("a.zjrq", Condition.LESS_EQUAL, qury.get("sbsj2"));
+		condition.add("a.zjsj", Condition.GREATER_EQUAL, qury.get("sbsj"));
+		condition.add("a.zjsj", Condition.LESS_EQUAL, qury.get("sbsj2"));
 		StringBuffer sb = new StringBuffer();
 		sb.append("		select  SQL_CALC_FOUND_ROWS  @rownum:=@rownum+1 AS 'key',v.* from ( SELECT ");
 		sb.append("		c.dwmc,c.JGZCH as zsbh,d.mc as jgxz,c.yzbm,c.DZHI as bgdz,c.DHUA as dhhm,a.*,");
