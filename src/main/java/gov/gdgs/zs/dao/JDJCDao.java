@@ -27,8 +27,8 @@ public class JDJCDao extends BaseDao{
 		condition.add("c.cs_dm", Condition.EQUAL, qury.get("cs"));
 		condition.add("a.nd", Condition.EQUAL, qury.get("nd"));
 		condition.add("a.ztdm", Condition.EQUAL, qury.get("bbzt"));
-		condition.add("a.zjrq", Condition.GREATER_EQUAL, qury.get("sbsj"));
-		condition.add("a.zjrq", Condition.LESS_EQUAL, qury.get("sbsj2"));
+		condition.add("a.zjsj", Condition.GREATER_EQUAL, qury.get("sbsj"));
+		condition.add("a.zjsj", Condition.LESS_EQUAL, qury.get("sbsj2"));
 		StringBuffer sb = new StringBuffer();
 		sb.append("		SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',v.*,");
 		sb.append("		case v.ztdm when 3 then '已年检' when 2 then '已自检' else null end as njzt,");
@@ -87,7 +87,7 @@ public class JDJCDao extends BaseDao{
 			sb.append(" from "+Config.PROJECT_SCHEMA+"zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d,(SELECT @rownum:=?) temp");
 			sb.append(condition.getSql());//相当元 where x.xx like '%%'
 			sb.append(" and a.ZSJG_ID=b.ID and  a.SWS_ID=d.ID and c.ID=d.RY_ID   order by a.ND desc) as t");
-			sb.append("    LIMIT ?, ? ");
+			sb.append("    LIMIT  ?, ? ");
 			// 装嵌传值数组
 			int startIndex = pageSize * (page - 1);
 			ArrayList<Object> params = condition.getParams();

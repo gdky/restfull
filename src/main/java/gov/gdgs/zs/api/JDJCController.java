@@ -23,7 +23,7 @@ public class JDJCController {
 
 	@Resource
 	private JDJCService jdjcService;
-	
+	//事务所年检
 	@RequestMapping(value = "/jdjc/swsnj1", method = { RequestMethod.GET })
 	public ResponseEntity<Map<String, Object>> swsnjcx(
 			@RequestParam(value = "pagenum", required = true) int pn,
