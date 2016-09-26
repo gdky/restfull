@@ -21,11 +21,14 @@ import java.util.Map;
 
 
 
+
 import javax.management.Query;
 
 import org.hashids.Hashids;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import com.google.common.base.Objects;
 
 @Repository
 public class RyglDao extends BaseDao{
@@ -39,12 +42,14 @@ public class RyglDao extends BaseDao{
 	public Map<String,Object> rycx(int pn,int ps,Map<String, Object> qury) {
 		final String url=Config.URL_PROJECT;
 		Condition condition = new Condition();
+		Condition condition2 = new Condition();
 		condition.add("a.xming", Condition.FUZZY, qury.get("xm"));
 		condition.add("a.rysf_dm", Condition.EQUAL, qury.get("rysfdm"));
 		condition.add("a.sfzh", Condition.FUZZY_LEFT, qury.get("sfzh"));
 		condition.add("a.CS_DM", Condition.EQUAL, qury.get("cs"));
 		condition.add("a.xb_DM", Condition.EQUAL, qury.get("xb"));
 		condition.add("a.xl_dm", Condition.EQUAL, qury.get("xl"));
+		condition2.add("a.xl_dm", Condition.EQUAL, qury.get("xl"));
 		StringBuffer sb = new StringBuffer();
 		sb.append("	select SQL_CALC_FOUND_ROWS ");
 		sb.append("		@rownum:=@rownum+1 as 'key',");
@@ -59,6 +64,14 @@ public class RyglDao extends BaseDao{
 		sb.append("				e.mc as rysf,a.rysf_dm as rysfdm");
 		sb.append("				from zs_ryjbxx a,dm_cs b,dm_mz c,dm_xb d,dm_rysf e,dm_xl f,(select @rownum:=?) zs_ry");
 		sb.append("		"+condition.getSql()+" ");
+		if(qury.containsKey("dwmc")){
+			if (!Objects.equal(qury.get("dwmc"), "") && !Objects.equal(qury.get("dwmc"), null)) {
+				sb.append("		and a.ID in (");
+				sb.append("		select j.RY_ID from zs_cyry j,zs_jg h where j.JG_ID=h.id and h.id='"+qury.get("dwmc")+"' union");
+				sb.append("		select g.RY_ID from zs_zysws g,zs_jg h where g.jg_id=h.ID and h.id='"+qury.get("dwmc")+"' union");
+				sb.append("		select i.RY_ID from zs_fzysws i,zs_jg h where i.ZZDW=h.dwmc and h.id='"+qury.get("dwmc")+"') ");
+			}
+		}
 		sb.append("				and a.xb_dm= d.id");
 		sb.append("				and a.cs_dm=b.id");
 		sb.append("				and a.mz_dm=c.id");
@@ -471,7 +484,7 @@ public class RyglDao extends BaseDao{
 		sb.append("		date_format(a.LRSJ,'%Y-%m-%d') as lrsj,");
 		sb.append("		date_format(a.SWDLYWKSSJ,'%Y-%m-%d') as swdlywkssj,");
 		sb.append("		a.zgxlzymc,");
-		sb.append("		date_format(a.ZGXLFZJGJSJ,'%Y-%m-%d') as zgxlfzjgjsj,");
+		sb.append("		date_format(a.ZGXLFZJGJSJ,'%Y-%m-%d') as zgxlfzjgjsj,b.xpian,");
 		sb.append("		b.rydazt");
 		sb.append("		from zs_cyry a,zs_ryjbxx b,zs_jg c,dm_xb d,dm_xl e,dm_cs f,dm_mz g,dm_zzmm h,dm_zw i");
 		sb.append("		where a.RY_ID = b.ID");

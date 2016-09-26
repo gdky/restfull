@@ -25,6 +25,9 @@ public class SPservice {
 		return spDao.wspcx(uid);
 	}
 	
+	public List<Map<String,Object>> swswspcx(int uid){
+		return spDao.swswspcx(uid);
+	}
 	public List<Map<String,Object>> cklc(int lid){
 		return spDao.cklc(lid);
 	}
@@ -98,6 +101,10 @@ public class SPservice {
 		switch (splx) {
 		case "jgbgsq"://机构变更申请
 			this.spDao.swsbgsq(sqxm);break;
+		case "swsslzltb"://设立资料填报申请
+			this.spDao.swsslzltb(sqxm);break;
+		case "swsfsslsq"://机构分所设立申请
+			this.spDao.swsfsslsq(sqxm);break;
 		case"jgzxsq"://机构注销申请
 			this.spDao.swszxsq(sqxm);break;
 		case"jghbsq"://机构合并申请

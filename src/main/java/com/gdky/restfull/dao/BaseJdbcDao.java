@@ -6,13 +6,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.PreparedStatementCreator;  
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -69,10 +67,8 @@ public class BaseJdbcDao {
 	public  Number insertAndGetKeyByNamedJdbc(final String sqlStatement, final Map<String,Object> paramObj,
 			final String[] idColumnName) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
-		 SqlParameterSource ps=new BeanPropertySqlParameterSource(paramObj); 
+		SqlParameterSource ps=new MapSqlParameterSource(paramObj);
 		namedParameterJdbcTemplate.update(sqlStatement,ps,keyHolder,idColumnName);
 		return keyHolder.getKey();
 	}
-
-
 }

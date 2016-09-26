@@ -48,6 +48,12 @@ public class CheckingService {
 		return "";
 	}
 	
+	public boolean checkJGSPingSelf(Integer jgid){
+		return this.chDao.checkJGSPing(jgid);
+	}
+	public boolean checkJGFssl(Integer jgid){
+		return this.chDao.checkJGFssl(jgid);
+	}
 	public boolean checkIsBH(String spid){
 		return this.chDao.checkIsBH(spid);
 	}

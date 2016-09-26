@@ -21,7 +21,7 @@ public class SelectDao extends BaseJdbcDao{
 
 	public Map<String, Object> getJgSelect(HashMap<String, Object> map) {
 		Condition condition = new Condition();
-		StringBuffer sql=new StringBuffer("SELECT jg.ID  id, jg.DWMC mc FROM zs_jg jg ");
+		StringBuffer sql=new StringBuffer("SELECT jg.ID  id, jg.DWMC mc FROM zs_jg jg where jg.yxbz=1");
 		sql.append(" ORDER BY jg.ID");
 		ArrayList<Object> params = condition.getParams();
 		List<Map<String,Object>> ls=this.jdbcTemplate.query(sql.toString(),params.toArray(),new RowMapper<Map<String,Object>>() {

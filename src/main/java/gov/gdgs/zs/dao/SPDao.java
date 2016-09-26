@@ -653,6 +653,23 @@ public class SPDao extends BaseDao{
 	 
 	/*-------------------------------事务所端-------------------------------------*/
 	 /**
+	  * 事务所端未审批查询
+	  * @param uid
+	  * @return
+	  */
+	 public List<Map<String, Object>> swswspcx(int uid){
+			String param ="41,42,43,44";//41:其他从业人员转籍;42:其他从业人员信息变更;43:其他从业人员注销;44:其他从业人员转执业;全显示请留""
+			StringBuffer sb = new StringBuffer();
+			sb.append("		SELECT ");
+			sb.append("		d.PERANT_ID as lx,a.LCLXID as lid, d.MC as wsxm, COUNT(c.id) wss ");
+			sb.append("		FROM zs_splc a,fw_user_role e,dm_lclx d,zs_splcbz b");
+			sb.append("		LEFT JOIN zs_spzx c ON c.LCBZID=b.id AND c.ztbj='Y'");
+			sb.append("		WHERE a.ID=b.LCID AND b.ROLEID=e.role_id AND d.ID=a.LCLXID AND a.ZTBJ=2 AND a.LCLXID not in (29"+(param.length()>0?(","+param):" ")+") and e.USER_ID = ?");
+			sb.append("		GROUP BY a.LCLXID");
+			sb.append("		order by d.PERANT_ID,a.LCLXID");
+			return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{uid});
+		}
+	 /**
 		 * 事务所变更审批项目申请
 		 * @param spxm
 		 */
@@ -685,6 +702,74 @@ public class SPDao extends BaseDao{
 		for(Map<String, Object> rec:forupdate){//插入变更项目信息
 			this.jdbcTemplate.update(sql2,new Object[]{rec.get("mc"),rec.get("jzhi"),rec.get("xzhi"),uuid});
 		}
+	}
+	/**
+	 * 事务所设立资料填报审批申请
+	 * @param sqxm
+	 * @throws Exception
+	 */
+	public void swsslzltb(Map<String, Object> sqxm) throws Exception{
+		List<List<String>> nb = (List<List<String>>) sqxm.remove("nbjgsz");
+		if(this.jdbcTemplate.queryForList("select id from zs_nbjgsz where jg_id=?",
+				new Object[]{sqxm.get("jgid")}).size()>0){
+			for(List<String> rec:nb){
+				String nbSql="update zs_nbjgsz set BMMC=?,JBZN=?,RS=? where JG_ID=?";
+				rec.add(sqxm.get("jgid")+"");
+				this.jdbcTemplate.update(nbSql,rec.toArray());
+			}
+		}else{
+			for(List<String> rec:nb){
+				String nbSql="insert into zs_nbjgsz (BMMC,JBZN,RS,ID,JG_ID) values(?,?,?,replace(uuid(),'-',''),?)";
+				rec.add(sqxm.get("jgid")+"");
+				this.jdbcTemplate.update(nbSql,rec.toArray());
+			}
+		}
+		sqxm.remove("uid");
+		List<Object> listValue = new ArrayList<Object>();  //Map转List
+		Iterator<String> it = sqxm.keySet().iterator();  
+		while (it.hasNext()) {  
+			String key = it.next().toString();  
+			listValue.add(sqxm.get(key));  
+		};
+		String sql ="update zs_jg set DWMC=?,GZ_DM=?,CS_DM=?,FDDBR=?,DZHI=?,JGZCH=?,JGXZ_DM=?,ZCZJ=?,ZCDZ=?,YZBM=?,"
+				+ "CZHEN=?,DHUA=?,KHH=?,KHHZH=?,YYZZHM=?,JYFW=?,SWDJHM=?,JGDMZH=?,SZYX=?,SZPHONE=?,TXYXMING=?,XTYYX=?,XTYPHONE=?,DZYJ=?,GSZZH=?,GSYHMCBH=?,"
+				+ "YHDW=?,YHSJ=?,GZBH=?,GZDW=?,GZRY=?,GZSJ=?,YZBH=?,YZDW=?,YZRY=?,YZSJ=?,SJLZXSBWH=?,SGLZXSBSJ=?,ZJPZWH=?,ZJPZSJ=?,FJ=?,JBQK=?,GLZD=?,GDDH=?,BGCSZCZM=?,TGZT_DM=5 where id=?";
+		this.jdbcTemplate.update(sql,listValue.toArray());
+		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
+		spsq.put("sid", sqxm.get("jgid"));
+		spsq.put("lclx", "402882891f4b1acc011f546cf7d10090");
+		spsq.put("jgid", sqxm.get("jgid"));
+		swsSPqq(spsq);
+	}
+	/**
+	 * 事务所分所设立审批申请
+	 * @param sqxm
+	 * @throws Exception
+	 */
+	public void swsfsslsq(Map<String, Object> sqxm) throws Exception{
+		List<List<String>> nb = (List<List<String>>) sqxm.remove("nbjgsz");
+		sqxm.remove("uid");
+		List<Object> listValue = new ArrayList<Object>();  //Map转List
+		Iterator<String> it = sqxm.keySet().iterator();  
+		while (it.hasNext()) {  
+			String key = it.next().toString();  
+			listValue.add(sqxm.get(key));  
+		};
+		String sql ="insert into zs_jg (DWMC,XJG,CS_DM,FDDBR,DZHI,JGZCH,JGXZ_DM,ZCZJ,ZCDZ,YZBM,"
+				+ "CZHEN,DHUA,KHH,KHHZH,YYZZHM,JYFW,SWDJHM,JGDMZH,SZYX,SZPHONE,TXYXMING,XTYYX,XTYPHONE,DZYJ,GSZZH,GSYHMCBH,"
+				+ "YHDW,YHSJ,GZBH,GZDW,GZRY,GZSJ,YZBH,YZDW,YZRY,YZSJ,SJLZXSBWH,SGLZXSBSJ,ZJPZWH,ZJPZSJ,FJ,JBQK,GLZD,GDDH,BGCSZCZM,JGZT_DM,PARENTJGID,LRRQ,YXBZ)"
+				+ " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'5',?,sysdate(),'0')";
+		Number rs = this.insertAndGetKeyByJdbc(sql,listValue.toArray(),new String[] {"ID"});
+		for(List<String> rec:nb){
+			String nbSql="insert into zs_nbjgsz (BMMC,JBZN,RS,ID,JG_ID) values(?,?,?,replace(uuid(),'-',''),?)";
+			rec.add(rs.toString());
+			this.jdbcTemplate.update(nbSql,rec.toArray());
+		}
+		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
+		spsq.put("sid", rs);
+		spsq.put("lclx", "4028808722837891012283900818002d");
+		spsq.put("jgid", sqxm.get("jgid"));
+		swsSPqq(spsq);
 	}
 	/**
 	 * 事务所合并审批申请
@@ -979,6 +1064,18 @@ public class SPDao extends BaseDao{
 		 */
 		public void updatePTXM(Map<String, Object> ptxm)throws Exception{
 			List<Map<String, Object>> forupdate = (List<Map<String, Object>>) ptxm.remove("bgjl");//获取并移除bgjl属性
+			if(ptxm.containsKey("nbjgsz")){
+				List<List<String>> nb = (List<List<String>>) ptxm.remove("nbjgsz");
+				for(List<String> rec:nb){
+					String fir=rec.get(0)+"";
+					if(fir.equals("null")){
+						continue;
+					}
+					String nbSql="update zs_nbjgsz set BMMC=?,JBZN=?,RS=? where JG_ID=?";
+					rec.add((String) ptxm.get("jgid"));
+					this.jdbcTemplate.update(nbSql,rec.toArray());
+				}
+			}
 			Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
 			int jgid = (int)hashids.decode((String)ptxm.get("jgid"))[0];
 			ptxm.put("jgid", jgid);
@@ -988,7 +1085,7 @@ public class SPDao extends BaseDao{
 				String key = it.next().toString();  
 				listValue.add(ptxm.get(key));  
 			};
-			String sql ="update zs_jg set DHUA=?,CZHEN=?,jyfw=?,yzbm=?,SZPHONE=?,JGZCH=?,SWDJHM=?,jgdmzh=?,GSYHMCBH=?,KHH=?,KHHZH=?,TXYXMING=?,XTYPHONE=?,XTYYX=?,SZYX=?,wangzhi=?,dzyj=?,yhdw=?,yhsj=?,gzbh=?,gzdw=?,gzry=?,gzsj=?,yzbh=?,yzdw=?,yzry=?,yzsj=?,TTHYBH=?,rhsj=?,JBQK=?,GLZD=?,GDDH=?,BGCSZCZM=? where id =?";
+			String sql ="update zs_jg set DHUA=?,CZHEN=?,jyfw=?,yzbm=?,SZPHONE=?,JGZCH=?,SWDJHM=?,KHH=?,KHHZH=?,TXYXMING=?,XTYPHONE=?,XTYYX=?,SZYX=?,JGDMZH=?,GSYHMCBH=?,wangzhi=?,dzyj=?,yhdw=?,yhsj=?,gzbh=?,gzdw=?,gzry=?,gzsj=?,yzbh=?,yzdw=?,yzry=?,yzsj=?,TTHYBH=?,rhsj=?,JBQK=?,GLZD=?,GDDH=?,BGCSZCZM=? where id =?";
 			String sql2 ="insert into zs_jglsbgxxb (MC,JZHI,XZHI,GXSJ,JGB_ID,ID) values(?,?,?,sysdate(),?,?)";
 			this.jdbcTemplate.update(sql,listValue.toArray());//更新数据库
 			for(Map<String, Object> rec:forupdate){//插入变更项目信息
