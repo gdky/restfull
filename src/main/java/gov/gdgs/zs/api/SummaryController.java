@@ -27,7 +27,7 @@ public class SummaryController {
 	/*
 	 * 获取事务所基本信息
 	 */
-	@RequestMapping(value = "/summary/{hashid}", method = { RequestMethod.GET })
+	@RequestMapping(value = "/clisummary/{hashid}", method = { RequestMethod.GET })
 	public ResponseEntity<?> getClientSummary(@PathVariable String hashid)  {
 		
 		//解码事务所hashid
