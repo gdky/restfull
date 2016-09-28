@@ -95,10 +95,9 @@ public class SwsService {
 	}
 	public Map<String, Object> getSzxx(Map<String,Object> swsxx) {
 		Map<String,Object> obj = new HashMap<String,Object>();
-		Map<String,Object> data = (Map<String,Object>)swsxx.get("data");
-		obj.put("xming", (String)data.get("fddbr"));
-		obj.put("szphone", (String)data.get("szphone"));
-		obj.put("szyx", (String)data.get("szyx"));
+		obj.put("xming", (String)swsxx.get("fddbr"));
+		obj.put("szphone", (String)swsxx.get("szphone"));
+		obj.put("szyx", (String)swsxx.get("szyx"));
 		return obj;
 	}
 	

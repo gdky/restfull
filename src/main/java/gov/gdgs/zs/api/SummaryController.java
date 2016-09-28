@@ -34,7 +34,7 @@ public class SummaryController {
 		Long jid = HashIdUtil.decode(hashid);
 		
 		//获取事务所基本信息
-		Map<String,Object> swsxx  = swsService.swsxx("swsxx", hashid);
+		Map<String,Object> swsxx  = (Map<String,Object>) (swsService.swsxx("swsxx", hashid)).get("data");
 		
 		//获取所长信息
 		Map<String,Object> szxx = swsService.getSzxx(swsxx);
