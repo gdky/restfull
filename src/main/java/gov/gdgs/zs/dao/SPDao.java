@@ -127,6 +127,10 @@ public class SPDao extends BaseDao{
 		sb.append("		case f.yjxx when f.yjxx then f.yjxx else '无' end as yjxx,group_concat(concat(b.LCBZ,'.',h.DESCRIPTION)) as dqlcbz");
 		sb.append("		FROM zs_splc a,dm_lclx d,zs_splcbz b,zs_spzx c,zs_jg e,zs_jgyjxxb f,fw_user_role g,fw_role h,(SELECT @rownum:=?) zs_jg");
 		sb.append(condition.getSql());
+		if(qury.containsKey("zsid")){
+			Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+			sb.append("and c.ZSJG_ID in (select id from zs_jg i where i.PARENTJGID="+hashids.decode(qury.get("zsid")+"")[0]+")");
+		}
 		sb.append("		and a.ID=b.LCID AND b.ROLEID=g.role_id and g.USER_ID=? AND d.ID=a.LCLXID AND a.ZTBJ=2 and b.ROLEID=h.ID AND a.LCLXID<>'29' and a.LCLXID=? and e.id=f.id");
 		sb.append("		and c.LCBZID=b.id AND c.ztbj='Y' and e.ID=c.ZSJG_ID group by c.id order by c.TJSJ desc");
 		sb.append("		    LIMIT ?, ? ");
@@ -207,6 +211,10 @@ public class SPDao extends BaseDao{
 		sb.append("		FROM zs_splc a,dm_lclx d,zs_splcbz b,zs_spzx c,fw_user_role g,zs_ryjbxx f,"+bm+" i,"+bm2+" j,");
 		sb.append("		fw_role h,dm_xb k,(SELECT @rownum:=?) zs_jg");
 		sb.append(condition.getSql()+where);
+		if(qury.containsKey("zsid")){
+			Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+			sb.append("and c.ZSJG_ID in (select id from zs_jg l where l.PARENTJGID="+hashids.decode(qury.get("zsid")+"")[0]+")");
+		}
 		sb.append("		and a.ID=b.LCID AND b.ROLEID=g.role_id ");
 		sb.append("		 AND d.ID=a.LCLXID AND a.ZTBJ=2 and g.USER_ID=?");
 		sb.append("		and b.ROLEID=h.ID  AND a.LCLXID<>'29' and a.LCLXID=?");
@@ -657,17 +665,29 @@ public class SPDao extends BaseDao{
 	  * @param uid
 	  * @return
 	  */
-	 public List<Map<String, Object>> swswspcx(int uid){
+	 public List<Map<String, Object>> swswspcx(Integer uid,final Integer jgid){
 			String param ="41,42,43,44";//41:其他从业人员转籍;42:其他从业人员信息变更;43:其他从业人员注销;44:其他从业人员转执业;全显示请留""
 			StringBuffer sb = new StringBuffer();
 			sb.append("		SELECT ");
 			sb.append("		d.PERANT_ID as lx,a.LCLXID as lid, d.MC as wsxm, COUNT(c.id) wss ");
 			sb.append("		FROM zs_splc a,fw_user_role e,dm_lclx d,zs_splcbz b");
-			sb.append("		LEFT JOIN zs_spzx c ON c.LCBZID=b.id AND c.ztbj='Y'");
+			sb.append("		LEFT JOIN zs_spzx c ON c.LCBZID=b.id AND c.ztbj='Y' and c.ZSJG_ID in (select id from zs_jg f where f.PARENTJGID=?)");
 			sb.append("		WHERE a.ID=b.LCID AND b.ROLEID=e.role_id AND d.ID=a.LCLXID AND a.ZTBJ=2 AND a.LCLXID not in (29"+(param.length()>0?(","+param):" ")+") and e.USER_ID = ?");
 			sb.append("		GROUP BY a.LCLXID");
 			sb.append("		order by d.PERANT_ID,a.LCLXID");
-			return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{uid});
+			return this.jdbcTemplate.query(sb.toString(),new Object[]{jgid,uid},
+					new RowMapper<Map<String,Object>>() {
+				public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+					Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+					String id = hashids.encode(jgid);
+					Map<String,Object> map = new HashMap<String,Object>();
+					map.put("jgid", id);
+					map.put("lid", rs.getObject("lid"));
+					map.put("wsxm", rs.getObject("wsxm"));
+					map.put("wss", rs.getObject("wss"));
+					return map;
+				}
+			});
 		}
 	 /**
 		 * 事务所变更审批项目申请
@@ -1086,10 +1106,10 @@ public class SPDao extends BaseDao{
 				listValue.add(ptxm.get(key));  
 			};
 			String sql ="update zs_jg set DHUA=?,CZHEN=?,jyfw=?,yzbm=?,SZPHONE=?,JGZCH=?,SWDJHM=?,KHH=?,KHHZH=?,TXYXMING=?,XTYPHONE=?,XTYYX=?,SZYX=?,JGDMZH=?,GSYHMCBH=?,wangzhi=?,dzyj=?,yhdw=?,yhsj=?,gzbh=?,gzdw=?,gzry=?,gzsj=?,yzbh=?,yzdw=?,yzry=?,yzsj=?,TTHYBH=?,rhsj=?,JBQK=?,GLZD=?,GDDH=?,BGCSZCZM=? where id =?";
-			String sql2 ="insert into zs_jglsbgxxb (MC,JZHI,XZHI,GXSJ,JGB_ID,ID) values(?,?,?,sysdate(),?,?)";
+			String sql2 ="insert into zs_jglsbgxxb (MC,JZHI,XZHI,GXSJ,JGB_ID,ID) values(?,?,?,sysdate(),?,replace(uuid(),'-',''))";
 			this.jdbcTemplate.update(sql,listValue.toArray());//更新数据库
 			for(Map<String, Object> rec:forupdate){//插入变更项目信息
-				this.jdbcTemplate.update(sql2,new Object[]{rec.get("mc"),rec.get("jzhi"),rec.get("xzhi"),ptxm.get("jgid"),new Common().newUUID()});
+				this.jdbcTemplate.update(sql2,new Object[]{rec.get("mc"),rec.get("jzhi"),rec.get("xzhi"),ptxm.get("jgid")});
 			}
 				
 		}
@@ -1127,7 +1147,55 @@ public class SPDao extends BaseDao{
 		 */
 		public void cydrzssq(Map<String, Object> sqxm) throws Exception{
 			this.jdbcTemplate.update("update zs_cyry a set a.jg_id=? where a.id=?",new Object []{sqxm.get("jgid"),sqxm.get("ryid")});
-		}	
+		}
+		/**
+		 * 从业人员信息变更申请
+		 * @param sqxm
+		 * @throws Exception
+		 */
+		public void cyrybgsq(Map<String, Object> sqxm) throws Exception{
+			List<List<String>> nb = (List<List<String>>) sqxm.remove("nbjgsz");
+			List<Map<String, Object>> forupdate = (List<Map<String, Object>>) sqxm.remove("bgjl");
+			Object uid = sqxm.remove("uid");
+			Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+			Object ryid = hashids.decode((String)sqxm.remove("ryid"))[0];
+			sqxm.remove("jgid");
+			sqxm.put("id", ryid);
+			List<Object> listValue = new ArrayList<Object>();  //Map转List
+			Iterator<String> it = sqxm.keySet().iterator();  
+			while (it.hasNext()) {  
+				String key = it.next().toString();  
+				listValue.add(sqxm.get(key));  
+			};
+			String sql ="update zs_cyry a,zs_ryjbxx b set b.XMING=?,b.CS_DM=?,b.XB_DM=?,b.MZ_DM=?,b.SRI=?,b.XL_DM=?,b.SFZH=?,"
+					+ "b.ZZMM_DM=?,b.TXDZ=?,b.YDDH=?,b.YZBM=?,a.ZW_DM=?,b.DHHM=?,b.BYYX=?,a.XZSNGZGW=?,b.BYSJ=?,a.LRSJ=?,a.SWDLYWKSSJ=?,"
+					+ "a.ZGXLZYMC=?,a.ZGXLFZJGJSJ=?,b.RYDAZT=?,b.xpian=? where a.ry_id=b.id and b.id=?";
+			this.jdbcTemplate.update(sql,listValue.toArray());
+			List<Map<String, Object>> jls = this.jdbcTemplate.queryForList("select a.id from zs_jl a where a.ry_id=?",ryid);
+			for(Map<String, Object> rec:forupdate){//插入变更表
+				String jlbSql="insert into zs_cyrylsbgxxb (ID,MC,JZHI,XZHI,GXSJ,CYRY_ID,GXRY_ID) values(replace(uuid(),'-',''),?,?,?,sysdate(),(select id from zs_cyry where ry_id=?),?)";
+				this.jdbcTemplate.update(jlbSql,new Object[]{rec.get("mc"),rec.get("jzhi"),rec.get("xzhi"),ryid,uid});
+			}
+			if(jls.size()>0){
+				for(List<String> rec:nb){//更新人员简历
+					int rowNum = nb.indexOf(rec);
+					String nbSql="update zs_jl set QZNY=?,XXXX=?,ZMR=? where ID=?";
+					try {
+						rec.add(jls.get(rowNum).get("id")+"");
+					} catch (Exception e) {
+						continue;
+					}
+					this.jdbcTemplate.update(nbSql,rec.toArray());
+				}
+			}else{
+				for(List<String> rec:nb){//更新人员简历
+					int rowNum = nb.indexOf(rec);
+					String nbSql="insert into zs_jl (QZNY,XXXX,ZMR,ID,RY_ID) values(?,?,?,replace(uuid(),'-',''),?)";
+					rec.add((String) ryid);
+					this.jdbcTemplate.update(nbSql,rec.toArray());
+				}
+			}
+		}
 
 	/**
 	 * 非执业备案查询

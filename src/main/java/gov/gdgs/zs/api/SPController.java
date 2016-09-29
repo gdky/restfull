@@ -51,7 +51,7 @@ public class SPController {
 	@RequestMapping(value = "/spapi/swswspcx", method = RequestMethod.GET)
 	public ResponseEntity<?> swswspcx(HttpServletRequest request ) throws Exception{
 		User user =  accountService.getUserFromHeaderToken(request);
-		return new ResponseEntity<>(spPservice.swswspcx(user.getId()),HttpStatus.OK);
+		return new ResponseEntity<>(spPservice.swswspcx(user.getId(),user.getJgId()),HttpStatus.OK);
 	}
 	
 	/**

@@ -51,6 +51,8 @@ public class RyglService {
 		switch(cxlx){
 		case "zyry":
 			return ryglDao.swszycx(pn,ps,jgid,map);
+		case "cyry":
+			return ryglDao.swscycx(pn,ps,jgid,map);
 		}
 		return null;
 	}
@@ -199,5 +201,10 @@ public class RyglService {
 			}
 		}
 		return ryglDao.zyglscdy(rylx,map,pJgid);
+	}
+	public void ryxpgx(String gid,String path) {
+		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+		int ryid = (int)hashids.decode(gid)[0];
+		ryglDao.ryxpgx(ryid, path);
 	}
 }
