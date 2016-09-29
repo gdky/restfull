@@ -25,8 +25,8 @@ public class SPservice {
 		return spDao.wspcx(uid);
 	}
 	
-	public List<Map<String,Object>> swswspcx(int uid){
-		return spDao.swswspcx(uid);
+	public List<Map<String,Object>> swswspcx(Integer uid,Integer jgid){
+		return spDao.swswspcx(uid,jgid);
 	}
 	public List<Map<String,Object>> cklc(int lid){
 		return spDao.cklc(lid);
@@ -139,16 +139,18 @@ public class SPservice {
 	 */
 	public void fspsq(Map<String,Object> ptxm,String splx)throws Exception {
 		 switch (splx) {
-			case "jgbgsq":
+			case "jgbgsq"://机构信息变更
 				this.spDao.updatePTXM(ptxm);
-			case "zyzrfs":
+			case "zyzrfs"://执业转入分所
 				this.spDao.zyzrfssq(ptxm);
-			case "cydrsq":
+			case "cydrsq"://从业转入分所
 				this.spDao.cydrsq(ptxm);
-			case "zydrzssq":
+			case "zydrzssq"://执业调入主所
 				this.spDao.zydrzssq(ptxm);
-			case "cydrzssq":
+			case "cydrzssq"://从业调入主所
 				this.spDao.cydrzssq(ptxm);
+			case "cyrybgsq"://从业信息变更
+				this.spDao.cyrybgsq(ptxm);
 		 }
 	}
 

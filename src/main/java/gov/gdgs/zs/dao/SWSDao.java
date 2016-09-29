@@ -148,13 +148,13 @@ public class SWSDao extends BaseDao{
 	 */
 	public Map<String,Object> swsxx(int id){
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select a.dwmc,ifnull(a.CS_DM,(select c.mc from dm_cs c where c.ID=a.CS_DM)) as cs,	a.fddbr,a.dzhi,a.sjlzxsbwh,a.zcdz, ");
+		sb.append("		select a.dwmc,if(a.CS_DM is not null,(select c.mc from dm_cs c where c.ID=a.CS_DM),null) as cs,	a.fddbr,a.dzhi,a.sjlzxsbwh,a.zcdz, ");
 		sb.append("		date_format(a.sglzxsbsj,'%Y-%m-%d') as sglzxsbsj,date_format(a.zjpzsj,'%Y-%m-%d')");
 		sb.append("		as zjpzsj,a.yzbm,a.zjpzwh,a.czhen,a.dhua,a.szyx, ");
 		sb.append("		a.txyxming,a.xtyyx,a.xtyphone,a.JGZCH as zsbh,	a.zczj,a.jyfw,a.GZ_DM as isgz,");
 		sb.append("		(select count(id) from zs_zysws where jg_id=a.id)+");
 		sb.append("		(select count(id) from zs_cyry where jg_id=a.id and CYRYZT_DM=1) as zrs, ");
-		sb.append("		ifnull(a.JGXZ_DM,(select b.mc from dm_jgxz b where b.ID=a.JGXZ_DM)) as swsxz,a.szphone,a.gsyhmcbh,a.dzyj,a.yhdw,date_format(a.yhsj,'%Y-%m-%d') as yhsj, ");
+		sb.append("		if(a.JGXZ_DM is not null,(select b.mc from dm_jgxz b where b.ID=a.JGXZ_DM),null) as swsxz,a.szphone,a.gsyhmcbh,a.dzyj,a.yhdw,date_format(a.yhsj,'%Y-%m-%d') as yhsj, ");
 		sb.append("		a.gzbh,a.gzdw,a.gzry,date_format(a.gzsj,'%Y-%m-%d') as gzsj,a.yzbh,a.yzdw,");
 		sb.append("		a.yzry,date_format(a.yzsj,'%Y-%m-%d') as yzsj, a.tgzt_dm as tgzt,");
 		sb.append("		a.tthybh,date_format(a.rhsj,'%Y-%m-%d') as rhsj,a.khh,a.khhzh,a.fj,a.swdjhm,a.jbqk, ");
