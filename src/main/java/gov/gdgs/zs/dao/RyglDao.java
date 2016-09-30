@@ -21,11 +21,14 @@ import java.util.Map;
 
 
 
+
 import javax.management.Query;
 
 import org.hashids.Hashids;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+
+import com.google.common.base.Objects;
 
 @Repository
 public class RyglDao extends BaseDao{
@@ -39,12 +42,14 @@ public class RyglDao extends BaseDao{
 	public Map<String,Object> rycx(int pn,int ps,Map<String, Object> qury) {
 		final String url=Config.URL_PROJECT;
 		Condition condition = new Condition();
+		Condition condition2 = new Condition();
 		condition.add("a.xming", Condition.FUZZY, qury.get("xm"));
 		condition.add("a.rysf_dm", Condition.EQUAL, qury.get("rysfdm"));
 		condition.add("a.sfzh", Condition.FUZZY_LEFT, qury.get("sfzh"));
 		condition.add("a.CS_DM", Condition.EQUAL, qury.get("cs"));
 		condition.add("a.xb_DM", Condition.EQUAL, qury.get("xb"));
 		condition.add("a.xl_dm", Condition.EQUAL, qury.get("xl"));
+		condition2.add("a.xl_dm", Condition.EQUAL, qury.get("xl"));
 		StringBuffer sb = new StringBuffer();
 		sb.append("	select SQL_CALC_FOUND_ROWS ");
 		sb.append("		@rownum:=@rownum+1 as 'key',");
@@ -59,6 +64,14 @@ public class RyglDao extends BaseDao{
 		sb.append("				e.mc as rysf,a.rysf_dm as rysfdm");
 		sb.append("				from zs_ryjbxx a,dm_cs b,dm_mz c,dm_xb d,dm_rysf e,dm_xl f,(select @rownum:=?) zs_ry");
 		sb.append("		"+condition.getSql()+" ");
+		if(qury.containsKey("dwmc")){
+			if (!Objects.equal(qury.get("dwmc"), "") && !Objects.equal(qury.get("dwmc"), null)) {
+				sb.append("		and a.ID in (");
+				sb.append("		select j.RY_ID from zs_cyry j,zs_jg h where j.JG_ID=h.id and h.id='"+qury.get("dwmc")+"' union");
+				sb.append("		select g.RY_ID from zs_zysws g,zs_jg h where g.jg_id=h.ID and h.id='"+qury.get("dwmc")+"' union");
+				sb.append("		select i.RY_ID from zs_fzysws i,zs_jg h where i.ZZDW=h.dwmc and h.id='"+qury.get("dwmc")+"') ");
+			}
+		}
 		sb.append("				and a.xb_dm= d.id");
 		sb.append("				and a.cs_dm=b.id");
 		sb.append("				and a.mz_dm=c.id");
@@ -460,18 +473,18 @@ public class RyglDao extends BaseDao{
 		sb.append("		e.MC as xl,");
 		sb.append("		b.sfzh,");
 		sb.append("		h.MC as zzmm,");
-		sb.append("		b.txdz,");
-		sb.append("		b.yddh,");
-		sb.append("		b.yzbm,");
-		sb.append("		i.mc as zw,");
-		sb.append("		b.dhhm,");
-		sb.append("		b.byyx,");
+		sb.append("		b.txdz,b.XL_DM,");
+		sb.append("		b.yddh,b.CS_DM,");
+		sb.append("		b.yzbm,b.MZ_DM,");
+		sb.append("		i.mc as zw,a.ZW_DM,");
+		sb.append("		b.dhhm,b.ZZMM_DM,");
+		sb.append("		b.byyx,b.XB_DM,");
 		sb.append("		a.xzsngzgw,");
 		sb.append("		date_format(b.BYSJ,'%Y-%m-%d') as bysj,");
 		sb.append("		date_format(a.LRSJ,'%Y-%m-%d') as lrsj,");
 		sb.append("		date_format(a.SWDLYWKSSJ,'%Y-%m-%d') as swdlywkssj,");
 		sb.append("		a.zgxlzymc,");
-		sb.append("		date_format(a.ZGXLFZJGJSJ,'%Y-%m-%d') as zgxlfzjgjsj,");
+		sb.append("		a.ZGXLFZJGJSJ as zgxlfzjgjsj,b.xpian,");
 		sb.append("		b.rydazt");
 		sb.append("		from zs_cyry a,zs_ryjbxx b,zs_jg c,dm_xb d,dm_xl e,dm_cs f,dm_mz g,dm_zzmm h,dm_zw i");
 		sb.append("		where a.RY_ID = b.ID");
@@ -507,7 +520,7 @@ public class RyglDao extends BaseDao{
 	}
 	/**
 	 * 
-	 * 事务所端执业查询
+	 * 事务所端执业人员查询
 	 * @param jgid
 	 * @return 
 	 */
@@ -588,9 +601,96 @@ public class RyglDao extends BaseDao{
 				map.put("xl", rs.getObject("xl"));
 				map.put("ryztdm", rs.getObject("ryspgczt_dm"));
 				map.put("zyswsid", hashids.encode(rs.getLong("zyswsid")));
+				map.put("ryid", id);
 				return map;
 				}
 	});
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		meta.put("pageAll",(total + ps - 1) / ps);
+		ob.put("page", meta);
+		
+		return ob;
+	}
+	/**
+	 * 
+	 * 事务所端从业人员查询
+	 * @param jgid
+	 * @return 
+	 */
+	public Map<String, Object> swscycx(int pn,int ps,int jgid,Map<String, Object> qury){
+		final String url=Config.URL_PROJECT;
+		Condition condition = new Condition();
+		condition.add("b.xming", Condition.FUZZY, qury.get("xm"));
+		condition.add("b.sfzh", Condition.FUZZY_LEFT, qury.get("sfzh"));
+		condition.add("b.CS_DM", Condition.EQUAL, qury.get("cs"));
+		condition.add("b.xb_DM", Condition.EQUAL, qury.get("xb"));
+		condition.add("b.xl_dm", Condition.EQUAL, qury.get("xl"));
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', b.id,b.xming,d.mc as xb,b.sfzh,e.mc as cs,f.mc as xl,g.mc as zw");
+		sb.append("		 from zs_cyry a,zs_ryjbxx b,dm_xb d,dm_cs e,dm_xl f,dm_zw g,(select @rownum:=?) zs_ry ");
+		sb.append(condition.getSql());
+		sb.append("		and  a.JG_ID=? and b.ID=a.ry_id and CYRYZT_DM in (1,3)");
+		sb.append("		and b.XB_DM=d.ID and b.CS_DM=e.ID and f.ID=b.XL_DM and a.ZW_DM=g.ID");
+		if(qury.containsKey("sorder")){
+			Boolean asc = qury.get("sorder").toString().equals("ascend");
+			switch (qury.get("sfield").toString()) {
+			case "xm":
+				if(asc){
+					sb.append("		    order by convert( b.xming USING gbk) COLLATE gbk_chinese_ci ");
+				}else{
+					sb.append("		    order by convert( b.xming USING gbk) COLLATE gbk_chinese_ci desc");
+				}
+				break;
+			case "xl":
+				if(asc){
+					sb.append("		    order by b.xl_dm ");
+				}else{
+					sb.append("		    order by b.xl_dm desc");
+				}
+				break;
+			case "zw":
+				if(asc){
+					sb.append("		    order by a.ZW_DM");
+				}else{
+					sb.append("		    order by a.ZW_DM desc");
+				}
+				break;
+			}
+		}
+		sb.append("		    LIMIT ?, ? ");
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add(jgid);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		List<Map<String,Object>> ls = this.jdbcTemplate.query(sb.toString(),params.toArray(),
+				new RowMapper<Map<String,Object>>(){
+			public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
+				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+				Map<String,Object> map = new HashMap<String,Object>();
+				Map<String,Object> link = new HashMap<>();
+				String id = hashids.encode(rs.getLong("id"));
+				link.put("herf_xxzl", url+"/ryxx/cyryxx/"+id);
+				link.put("herf_bgjl", url+"/ryxx/cyrybgjl/"+id);
+				map.put("key", rs.getObject("key"));
+				map.put("xh", rs.getObject("key"));
+				map.put("_links", link);
+				map.put("xm", rs.getObject("xming"));
+				map.put("xb", rs.getObject("xb"));
+				map.put("cs", rs.getObject("cs"));
+				map.put("sfzh", rs.getObject("sfzh"));
+				map.put("zw", rs.getObject("zw"));
+				map.put("xl", rs.getObject("xl"));
+				map.put("ryid", id);
+				return map;
+			}
+		});
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();
 		ob.put("data", ls);
@@ -993,5 +1093,14 @@ public class RyglDao extends BaseDao{
 		}
 		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{qury.get("xming"),qury.get("sfzh")});
 	}
+	/**
+	 * 人员相片更新
+	 * @param ryid
+	 * @param path
+	 */
+	public void ryxpgx(int ryid,String path) {
+		this.jdbcTemplate.update("update zs_ryjbxx a set a.xpian=? where id=?",new Object[]{path,ryid});
+	}
+	
 }
 

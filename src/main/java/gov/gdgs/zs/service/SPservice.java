@@ -25,6 +25,9 @@ public class SPservice {
 		return spDao.wspcx(uid);
 	}
 	
+	public List<Map<String,Object>> swswspcx(Integer uid,Integer jgid){
+		return spDao.swswspcx(uid,jgid);
+	}
 	public List<Map<String,Object>> cklc(int lid){
 		return spDao.cklc(lid);
 	}
@@ -98,6 +101,10 @@ public class SPservice {
 		switch (splx) {
 		case "jgbgsq"://机构变更申请
 			this.spDao.swsbgsq(sqxm);break;
+		case "swsslzltb"://设立资料填报申请
+			this.spDao.swsslzltb(sqxm);break;
+		case "swsfsslsq"://机构分所设立申请
+			this.spDao.swsfsslsq(sqxm);break;
 		case"jgzxsq"://机构注销申请
 			this.spDao.swszxsq(sqxm);break;
 		case"jghbsq"://机构合并申请
@@ -132,16 +139,18 @@ public class SPservice {
 	 */
 	public void fspsq(Map<String,Object> ptxm,String splx)throws Exception {
 		 switch (splx) {
-			case "jgbgsq":
+			case "jgbgsq"://机构信息变更
 				this.spDao.updatePTXM(ptxm);
-			case "zyzrfs":
+			case "zyzrfs"://执业转入分所
 				this.spDao.zyzrfssq(ptxm);
-			case "cydrsq":
+			case "cydrsq"://从业转入分所
 				this.spDao.cydrsq(ptxm);
-			case "zydrzssq":
+			case "zydrzssq"://执业调入主所
 				this.spDao.zydrzssq(ptxm);
-			case "cydrzssq":
+			case "cydrzssq"://从业调入主所
 				this.spDao.cydrzssq(ptxm);
+			case "cyrybgsq"://从业信息变更
+				this.spDao.cyrybgsq(ptxm);
 		 }
 	}
 

@@ -42,6 +42,17 @@ public class SPController {
 		User user =  accountService.getUserFromHeaderToken(request);
 		return new ResponseEntity<>(spPservice.wspcx(user.getId()),HttpStatus.OK);
 	}
+	/**
+	 * 事务所端未审批查询
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/spapi/swswspcx", method = RequestMethod.GET)
+	public ResponseEntity<?> swswspcx(HttpServletRequest request ) throws Exception{
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(spPservice.swswspcx(user.getId(),user.getJgId()),HttpStatus.OK);
+	}
 	
 	/**
 	 * 未审批类型明细查询
