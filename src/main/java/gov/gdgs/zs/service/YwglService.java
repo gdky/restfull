@@ -575,4 +575,52 @@ public class YwglService {
 		return ywglDao.getYwbbsjhzSws(page, pagesize, map);
 	}
 
+	/**
+	 * 业务报备数据汇总-外省报备数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzWs(int page, int pagesize,
+			String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjhzWs(page, pagesize, map);
+	}
+
+	/**
+	 * 业务报备数据汇总-业务报备总收费金额数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzJe(int page, int pagesize,
+			String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjhzJe(page, pagesize, map);
+	}
+
 }

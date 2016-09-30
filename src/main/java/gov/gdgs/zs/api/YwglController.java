@@ -251,4 +251,38 @@ public class YwglController {
 				where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
+	
+	/**
+	 * 业务报备数据汇总-外省报备数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/ywgl/ywbbsjhz/ws", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwbbsjhzWs(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where) {
+		Map<String, Object> map = ywglService.getYwbbsjhzWs(page, pagesize,
+				where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	
+	/**
+	 * 业务报备数据汇总-业务报备总收费金额数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/ywgl/ywbbsjhz/je", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwbbsjhzJe(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where) {
+		Map<String, Object> map = ywglService.getYwbbsjhzJe(page, pagesize,
+				where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
 }

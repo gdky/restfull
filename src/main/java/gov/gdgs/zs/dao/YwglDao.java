@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
 import com.gdky.restfull.utils.HashIdUtil;
@@ -1137,7 +1138,7 @@ public class YwglDao extends BaseJdbcDao {
 		sjSql.append("        lx.mc ywlx, ");
 		sjSql.append("        ifnull(b.xyje,0) xyje, ");
 		sjSql.append("        ifnull(b.sjsqje,0) sjsqje, ");
-		sjSql.append("        b.bbrq  ");
+		sjSql.append("        date_format(b.bbrq,'%Y-%m-%d') bbrq  ");
 		sjSql.append("   from dm_ywlx lx, zs_ywbb b ");
 		sjSql.append("  where lx.id = b.ywlx_dm ");
 		sjSql.append("    and year(b.bbrq) = ? ");
@@ -1354,6 +1355,135 @@ public class YwglDao extends BaseJdbcDao {
 		sql.append("    order by b.id ");
 		sql.append(" )sj, ");
 		sql.append(" (select @rownum := ? )xh ");
+		sql.append("   limit ?,? ");
+		
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		params.add(startIndex);
+		params.add(startIndex);
+		params.add(pagesize);
+		
+		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(),params.toArray());
+		
+		// 获取符合条件的记录数
+		String countSql = " SELECT FOUND_ROWS()";
+		int total = jdbcTemplate.queryForObject(countSql, int.class);
+
+		Map<String, Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		ob.put("total", total);
+		ob.put("pagesize", pagesize);
+		ob.put("current", page);
+		return ob;
+	}
+
+	/**
+	 * 业务报备数据汇总-外省报备数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param map
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzWs(int page, int pagesize,
+			HashMap<String, Object> map) {
+		ArrayList<Object> params = new ArrayList<>();
+		String bbnd="";
+		String ywlx="";
+		if(null!=map.get("bbnd")){
+			bbnd=map.get("bbnd").toString();
+		}
+		if(null!=map.get("ywlx")){
+			ywlx=map.get("ywlx").toString();
+		}
+		StringBuffer sql=new StringBuffer(" select SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 as 'xh',sj.* ");
+		sql.append(" from( ");
+		sql.append(" select b.swsmc, ");
+		sql.append("        b.wtdw, ");
+		sql.append("        b.swsswdjzh, ");
+		sql.append("        b.city fsd, ");
+		sql.append("        b.bgwh, ");
+		sql.append("        b.bbhm, ");
+		sql.append("        b.yjfh, ");
+		sql.append("        b.rjfh, ");
+		sql.append("        b.sjfh, ");
+		sql.append("        b.qzsws, ");
+		sql.append("        ifnull(b.xyje, 0) xyje, ");
+		sql.append("        ifnull(b.sjsqje, 0) sjsqje, ");
+		sql.append("        date_format(b.bbrq, '%Y-%m-%d') bbrq, ");
+		sql.append("        ifnull(b.tzvalue1, 0) tzvalue1, ");
+		sql.append("        ifnull(b.tjvalue2, 0) tjvalue2 ");
+		sql.append("   from zs_ywbb b ");
+		sql.append("  where b.isws='Y' ");
+		sql.append("    and year(b.bbrq) = ? ");
+		sql.append("    and b.ywlx_dm = ? ");
+		params.add(bbnd);
+		params.add(ywlx);
+		sql.append("    order by b.id ");
+		sql.append(" )sj, ");
+		sql.append(" (select @rownum := ? )xh ");
+		sql.append("   limit ?,? ");
+		
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		params.add(startIndex);
+		params.add(startIndex);
+		params.add(pagesize);
+		
+		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(),params.toArray());
+		
+		// 获取符合条件的记录数
+		String countSql = " SELECT FOUND_ROWS()";
+		int total = jdbcTemplate.queryForObject(countSql, int.class);
+
+		Map<String, Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		ob.put("total", total);
+		ob.put("pagesize", pagesize);
+		ob.put("current", page);
+		return ob;
+	}
+
+	/**
+	 * 业务报备数据汇总-业务报备总收费金额数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param map
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzJe(int page, int pagesize,
+			HashMap<String, Object> map) {
+		ArrayList<Object> params = new ArrayList<>();
+		String bbnd="";
+		String ywlx="";
+		String fsd="";
+		if(null!=map.get("bbnd")){
+			bbnd=map.get("bbnd").toString();
+		}
+		if(null!=map.get("ywlx")){
+			ywlx=map.get("ywlx").toString();
+		}
+		if(null!=map.get("fsd")){
+			fsd=map.get("fsd").toString();
+		}
+		StringBuffer sql=new StringBuffer(" select sql_calc_found_rows @rownum := @rownum + 1 as xh, sj.* ");
+		sql.append("   from (select b.swsmc, sum(ifnull(b.xyje,0)) xyje, sum(ifnull(b.sjsqje,0)) sjsqje ");
+		sql.append("           from zs_ywbb b, dm_cs c ");
+		sql.append("          where b.cs_dm = c.id ");
+		if(!StringUtils.isEmpty(bbnd)){
+			sql.append("        and year(b.bbrq) = ? ");
+			params.add(bbnd);
+		}
+		if(!StringUtils.isEmpty(ywlx)){
+			sql.append("        and b.ywlx_dm = ? ");
+			params.add(ywlx);
+		}
+		if(!StringUtils.isEmpty(fsd)){
+			sql.append("        and b.cs_dm= ? ");
+			params.add(fsd);
+		}
+		sql.append("          group by b.JG_ID,b.SWSMC) sj, ");
+		sql.append("        (select @rownum := ?) xh ");
+		sql.append("        order by sj.xyje desc,sj.sjsqje desc ");
 		sql.append("   limit ?,? ");
 		
 		// 装嵌传值数组
