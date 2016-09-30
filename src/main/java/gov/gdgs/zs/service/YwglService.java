@@ -237,22 +237,12 @@ public class YwglService {
 	}
 
 	/*
-	 * 按类型处理业务报备修改操作
-	 * 修改请求json结构为{lx:int number, data:{}}
-	 * data为修改的业务具体属性信息，lx为修改操作类型
-	 * 1 - 业务信息修改
-	 * 2 - 退回操作，将业务状态置为0(保存)
-	 * 3 - 报备操作，将业务状态置为1（报备）
-	 * 4 - 收费操作，将业务状态置为3（已收费）
-	 * 5 - 申请撤销，将业务状态置为7（申请撤销）
-	 * 6 - 同意撤销操作，将业务状态置为5（撤销）
-	 * 7 - 拒绝撤销操作，将业务状态置为1（报备）
-	 * 8 - 申请退回操作，将业务状态置为6（申请退回）
-	 * 9 - 拒绝退回操作，将业务状态置为1（报备）
-	 * 10- 申请启用操作，将业务状态置为8（申请启用）
-	 * 11- 同意启用操作，将当条业务状态置为4（作废），
-	 *     同时建立一条新记录，保留原记录信息，使用新的报备号码，状态置为0（保存）
-	 * 12- 拒绝启用操作，将业务状态置为5（撤销）
+	 * 按类型处理业务报备修改操作 修改请求json结构为{lx:int number, data:{}}
+	 * data为修改的业务具体属性信息，lx为修改操作类型 1 - 业务信息修改 2 - 退回操作，将业务状态置为0(保存) 3 -
+	 * 报备操作，将业务状态置为1（报备） 4 - 收费操作，将业务状态置为3（已收费） 5 - 申请撤销，将业务状态置为7（申请撤销） 6 -
+	 * 同意撤销操作，将业务状态置为5（撤销） 7 - 拒绝撤销操作，将业务状态置为1（报备） 8 - 申请退回操作，将业务状态置为6（申请退回） 9 -
+	 * 拒绝退回操作，将业务状态置为1（报备） 10- 申请启用操作，将业务状态置为8（申请启用） 11- 同意启用操作，将当条业务状态置为4（作废），
+	 * 同时建立一条新记录，保留原记录信息，使用新的报备号码，状态置为0（保存） 12- 拒绝启用操作，将业务状态置为5（撤销）
 	 */
 	public void updateYwbb(String hashid, Map<String, Object> map) {
 		Long id = HashIdUtil.decode(hashid);
@@ -340,14 +330,15 @@ public class YwglService {
 		condition.add(" AND yxbz = 1  ");
 		condition.add(" AND (zt = 1  OR zt = 3)  ");
 		String yjlx = (String) where.get("yjlx");
-		if (yjlx!=null && yjlx.equals("1")){
+		if (yjlx != null && yjlx.equals("1")) {
 			condition.add(" AND sjsqje is null ");
-		} else if (yjlx != null && yjlx.equals("2")){
+		} else if (yjlx != null && yjlx.equals("2")) {
 			condition.add(" AND sjsqje > 1000000 ");
-		} else if (yjlx != null && yjlx.equals("3")){
+		} else if (yjlx != null && yjlx.equals("3")) {
 			condition.add(" AND sjsqje < 500 ");
 		} else {
-			condition.add(" AND (sjsqje < 500 OR sjsqje > 1000000 OR sjsqje is null) ");
+			condition
+					.add(" AND (sjsqje < 500 OR sjsqje > 1000000 OR sjsqje is null) ");
 		}
 		Map<String, Object> rs = ywglDao.getYwbb(page, pagesize, condition);
 		return rs;
@@ -383,12 +374,14 @@ public class YwglService {
 		condition.add("is_yd", "EQUAL", where.get("is_yd"));
 		condition.add("swbz", "EQUAL", where.get("swbz"));
 		condition.add(" AND yxbz = 1 AND zt != 0 AND zt != 4 ");
-		
-		Map<String, Object> rs = ywglDao.getYwbbNDBTYJ(page, pagesize, condition);
+
+		Map<String, Object> rs = ywglDao.getYwbbNDBTYJ(page, pagesize,
+				condition);
 		return rs;
 	}
 
-	public Map<String, Object> getYwbbWTFYJ(int page, int pagesize, String whereParam) {
+	public Map<String, Object> getYwbbWTFYJ(int page, int pagesize,
+			String whereParam) {
 		HashMap<String, Object> where = new HashMap<String, Object>();
 		if (whereParam != null) {
 			try {
@@ -417,26 +410,28 @@ public class YwglService {
 		condition.add("is_yd", "EQUAL", where.get("is_yd"));
 		condition.add("swbz", "EQUAL", where.get("swbz"));
 		condition.add(" AND yxbz = 1 AND zt != 0 AND zt != 4 ");
-		
-		Map<String, Object> rs = ywglDao.getYwbbWTFYJ(page, pagesize, condition);
+
+		Map<String, Object> rs = ywglDao
+				.getYwbbWTFYJ(page, pagesize, condition);
 		return rs;
 	}
 
 	/**
 	 * 业务报备数据分析
+	 * 
 	 * @param where
 	 * @return
 	 */
 	public Map<String, Object> getYwbbsjfx(String where) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		if(where != null){
-			try{
+		if (where != null) {
+			try {
 				where = java.net.URLDecoder.decode(where, "UTF-8");
 				ObjectMapper mapper = new ObjectMapper();
 				map = mapper.readValue(where,
 						new TypeReference<Map<String, Object>>() {
 						});
-			}catch(Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -445,19 +440,20 @@ public class YwglService {
 
 	/**
 	 * 业务报备数据分析
+	 * 
 	 * @param where
 	 * @return
 	 */
 	public Map<String, Object> getYwbbsjfxDq(String where) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		if(where != null){
-			try{
+		if (where != null) {
+			try {
 				where = java.net.URLDecoder.decode(where, "UTF-8");
 				ObjectMapper mapper = new ObjectMapper();
 				map = mapper.readValue(where,
 						new TypeReference<Map<String, Object>>() {
 						});
-			}catch(Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -466,14 +462,14 @@ public class YwglService {
 
 	public Map<String, Object> getYwbbsjfxSws(String where) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		if(where != null){
-			try{
+		if (where != null) {
+			try {
 				where = java.net.URLDecoder.decode(where, "UTF-8");
 				ObjectMapper mapper = new ObjectMapper();
 				map = mapper.readValue(where,
 						new TypeReference<Map<String, Object>>() {
 						});
-			}catch(Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
@@ -482,18 +478,149 @@ public class YwglService {
 
 	public Map<String, Object> getYwbbsjfxYwlx(String where) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
-		if(where != null){
-			try{
+		if (where != null) {
+			try {
 				where = java.net.URLDecoder.decode(where, "UTF-8");
 				ObjectMapper mapper = new ObjectMapper();
 				map = mapper.readValue(where,
 						new TypeReference<Map<String, Object>>() {
 						});
-			}catch(Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 		return ywglDao.getYwbbsjfxYwlx(map);
+	}
+
+	/**
+	 * 业务报备数据汇总-机构人员报备数据分析
+	 * 
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzRy(int page, int pagesize,
+			String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjhzRy(page, pagesize, map);
+	}
+
+	/**
+	 * 业务报备数据汇总-机构人员报备数据分析-根据业务报备表的id查找报备数据明细
+	 * 
+	 * @param bbid
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzRyMx(String bbid) {
+		return ywglDao.getYwbbsjhzRyMx(bbid);
+	}
+
+	/**
+	 * 业务报备数据汇总-机构人员报备数据分析-报备机构
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzYwbbJg(int page, int pagesize,
+			String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjhzYwbbJg(page, pagesize, map);
+	}
+
+	/**
+	 * 业务报备数据汇总-会计所报备数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzSws(int page, int pagesize,
+			String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjhzSws(page, pagesize, map);
+	}
+
+	/**
+	 * 业务报备数据汇总-外省报备数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzWs(int page, int pagesize,
+			String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjhzWs(page, pagesize, map);
+	}
+
+	/**
+	 * 业务报备数据汇总-业务报备总收费金额数据分析
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getYwbbsjhzJe(int page, int pagesize,
+			String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getYwbbsjhzJe(page, pagesize, map);
 	}
 
 }
