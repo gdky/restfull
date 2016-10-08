@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.YwglService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.entity.ResponseMessage;
+import com.gdky.restfull.entity.User;
+import com.gdky.restfull.service.AccountService;
 
 
 /**
@@ -33,6 +37,9 @@ public class YwglController {
 	
 	@Resource
 	private YwglService ywglService;
+	
+	@Autowired
+	private AccountService accountService;
 	
 	/**
 	 * 获取有效的业务报备
@@ -136,9 +143,11 @@ public class YwglController {
 	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.POST)
 	public  ResponseEntity<Map<String,Object>> addYwbb(
-			@RequestBody Map<String,Object> values){ 
-
-		Map<String,Object> obj = ywglService.addYwbb(values);
+			@RequestBody Map<String,Object> values,
+			HttpServletRequest request){ 
+		
+		User user =  accountService.getUserFromHeaderToken(request);
+		Map<String,Object> obj = ywglService.addYwbb(values,user);
 		return new ResponseEntity<>(obj,HttpStatus.CREATED);
 	}
 

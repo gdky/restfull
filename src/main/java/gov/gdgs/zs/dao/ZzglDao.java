@@ -1,5 +1,6 @@
 package gov.gdgs.zs.dao;
 
+import gov.gdgs.zs.entity.SdjlJG;
 import gov.gdgs.zs.untils.Condition;
 
 import java.sql.ResultSet;
@@ -9,12 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 
 @Repository
-public class ZzsdDao extends BaseDao {
+public class ZzglDao extends BaseDao {
 
 	public Map<String, Object> getJgZzsd(int page, int pagesize,
 			Condition condition) {
@@ -271,6 +273,11 @@ public class ZzsdDao extends BaseDao {
 	public void unlockSWSZzsd(List<Object[]> batchArgs) {
 		String sql = "update zs_sdjl_zysws set jsr = ?, jsr_role = ?, jstime = ?,yxbz = ? where id = ? ";
 		this.jdbcTemplate.batchUpdate(sql, batchArgs);
+	}
+	
+	public List<SdjlJG> getSdjlByJg(Integer jgId){
+		String sql  = "select * from zs_sdjl_jg where jg_id = ? and yxbz = 1";
+		return this.jdbcTemplate.query(sql, new Object[]{jgId},new BeanPropertyRowMapper<SdjlJG>(SdjlJG.class));
 	}
 
 

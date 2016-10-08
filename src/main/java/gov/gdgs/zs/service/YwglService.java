@@ -14,11 +14,13 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.entity.User;
 import com.gdky.restfull.exception.YwbbException;
 import com.gdky.restfull.utils.HashIdUtil;
 
@@ -31,6 +33,9 @@ public class YwglService {
 
 	@Resource
 	private SWSDao swsDao;
+	
+	@Autowired
+	private ZzglService zzglService;
 
 	public Map<String, Object> getYwbb(int page, int pageSize, String whereParam) {
 		HashMap<String, Object> where = new HashMap<String, Object>();
@@ -105,13 +110,18 @@ public class YwglService {
 		return obj;
 	}
 
-	public Map<String, Object> addYwbb(Map<String, Object> values) {
+	public Map<String, Object> addYwbb(Map<String, Object> values, User user) {
 		Map<String, Object> xy = (Map<String, Object>) values.get("dataXY");
 		Map<String, Object> yw = (Map<String, Object>) values.get("dataYW");
 		Map<String, Object> jg = (Map<String, Object>) values.get("dataJG");
 		Map<String, Object> customer = (Map<String, Object>) values
 				.get("customer");
 		String type = (String) values.get("type");
+		
+		/* 判断是否有报备上报资质 */
+		if(zzglService.isJgLocked(user)){
+			throw new YwbbException("不具备业务上报资质或上报业务资质目前被锁，请联系中心解锁后再尝试");
+		}
 
 		// 整理业务记录
 		HashMap<String, Object> o = new HashMap<String, Object>();
@@ -158,15 +168,23 @@ public class YwglService {
 		Calendar calND = Calendar.getInstance();
 		calND.setTime(Common.getTimeFromJsToJava(sssq.get(1))); // 暂按项目所属期止
 		o.put("ND", calND.get(Calendar.YEAR));
+		o.put("MEMO", xy.get("MEMO"));
 		o.put("NSRXZ", yw.get("NSRXZ"));
 		o.put("HY_ID", yw.get("HY_ID"));
 		o.put("ZSFS_DM", yw.get("ZSFS_DM"));
 		o.put("ISWS", yw.get("ISWS"));
 		o.put("SB_DM", yw.get("SB_DM"));
 		// 处理城市和地区
-		List<Integer> dq = (List<Integer>) yw.get("DQ");
-		o.put("CS_DM", dq.get(0));
-		o.put("QX_DM", dq.get(1));
+		if(yw.get("ISWS").equals("Y")){
+			o.put("CITY", yw.get("CITY"));
+			o.put("CS_DM", null);
+			o.put("QX_DM", null);
+		}else{
+			List<Integer> dq = (List<Integer>) yw.get("DQ");
+			o.put("CS_DM", dq.get(0));
+			o.put("QX_DM", dq.get(1));
+			o.put("CITY", ywglDao.getCITY(dq.get(0)));
+		}
 		o.put("WTDWXZ_DM", yw.get("WTDWXZ_DM"));
 		o.put("WTDWNSRSBHDF", customer.get("NSRSBH"));
 		o.put("WTDWLXR", customer.get("LXR"));
@@ -190,9 +208,6 @@ public class YwglService {
 		} else {
 			o.put("IS_YD", "N");
 		}
-
-		/* 判断是否有报备上报资质 */
-		// TODO
 
 		/* 判断协议号是否唯一 */
 		int xyhNum = ywglDao.getXyhNum((String) o.get("XYH"));

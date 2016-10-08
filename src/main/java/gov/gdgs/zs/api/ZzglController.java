@@ -1,7 +1,7 @@
 package gov.gdgs.zs.api;
 
 import gov.gdgs.zs.configuration.Config;
-import gov.gdgs.zs.service.ZzsdService;
+import gov.gdgs.zs.service.ZzglService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +24,17 @@ import com.gdky.restfull.entity.User;
 import com.gdky.restfull.service.AccountService;
 
 /**
- * 资质锁定api
+ * 资质管理api
  * 
  * @author admin
  * 
  */
 @RestController
 @RequestMapping(value = Config.URL_PROJECT)
-public class ZzsdController {
+public class ZzglController {
 
 	@Autowired
-	private ZzsdService zzsdService;
+	private ZzglService zzsdService;
 
 	@Autowired
 	private AccountService accountService;

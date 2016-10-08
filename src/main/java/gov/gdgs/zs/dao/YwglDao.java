@@ -30,7 +30,7 @@ public class YwglDao extends BaseJdbcDao {
 		// <=== 查询条件集合
 		sb.append(" ( "
 				+ condition.getSelectSql("zs_ywbb", "id"));
-		sb.append("    ORDER BY id ");
+		sb.append("    ORDER BY bbrq desc  ");
 		sb.append("    LIMIT ? , ?) sub) ");
 		// ===> 插入查询条件集合结束
 		sb.append(" left join dm_hy AS hy ");
@@ -106,12 +106,12 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" insert into zs_ywbb ");
 		sb.append(" (ND,BBRQ,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
 		sb.append(" QZSWS,QMSWSID,TXDZ,SWSDZYJ,SWSWZ,YWLX_DM,JTXM,ZBRQ, ");
-		sb.append(" SENDTIME,SSTARTTIME,NSRXZ,HY_ID,ZSFS_DM,ISWS,SB_DM,CS_DM,QX_DM, ");
+		sb.append(" SENDTIME,SSTARTTIME,MEMO,NSRXZ,HY_ID,ZSFS_DM,ISWS,SB_DM,CS_DM,QX_DM,CITY, ");
 		sb.append(" WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ,XYJE,CUSTOMER_ID,TZVALUE1,TJVALUE2, ");
 		sb.append(" YZM,BBHM,IS_YD,ZT) ");
 		sb.append(" values(:ND,:BBRQ,:BGWH,:BGRQ,:SFJE,:JG_ID,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWNSRSBH,:XYH,:YJFH,:RJFH,:SJFH, ");
 		sb.append(" :QZSWS,:QMSWSID,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX_DM,:JTXM,:ZBRQ, ");
-		sb.append(" :SENDTIME,:SSTARTTIME,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM, ");
+		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
 		sb.append(" :YZM,:BBHM,:IS_YD,:ZT) ");
 		this.namedParameterJdbcTemplate.update(sb.toString(), o);		
@@ -351,6 +351,7 @@ public class YwglDao extends BaseJdbcDao {
 			map.put("bbhm", rs.getObject("bbhm"));
 			map.put("bbrq", rs.getDate("bbrq"));
 			map.put("bgwh", rs.getString("bgwh"));
+			map.put("bgrq",rs.getDate("bgrq"));
 			map.put("zbrq", rs.getDate("zbrq"));
 			map.put("yzm", rs.getString("yzm"));
 			map.put("sfje", rs.getBigDecimal("sfje"));
@@ -1090,6 +1091,12 @@ public class YwglDao extends BaseJdbcDao {
 		Map<String,Object> ob = new HashMap<>();
 		ob.put("data", ls);
 		return ob; 
+	}
+
+	public Object getCITY(Object CS_DM) {
+		String sql = "select mc from dm_cs where id = ?";
+		String mc = this.jdbcTemplate.queryForObject(sql, new Object[]{CS_DM}, String.class);
+		return mc;
 	}
 
 

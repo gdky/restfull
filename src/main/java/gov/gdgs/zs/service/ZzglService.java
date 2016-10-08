@@ -1,6 +1,6 @@
 package gov.gdgs.zs.service;
 
-import gov.gdgs.zs.dao.ZzsdDao;
+import gov.gdgs.zs.dao.ZzglDao;
 import gov.gdgs.zs.entity.SdjlJG;
 import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
@@ -25,10 +25,10 @@ import com.gdky.restfull.utils.HashIdUtil;
 
 @Service
 @Transactional
-public class ZzsdService {
+public class ZzglService {
 
 	@Resource
-	private ZzsdDao zzsdDao;
+	private ZzglDao zzglDao;
 
 	@Autowired
 	private AuthDao authDao;
@@ -57,7 +57,7 @@ public class ZzsdService {
 		condition.add("jl.jstime", "DATE_BETWEEN", where.get("jstime"));
 		condition.add("j.dwmc", "FUZZY", where.get("swsmc"));
 
-		Map<String, Object> rs = zzsdDao.getJgZzsd(page, pagesize, condition);
+		Map<String, Object> rs = zzglDao.getJgZzsd(page, pagesize, condition);
 		return rs;
 	}
 
@@ -84,7 +84,7 @@ public class ZzsdService {
 			}
 		}
 		if(batchArgs.size()>0){
-			zzsdDao.addJgZzsd(batchArgs);
+			zzglDao.addJgZzsd(batchArgs);
 		}
 	}
 
@@ -107,17 +107,17 @@ public class ZzsdService {
 			batchArgs.add(arg);
 		}
 		if(batchArgs.size()>0){
-			zzsdDao.addJgZzsd(batchArgs);
+			zzglDao.addJgZzsd(batchArgs);
 		}
 	}
 	
 	public List<Integer> getSdJGByLx(Integer lx){
-		List<Integer> ls = zzsdDao.getSdJGByLx(lx);
+		List<Integer> ls = zzglDao.getSdJGByLx(lx);
 		return ls;
 	}
 	
 	public List<Integer> getSdsws(){
-		List<Integer> ls = zzsdDao.getSdsws();
+		List<Integer> ls = zzglDao.getSdsws();
 		return ls;
 	}
 
@@ -132,7 +132,7 @@ public class ZzsdService {
 			batchArgs.add(arg);
 		}
 		if(batchArgs.size()>0){
-			zzsdDao.unlockJgZzsd(batchArgs);
+			zzglDao.unlockJgZzsd(batchArgs);
 		}
 	}
 	public void lockJgZzsd(User user, List<Integer> id) {
@@ -146,7 +146,7 @@ public class ZzsdService {
 			batchArgs.add(arg);
 		}
 		if(batchArgs.size()>0){
-			zzsdDao.lockJgZzsd(batchArgs);
+			zzglDao.lockJgZzsd(batchArgs);
 		}
 	}
 
@@ -173,7 +173,7 @@ public class ZzsdService {
 		condition.add("jl.jstime", "DATE_BETWEEN", where.get("jstime"));
 		condition.add("j.dwmc", "FUZZY", where.get("swsmc"));
 
-		Map<String, Object> rs = zzsdDao.getJgZzsdwx(page, pagesize, condition);
+		Map<String, Object> rs = zzglDao.getJgZzsdwx(page, pagesize, condition);
 		return rs;
 	}
 
@@ -194,7 +194,7 @@ public class ZzsdService {
 		condition.add("j.dwmc", "FUZZY", where.get("swsmc"));
 		condition.add("r.xming", "FUZZY", where.get("xming"));
 
-		Map<String, Object> rs = zzsdDao.getSWSzzzt(page, pagesize, condition);
+		Map<String, Object> rs = zzglDao.getSWSzzzt(page, pagesize, condition);
 		return rs;
 	}
 
@@ -214,7 +214,7 @@ public class ZzsdService {
 			}
 		}
 		if(batchArgs.size()>0){
-			zzsdDao.addSwszzsd(batchArgs);
+			zzglDao.addSwszzsd(batchArgs);
 		}
 		
 	}
@@ -242,7 +242,7 @@ public class ZzsdService {
 		condition.add("s.jstime", "DATE_BETWEEN", where.get("jstime"));
 		condition.add("r.xming", "FUZZY", where.get("xming"));
 
-		Map<String, Object> rs = zzsdDao.getSWSsdjl(page, pagesize, condition);
+		Map<String, Object> rs = zzglDao.getSWSsdjl(page, pagesize, condition);
 		return rs;
 	}
 
@@ -257,9 +257,17 @@ public class ZzsdService {
 			batchArgs.add(arg);
 		}
 		if(batchArgs.size()>0){
-			zzsdDao.unlockSWSZzsd(batchArgs);
+			zzglDao.unlockSWSZzsd(batchArgs);
 		}
 		
+	}
+
+	public boolean isJgLocked(User user) {
+		Integer jgId = user.getJgId();
+		if(zzglDao.getSdjlByJg(jgId).size()>0){
+			return true;
+		}		
+		return false;
 	}
 
 }
