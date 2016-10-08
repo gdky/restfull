@@ -35,6 +35,7 @@ import com.gdky.restfull.security.CustomUserDetails;
 import com.gdky.restfull.security.TokenUtils;
 import com.gdky.restfull.service.AccountService;
 import com.gdky.restfull.service.AuthService;
+import com.gdky.restfull.service.UserLogService;
 import com.gdky.restfull.utils.HashIdUtil;
 
 @RestController
@@ -46,7 +47,13 @@ public class AuthController {
 
 	  @Autowired
 	  private TokenUtils tokenUtils;
-
+	  
+	  @Autowired
+	  private HttpServletRequest httpRequest;
+	  
+	  @Autowired
+	  private UserLogService userLogService;
+	  
 	  @Autowired
 	  private UserDetailsService userDetailsService;
 	  @Autowired
@@ -82,6 +89,9 @@ public class AuthController {
 	    List<AsideMenu> menu = accountService.getMenuByUser(userDetails.getId());
 	    String token = this.tokenUtils.generateToken(userDetails);
 	    
+	    //登记登录信息
+	    userLogService.addLog(userDetails, httpRequest.getRemoteAddr(), "用户登录");
+	    
 	    AuthResponse resp = new AuthResponse(token);
 	    resp.setTokenhash(token);
 	    resp.setJgId(userDetails.getJgId());
@@ -89,6 +99,7 @@ public class AuthController {
 	    resp.setLo(role.getId());
 	    resp.setMenu(menu);
 	    resp.setNames(userDetails.getNames());
+	    
 
 	    // 返回 token与账户信息
 	    return ResponseEntity.ok(resp);
