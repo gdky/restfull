@@ -108,22 +108,22 @@ public class YwglDao extends BaseJdbcDao {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" insert into zs_ywbb ");
 		sb.append(" (ND,BBRQ,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
-		sb.append(" QZSWS,QMSWSID,TXDZ,SWSDZYJ,SWSWZ,YWLX_DM,JTXM,ZBRQ, ");
+		sb.append(" QZSWS,QMSWSID,TXDZ,SWSDZYJ,SWSWZ,YWLX_DM,JTXM,ZBRQ,ZGSWJG, ");
 		sb.append(" SENDTIME,SSTARTTIME,MEMO,NSRXZ,HY_ID,ZSFS_DM,ISWS,SB_DM,CS_DM,QX_DM,CITY, ");
 		sb.append(" WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ,XYJE,CUSTOMER_ID,TZVALUE1,TJVALUE2, ");
 		sb.append(" YZM,BBHM,IS_YD,ZT) ");
 		sb.append(" values(:ND,:BBRQ,:BGWH,:BGRQ,:SFJE,:JG_ID,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWNSRSBH,:XYH,:YJFH,:RJFH,:SJFH, ");
-		sb.append(" :QZSWS,:QMSWSID,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX_DM,:JTXM,:ZBRQ, ");
+		sb.append(" :QZSWS,:QMSWSID,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX_DM,:JTXM,:ZBRQ,:ZGSWJG, ");
 		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
 		sb.append(" :YZM,:BBHM,:IS_YD,:ZT) ");
 		this.namedParameterJdbcTemplate.update(sb.toString(), o);
 	}
 
-	public int getXyhNum(String xyh) {
-		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1";
+	public int getXyhNum(String xyh, Integer jgId) {
+		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1 and jg_id = ?";
 		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
-				new Object[] { xyh });
+				new Object[] { xyh,jgId });
 		return ls.size();
 	}
 

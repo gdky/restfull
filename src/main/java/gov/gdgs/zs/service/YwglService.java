@@ -177,13 +177,15 @@ public class YwglService {
 		// 处理城市和地区
 		if(yw.get("ISWS").equals("Y")){
 			o.put("CITY", yw.get("CITY"));
-			o.put("CS_DM", null);
+			o.put("CS_DM", -2);
 			o.put("QX_DM", null);
+			o.put("ZGSWJG", null);
 		}else{
 			List<Integer> dq = (List<Integer>) yw.get("DQ");
 			o.put("CS_DM", dq.get(0));
 			o.put("QX_DM", dq.get(1));
 			o.put("CITY", ywglDao.getCITY(dq.get(0)));
+			o.put("ZGSWJG", yw.get("ZGSWJG"));
 		}
 		o.put("WTDWXZ_DM", yw.get("WTDWXZ_DM"));
 		o.put("WTDWNSRSBHDF", customer.get("NSRSBH"));
@@ -203,14 +205,14 @@ public class YwglService {
 			o.put("TJVALUE2", null);
 		}
 		// 判断是否异地
-		if ((Integer) jg.get("cs_dm") != (Integer) o.get("CS_DM")) {
+		if ((Integer)o.get("CS_DM")!= -2 && ((Integer) jg.get("csdm") != (Integer) o.get("CS_DM"))) {
 			o.put("IS_YD", "Y");
 		} else {
 			o.put("IS_YD", "N");
 		}
 
 		/* 判断协议号是否唯一 */
-		int xyhNum = ywglDao.getXyhNum((String) o.get("XYH"));
+		int xyhNum = ywglDao.getXyhNum((String) o.get("XYH"),(Integer)o.get("JG_ID"));
 		if (xyhNum > 0) {
 			throw new YwbbException("协议文号已存在");
 		}
@@ -231,11 +233,13 @@ public class YwglService {
 			o.put("YZM", yzm);
 			o.put("BBHM", bbhm);
 			o.put("ZT", 0);
+			o.put("XYZT_DM", 2);
 			ywglDao.addYwbb(o);
 		} else if (type.equals("commit")) { // 直接报备
 			o.put("BBHM", bbhm);
 			o.put("YZM", yzm);
 			o.put("ZT", 1);
+			o.put("XYZT_DM", 3);
 			ywglDao.addYwbb(o);
 		}
 		return null;
@@ -253,11 +257,20 @@ public class YwglService {
 
 	/*
 	 * 按类型处理业务报备修改操作 修改请求json结构为{lx:int number, data:{}}
-	 * data为修改的业务具体属性信息，lx为修改操作类型 1 - 业务信息修改 2 - 退回操作，将业务状态置为0(保存) 3 -
-	 * 报备操作，将业务状态置为1（报备） 4 - 收费操作，将业务状态置为3（已收费） 5 - 申请撤销，将业务状态置为7（申请撤销） 6 -
-	 * 同意撤销操作，将业务状态置为5（撤销） 7 - 拒绝撤销操作，将业务状态置为1（报备） 8 - 申请退回操作，将业务状态置为6（申请退回） 9 -
-	 * 拒绝退回操作，将业务状态置为1（报备） 10- 申请启用操作，将业务状态置为8（申请启用） 11- 同意启用操作，将当条业务状态置为4（作废），
-	 * 同时建立一条新记录，保留原记录信息，使用新的报备号码，状态置为0（保存） 12- 拒绝启用操作，将业务状态置为5（撤销）
+	 * data为修改的业务具体属性信息，lx为修改操作类型 
+	 * 1 - 业务信息修改 
+	 * 2 - 退回操作，将业务状态置为0(保存) 
+	 * 3 - 报备操作，将业务状态置为1（报备） 
+	 * 4 - 收费操作，将业务状态置为3（已收费） 
+	 * 5 - 申请撤销，将业务状态置为7（申请撤销） 
+	 * 6 - 同意撤销操作，将业务状态置为5（撤销） 
+	 * 7 - 拒绝撤销操作，将业务状态置为1（报备） 
+	 * 8 - 申请退回操作，将业务状态置为6（申请退回） 
+	 * 9 - 拒绝退回操作，将业务状态置为1（报备） 
+	 * 10- 申请启用操作，将业务状态置为8（申请启用） 
+	 * 11- 同意启用操作，将当条业务状态置为4（作废），
+	 *     同时建立一条新记录，保留原记录信息，使用新的报备号码，状态置为0（保存） 
+	 * 12- 拒绝启用操作，将业务状态置为5（撤销）
 	 */
 	public void updateYwbb(String hashid, Map<String, Object> map) {
 		Long id = HashIdUtil.decode(hashid);
