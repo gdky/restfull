@@ -77,19 +77,6 @@ public class YwglDao extends BaseJdbcDao {
 		return rs;
 	}
 
-	public Map<String, Object> getYwbbByJg(Long id, int page, int pageSize,
-			Map<String, Object> where) {
-
-		String sql = "select * from zs_ywbb where jg_id=? and yxbz = 1 order by zbrq desc";
-
-		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sql,
-				new Object[] { id });
-
-		Map<String, Object> obj = new HashMap<String, Object>();
-		obj.put("data", ls);
-		return obj;
-	}
-
 	public List<Map<String, Object>> getYwbbMiscByJg(Long id) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select r.XMING,z.ID as ZYSWS_ID ");
@@ -393,9 +380,9 @@ public class YwglDao extends BaseJdbcDao {
 			}
 			if (rs.getString("ISWS") == null
 					|| rs.getString("ISWS").equals("N")) {
-				map.put("zsfs", "广东省");
+				map.put("dq", "广东省");
 			} else {
-				map.put("zsfs", "外省");
+				map.put("dq", "外省");
 			}
 			if (rs.getInt("SB_DM") == 1) {
 				map.put("sb", "国税");
@@ -405,6 +392,7 @@ public class YwglDao extends BaseJdbcDao {
 			map.put("hy", rs.getString("hy"));
 			map.put("cs", rs.getString("cs"));
 			map.put("qx", rs.getString("qx"));
+			map.put("city", rs.getString("city"));
 			if (rs.getInt("WTDWXZ_DM") == 0) {
 				map.put("wtdwxz", "居民企业");
 			} else {

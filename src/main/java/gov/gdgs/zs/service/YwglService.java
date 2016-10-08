@@ -2,7 +2,6 @@ package gov.gdgs.zs.service;
 
 import gov.gdgs.zs.dao.SWSDao;
 import gov.gdgs.zs.dao.YwglDao;
-import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
 import java.util.ArrayList;
@@ -17,11 +16,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.exception.YwbbException;
+import com.gdky.restfull.utils.Common;
 import com.gdky.restfull.utils.HashIdUtil;
 
 @Service
@@ -81,21 +82,15 @@ public class YwglService {
 	}
 
 	public Map<String, Object> getYwbbByJg(String hashId, int page,
-			int pageSize, String where) {
-		Long id = HashIdUtil.decode(hashId);
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		if (where != null) {
-			try {
-				where = java.net.URLDecoder.decode(where, "UTF-8");
-				ObjectMapper mapper = new ObjectMapper();
-				map = mapper.readValue(where,
-						new TypeReference<Map<String, Object>>() {
-						});
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			int pagesize, String whereparam) {
+		Long jgId = HashIdUtil.decode(hashId);
+		Condition condition = new Condition();
+		condition.add("jg_id", "EQUAL", jgId);
+		if(!StringUtils.isEmpty(whereparam)){
+			Map<String,Object> where = Common.decodeURItoMap(whereparam);
 		}
-		Map<String, Object> obj = ywglDao.getYwbbByJg(id, page, pageSize, map);
+		
+		Map<String, Object> obj = ywglDao.getYwbb(page, pagesize,condition);
 		return obj;
 	}
 

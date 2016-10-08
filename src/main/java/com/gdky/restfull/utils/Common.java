@@ -2,9 +2,14 @@ package com.gdky.restfull.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Common {
 	// 生成UUID
@@ -76,5 +81,18 @@ public class Common {
             s.insert(0,"0") ;   // 在第一个位置处补0  
         }  
         return s.toString() ;  
-    }  
+    }
+    
+    public static Map<String,Object> decodeURItoMap(String URIstring){
+    	HashMap<String, Object> map = new HashMap<String, Object>();
+    	try {
+    		URIstring = java.net.URLDecoder.decode(URIstring, "UTF-8");
+			ObjectMapper mapper = new ObjectMapper();
+			map = mapper.readValue(URIstring,
+					new TypeReference<Map<String, Object>>() {
+					});
+		} catch (Exception e) {
+		}
+		return map;
+    }
 }

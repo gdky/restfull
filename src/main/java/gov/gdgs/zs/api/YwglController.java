@@ -121,10 +121,10 @@ public class YwglController {
 	/*
 	 * 客户端用业务报备查询
 	 */
-	@RequestMapping(value = "/jg/{hashId}/yw", method = RequestMethod.GET)
+	@RequestMapping(value = "/jgyw/{hashId}", method = RequestMethod.GET)
 	public ResponseEntity<?> getYwbbByJg(@PathVariable("hashId") String hashId,
 			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value = "pagesize", required = true) int pageSize,
 			@RequestParam(value = "where", required = false) String where) {
 		Map<String, Object> obj = ywglService.getYwbbByJg(hashId, page,
 				pageSize, where);
