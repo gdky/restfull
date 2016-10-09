@@ -50,6 +50,7 @@ public class AccountController {
 		}*/
 		
 		HashMap<String,Object> resp = new HashMap<String,Object>();
+		resp.put("lo", userService.getRolesByUser(user.getUsername()).get(0).getId());
 		resp.put("names", user.getNames());
 		resp.put("menu", menu);
 		resp.put("newMsg", false);

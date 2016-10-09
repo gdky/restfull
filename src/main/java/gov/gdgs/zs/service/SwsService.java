@@ -4,6 +4,7 @@ import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.dao.SWSDao;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -91,5 +92,28 @@ public class SwsService {
 	}
 	public Object chilchenJG(Object pid){
 		return swsDao.chilchenJG(pid);
+	}
+	public Map<String, Object> getSzxx(Map<String,Object> swsxx) {
+		Map<String,Object> obj = new HashMap<String,Object>();
+		obj.put("xming", (String)swsxx.get("fddbr"));
+		obj.put("szphone", (String)swsxx.get("szphone"));
+		obj.put("szyx", (String)swsxx.get("szyx"));
+		return obj;
+	}
+	
+	public List<Map<String, Object>> getFqrxx(Long jgId) {
+		return swsDao.getFqrxx(jgId);
+	}
+	
+	public List<Map<String, Object>> getCzrxx(Long jgId) {
+		return swsDao.getCzrxx(jgId);
+	}
+	
+	public Map<String, Object> getSumZysws(Long jgId, int page, int pagesize) {
+		return swsDao.getSumZysws(jgId,page,pagesize);
+	}
+	
+	public Map<String, Object> getSumCyry(Long jgId, int page, int pagesize) {
+		return swsDao.getSumCyry(jgId,page,pagesize);
 	}
 }
