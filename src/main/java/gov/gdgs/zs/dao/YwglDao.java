@@ -1510,4 +1510,15 @@ public class YwglDao extends BaseJdbcDao {
 		String sql  = "update zs_ywbb set sjsqje=:sjsqje, fphm=:fphm, zt=:zt, xyzt_dm=:xyzt_dm where id = :id";
 		this.namedParameterJdbcTemplate.update(sql, data);
 	}
+	
+	public void handleYwTH (Long id,Map<String,Object> data ){
+		String sql  = "update zs_ywbb set sqthyy=:sqthyy, zt=:zt where id = :id";
+		this.namedParameterJdbcTemplate.update(sql, data);
+	}
+
+	public void handleYwQY(Long id, Map<String, Object> data) {
+		String sql  = "update zs_ywbb set sqqyly=:sqqyly, zt=:zt where id = :id";
+		this.namedParameterJdbcTemplate.update(sql, data);
+		
+	}
 }
