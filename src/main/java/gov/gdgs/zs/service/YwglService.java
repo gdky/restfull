@@ -623,4 +623,77 @@ public class YwglService {
 		return ywglDao.getYwbbsjhzJe(page, pagesize, map);
 	}
 
+	/**
+	 * 个人业务统计
+	 * @param jgid
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getGrywtj(String jgid, String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		map.put("jgid", jgid);
+		return ywglDao.getGrywtj(map);
+	}
+
+	/**
+	 * 客户端-事务所业务统计
+	 * @param jgid
+	 * @param pagesize 
+	 * @param page 
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getSwsywtj(String jgid, int page, int pagesize, String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		map.put("jgid", jgid);
+		return ywglDao.getSwsywtj(page, pagesize, map);
+	}
+
+	/**
+	 * 事务所业务统计-明细
+	 * @param ywlx
+	 * @param bbnd
+	 * @param jgid
+	 * @param where
+	 * @return
+	 */
+	public Map<String, Object> getSwsywtjMx(String ywlx, String bbnd,
+			String jgid, String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ywglDao.getSwsywtjMx(ywlx, bbnd, jgid, map);
+	}
+
 }
