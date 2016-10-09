@@ -214,14 +214,18 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	public void sentBack(Long id, Map<String, Object> data) {
-		String sql = "update zs_ywbb set thyy = ?,zt=? where id = ? ";
+		String sql = "update zs_ywbb set thyy = ?,zt=?, xyzt_dm=?  where id = ? ";
 		this.jdbcTemplate.update(sql,
-				new Object[] { data.get("thyy"), data.get("zt"), id });
+				new Object[] { data.get("thyy"), data.get("zt"),data.get("xyzt_dm"), id });
 	}
 
 	public void updateYwbbZT(Long id, int zt) {
 		String sql = "update zs_ywbb set zt=? where id = ? ";
 		this.jdbcTemplate.update(sql, new Object[] { zt, id });
+	}
+	public void updateYwbbZT(Long id, int zt, int xyzt_dm) {
+		String sql = "update zs_ywbb set zt=?, xyzt_dm =? where id = ? ";
+		this.jdbcTemplate.update(sql, new Object[] { zt, xyzt_dm, id });
 
 	}
 
@@ -232,13 +236,13 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" YWLX_DM,JTXM,TZVALUE1,TJVALUE2,SSTARTTIME,SENDTIME,NSRXZ,HY_ID,ZSFS_DM, ");
 		sb.append(" ISWS,SB_DM,CS_DM,QX_DM,WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ, ");
 		sb.append(" FPHM,XYJE,SJSQJE,XYZT_DM,MEMO,USER_ID,ZGSWJG,QMSWSID,SWSDH,SWSCZ,IS_YD, ");
-		sb.append(" CUSTOMER_ID,SQTHYY,SQQYLY,THYY,ZT,YDSPZT,SWBZ,YXBZ) ");
+		sb.append(" CUSTOMER_ID,SQTHYY,SQQYLY,THYY,ZT,YDSPZT,SWBZ,YXBZ,CITY) ");
 		sb.append(" select ?,BBRQ,ND,BGWH,BGRQ,ZBRQ,?,SFJE,JG_ID,SWSMC, ");
 		sb.append(" SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH,QZSWS,TXDZ,SWSDZYJ,SWSWZ, ");
 		sb.append(" YWLX_DM,JTXM,TZVALUE1,TJVALUE2,SSTARTTIME,SENDTIME,NSRXZ,HY_ID,ZSFS_DM, ");
 		sb.append(" ISWS,SB_DM,CS_DM,QX_DM,WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ, ");
 		sb.append(" FPHM,XYJE,SJSQJE,XYZT_DM,MEMO,USER_ID,ZGSWJG,QMSWSID,SWSDH,SWSCZ,IS_YD, ");
-		sb.append(" CUSTOMER_ID,SQTHYY,SQQYLY,THYY,?,YDSPZT,SWBZ,YXBZ  ");
+		sb.append(" CUSTOMER_ID,SQTHYY,SQQYLY,THYY,?,YDSPZT,SWBZ,YXBZ,CITY  ");
 		sb.append(" from zs_ywbb where id = ? ");
 		Number idNum = this.insertAndGetKeyByJdbc(sb.toString(), new Object[] {
 				bbhm, yzm, 0, id }, new String[] { "id" });
@@ -1500,5 +1504,10 @@ public class YwglDao extends BaseJdbcDao {
 		String sql = "select mc from dm_cs where id = ?";
 		String mc = this.jdbcTemplate.queryForObject(sql, new Object[]{CS_DM}, String.class);
 		return mc;
+	}
+	
+	public void handleYwSF (Long id,Map<String,Object> data ){
+		String sql  = "update zs_ywbb set sjsqje=:sjsqje, fphm=:fphm, zt=:zt, xyzt_dm=:xyzt_dm where id = :id";
+		this.namedParameterJdbcTemplate.update(sql, data);
 	}
 }

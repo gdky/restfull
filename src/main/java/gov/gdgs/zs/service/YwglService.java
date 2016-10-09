@@ -237,7 +237,10 @@ public class YwglService {
 			o.put("XYZT_DM", 3);
 			ywglDao.addYwbb(o);
 		}
-		return null;
+		Map<String,Object> resp = new HashMap<String,Object>();
+		resp.put("yzm", yzm);
+		resp.put("bbhm", bbhm);
+		return resp;
 	}
 
 	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
@@ -254,18 +257,18 @@ public class YwglService {
 	 * 按类型处理业务报备修改操作 修改请求json结构为{lx:int number, data:{}}
 	 * data为修改的业务具体属性信息，lx为修改操作类型 
 	 * 1 - 业务信息修改 
-	 * 2 - 退回操作，将业务状态置为0(保存) 
-	 * 3 - 报备操作，将业务状态置为1（报备） 
-	 * 4 - 收费操作，将业务状态置为3（已收费） 
-	 * 5 - 申请撤销，将业务状态置为7（申请撤销） 
-	 * 6 - 同意撤销操作，将业务状态置为5（撤销） 
-	 * 7 - 拒绝撤销操作，将业务状态置为1（报备） 
-	 * 8 - 申请退回操作，将业务状态置为6（申请退回） 
-	 * 9 - 拒绝退回操作，将业务状态置为1（报备） 
-	 * 10- 申请启用操作，将业务状态置为8（申请启用） 
-	 * 11- 同意启用操作，将当条业务状态置为4（作废），
-	 *     同时建立一条新记录，保留原记录信息，使用新的报备号码，状态置为0（保存） 
-	 * 12- 拒绝启用操作，将业务状态置为5（撤销）
+	 * 2 - 退回操作，将业务状态置为0(保存)，协议状态置为1
+	 * 3 - 报备操作，将业务状态置为1（报备），协议状态置为3  客户端
+	 * 4 - 收费操作，将业务状态置为3（已收费），协议状态置为4 客户端
+	 * 5 - 申请撤销，将业务状态置为7（申请撤销） 客户端
+	 * 6 - 同意撤销操作，将业务状态置为5（撤销），协议状态置为0
+	 * 7 - 拒绝撤销操作，将业务状态置为1（报备） ，协议状态置为3
+	 * 8 - 申请退回操作，将业务状态置为6（申请退回） 客户端
+	 * 9 - 拒绝退回操作，将业务状态置为1（报备），协议状态置为3 
+	 * 10- 申请启用操作，将业务状态置为8（申请启用） 客户端
+	 * 11- 同意启用操作，将当条业务状态置为4（作废），协议状态置为0
+	 *     同时建立一条新记录，保留原记录信息，使用新的报备号码，业务状态置为0，协议状态置为1（保存） 
+	 * 12- 拒绝启用操作，将业务状态置为5，协议状态置为0（撤销）
 	 */
 	public void updateYwbb(String hashid, Map<String, Object> map) {
 		Long id = HashIdUtil.decode(hashid);
@@ -274,16 +277,27 @@ public class YwglService {
 		if (lx != null && lx == 2) {
 			this.sentBackYw(id, data);
 		} else if (lx != null && lx == 6) {
-			this.updateYwbbZT(id, 5);
+			this.ywglDao.updateYwbbZT(id, 5, 0);
 		} else if (lx != null && lx == 7) {
-			this.updateYwbbZT(id, 1);
+			this.ywglDao.updateYwbbZT(id, 1, 3);
 		} else if (lx != null && lx == 9) {
-			this.updateYwbbZT(id, 1);
+			this.ywglDao.updateYwbbZT(id, 1, 3);
 		} else if (lx != null && lx == 11) {
 			this.passQY(id);
 		} else if (lx != null && lx == 12) {
-			this.updateYwbbZT(id, 5);
+			this.ywglDao.updateYwbbZT(id, 5, 0);
+		} else if (lx != null && lx == 3) {
+			this.ywglDao.updateYwbbZT(id, 1, 3);
+		} else if (lx != null && lx == 4) {
+			this.handleYwSF(id,data);
 		}
+	}
+
+	public void handleYwSF(Long id, Map<String, Object> data) {
+		data.put("id", id);
+		data.put("zt", 3);
+		data.put("xyzt_dm", 4);
+		ywglDao.handleYwSF(id, data);		
 	}
 
 	private void passQY(Long id) {
@@ -302,12 +316,8 @@ public class YwglService {
 		// 生成一条新记录
 		Number newId = this.ywglDao.newRecordFromId(id, bbhm.toString(), yzm);
 		// 将原记录置为作废
-		this.ywglDao.updateYwbbZT(id, 4);
+		this.ywglDao.updateYwbbZT(id, 4, 0);
 
-	}
-
-	private void updateYwbbZT(Long id, int zt) {
-		this.ywglDao.updateYwbbZT(id, zt);
 	}
 
 	/*
@@ -315,6 +325,7 @@ public class YwglService {
 	 */
 	public void sentBackYw(Long id, Map<String, Object> data) {
 		data.put("zt", 0);
+		data.put("xyzt_dm", 1);
 		this.ywglDao.sentBack(id, data);
 	}
 
