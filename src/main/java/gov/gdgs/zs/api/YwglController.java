@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.YwglService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.entity.ResponseMessage;
+import com.gdky.restfull.service.AccountService;
 
 /**
  * 业务管理API controller
@@ -32,6 +34,9 @@ public class YwglController {
 
 	@Resource
 	private YwglService ywglService;
+
+	@Resource
+	private AccountService accountService;
 
 	/**
 	 * 获取有效的业务报备
@@ -144,9 +149,63 @@ public class YwglController {
 		Map<String, Object> obj = ywglService.addYwbb(values);
 		return new ResponseEntity<>(obj, HttpStatus.CREATED);
 	}
+	
+	/**
+	 * 客户端-个人业务统计
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/ywgl/grywtj", method = RequestMethod.GET)
+	public ResponseEntity<?> getGrywtj(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+	    String jgid=accountService.getUserFromHeaderToken(request).getJgId().toString();
+		Map<String, Object> map = ywglService.getGrywtj(jgid,where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
 
 	/**
-	 * 业务报备数据分析
+	 * 客户端-事务所业务统计
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/ywgl/swsywtj", method = RequestMethod.GET)
+	public ResponseEntity<?> getSwsywtj(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+	    String jgid=accountService.getUserFromHeaderToken(request).getJgId().toString();
+		Map<String, Object> map = ywglService.getSwsywtj(jgid,page,pagesize,where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	
+    /**
+     * 客户端-事务所业务统计-明细
+     * @param ywlx
+     * @param bbnd
+     * @param where
+     * @param request
+     * @return
+     */
+	@RequestMapping(value = "/ywgl/swsywtj/{ywlx}", method = RequestMethod.GET)
+	public ResponseEntity<?> getSwsywtjMx(
+			@PathVariable("ywlx") String ywlx,
+			@RequestParam(value = "bbnd", required = true) String bbnd,
+			@RequestParam(value="where",required=false) String where,
+			HttpServletRequest request) {
+		String jgid=accountService.getUserFromHeaderToken(request).getJgId().toString();
+		Map<String, Object> map = ywglService.getSwsywtjMx(ywlx,bbnd,jgid,where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+
+	/**
+	 * 中心端-业务报备数据分析
+	 * 
 	 * @param where
 	 * @return
 	 */
@@ -158,7 +217,8 @@ public class YwglController {
 	}
 
 	/**
-	 * 业务报备数据分析
+	 * 中心端-业务报备数据分析
+	 * 
 	 * @param where
 	 * @return
 	 */
@@ -170,7 +230,8 @@ public class YwglController {
 	}
 
 	/**
-	 * 业务报备数据分析
+	 * 中心端-业务报备数据分析
+	 * 
 	 * @param where
 	 * @return
 	 */
@@ -182,7 +243,8 @@ public class YwglController {
 	}
 
 	/**
-	 * 业务报备数据分析
+	 * 中心端-业务报备数据分析
+	 * 
 	 * @param where
 	 * @return
 	 */
@@ -194,7 +256,8 @@ public class YwglController {
 	}
 
 	/**
-	 * 业务报备数据汇总-机构人员报备数据分析
+	 * 中心端-业务报备数据汇总-机构人员报备数据分析
+	 * 
 	 * @param where
 	 * @return
 	 */
@@ -209,19 +272,20 @@ public class YwglController {
 	}
 
 	/**
-	 * 业务报备数据汇总-机构人员报备数据分析-根据业务报备表的id查找报备数据明细
+	 * 中心端-业务报备数据汇总-机构人员报备数据分析-根据业务报备表的id查找报备数据明细
+	 * 
 	 * @param bbid
 	 * @return
 	 */
 	@RequestMapping(value = "/ywgl/ywbbsjhz/ry/{bbid}", method = RequestMethod.GET)
-	public ResponseEntity<?> getYwbbsjhzRyMx(
-			@PathVariable("bbid") String bbid) {
+	public ResponseEntity<?> getYwbbsjhzRyMx(@PathVariable("bbid") String bbid) {
 		Map<String, Object> map = ywglService.getYwbbsjhzRyMx(bbid);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
-	
+
 	/**
-	 * 业务报备数据汇总-机构人员报备数据分析-报备机构
+	 * 中心端-业务报备数据汇总-机构人员报备数据分析-报备机构
+	 * 
 	 * @param where
 	 * @return
 	 */
@@ -234,9 +298,10 @@ public class YwglController {
 				where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
-	
+
 	/**
-	 * 业务报备数据汇总-会计所报备数据分析
+	 * 中心端-业务报备数据汇总-会计所报备数据分析
+	 * 
 	 * @param page
 	 * @param pagesize
 	 * @param where
@@ -251,9 +316,10 @@ public class YwglController {
 				where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
-	
+
 	/**
-	 * 业务报备数据汇总-外省报备数据分析
+	 * 中心端-业务报备数据汇总-外省报备数据分析
+	 * 
 	 * @param page
 	 * @param pagesize
 	 * @param where
@@ -268,9 +334,10 @@ public class YwglController {
 				where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
-	
+
 	/**
-	 * 业务报备数据汇总-业务报备总收费金额数据分析
+	 * 中心端-业务报备数据汇总-业务报备总收费金额数据分析
+	 * 
 	 * @param page
 	 * @param pagesize
 	 * @param where
