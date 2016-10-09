@@ -1112,7 +1112,6 @@ public class YwglDao extends BaseJdbcDao {
 	 */
 	public Map<String, Object> getYwbbsjhzRy(int page, int pagesize,
 			HashMap<String, Object> map) {
-		StringBuffer hzSql = new StringBuffer();
 		StringBuffer sjSql = new StringBuffer();
 		ArrayList<Object> params = new ArrayList<>();
 		String bbnd = "";
@@ -1164,7 +1163,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	/**
-	 * 根据提交报备的年度和机构id对机构人员各个业务类型的报备数据进行统计
+	 * 根据提交报备的年度和机构id对机构人员各个业务类型的报备数据进行统计(事务所有报备记录的税务师)
 	 * 
 	 * @param bbnd
 	 * @param jgId
@@ -1187,13 +1186,57 @@ public class YwglDao extends BaseJdbcDao {
 		sql.append("        sum(if(b.ywlx_dm='10', 1, 0)) grhsqj ");
 		sql.append("   from zs_ryjbxx r, zs_zysws z, zs_ywbb b ");
 		sql.append("  where r.id = z.ry_id ");
+		sql.append("    and z.jg_id = b.jg_id ");
 		sql.append("    and (locate(concat(',', z.id, ','), b.qmswsid) > 0 or ");
 		sql.append("        locate(concat(z.id, ','), b.qmswsid) = 1 or ");
 		sql.append("        (locate(concat(',', z.id), b.qmswsid) > 0 and ");
 		sql.append("        locate(concat(',', z.id), b.qmswsid) = ");
 		sql.append("        length(b.qmswsid) - length(z.id))) ");
 		sql.append("    and year(b.bbrq) = ? ");
-		sql.append("    and b.jg_id = ? ");
+		sql.append("    and z.jg_id = ? ");
+		sql.append("    and z.yxbz='1' ");
+		sql.append("  group by r.id, r.xming ");
+		params.add(bbnd);
+		params.add(jgId);
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sql.toString(), params.toArray());
+		return ls;
+	}
+
+	/**
+	 * 根据提交报备的年度和机构id对机构人员各个业务类型的报备数据进行统计(事务所所有税务师)
+	 * 
+	 * @param bbnd
+	 * @param jgId
+	 * @return
+	 */
+	private List<Map<String, Object>> getAllJgRyYwbbsjhz(String bbnd,
+			String jgId) {
+		ArrayList<Object> params = new ArrayList<>();
+		StringBuffer sql = new StringBuffer(" select r.id, ");
+		sql.append("        r.xming ry, ");
+		sql.append("        sum(if(b.ywlx_dm = '1', 1, 0)) jskf, ");
+		sql.append("        sum(if(b.ywlx_dm = '2', 1, 0)) sqkc, ");
+		sql.append("        sum(if(b.ywlx_dm = '3', 1, 0)) qyhsqj, ");
+		sql.append("        sum(if(b.ywlx_dm = '4', 1, 0)) td, ");
+		sql.append("        sum(if(b.ywlx_dm = '5', 1, 0)) fdc, ");
+		sql.append("        sum(if(b.ywlx_dm = '6', 1, 0)) qt, ");
+		sql.append("        sum(if(b.ywlx_dm = '7', 1, 0)) gxjs, ");
+		sql.append("        sum(if(b.ywlx_dm = '8', 1, 0)) zx, ");
+		sql.append("        sum(if(b.ywlx_dm = '9', 1, 0)) bg, ");
+		sql.append("        sum(if(b.ywlx_dm = '10', 1, 0)) grhsqj ");
+		sql.append("   from zs_ryjbxx r, zs_zysws z ");
+		sql.append("   left join zs_ywbb b ");
+		sql.append("     on (locate(concat(',', z.id, ','), b.qmswsid) > 0 or ");
+		sql.append("        locate(concat(z.id, ','), b.qmswsid) = 1 or ");
+		sql.append("        (locate(concat(',', z.id), b.qmswsid) > 0 and ");
+		sql.append("        locate(concat(',', z.id), b.qmswsid) = ");
+		sql.append("        length(b.qmswsid) - length(z.id))) ");
+		sql.append("    and z.jg_id = b.jg_id ");
+		sql.append("    and year(b.bbrq) = ? ");
+		sql.append("  where r.id = z.ry_id ");
+		sql.append("    and z.jg_id = ? ");
+		sql.append("    and z.yxbz='1' ");
 		sql.append("  group by r.id, r.xming ");
 		params.add(bbnd);
 		params.add(jgId);
@@ -1204,12 +1247,13 @@ public class YwglDao extends BaseJdbcDao {
 
 	/**
 	 * 业务报备数据汇总-机构人员报备数据分析-根据业务报备表的id查找报备数据明细
+	 * 
 	 * @param bbid
 	 * @return
 	 */
 	public Map<String, Object> getYwbbsjhzRyMx(String bbid) {
 		Map<String, Object> ob = new HashMap<>();
-		StringBuffer sql=new StringBuffer(" SELECT b.xyh, ");
+		StringBuffer sql = new StringBuffer(" SELECT b.xyh, ");
 		sql.append("        b.bbhm, ");
 		sql.append("        b.wtdw, ");
 		sql.append("        b.wtdwnsrsbh, ");
@@ -1255,13 +1299,15 @@ public class YwglDao extends BaseJdbcDao {
 		sql.append("    and c.ID = b.CS_DM ");
 		sql.append("    and lx.ID = b.YWLX_DM ");
 		sql.append("    AND b.ID = ? ");
-		Map<String, Object> data=this.jdbcTemplate.queryForMap(sql.toString(), bbid);
+		Map<String, Object> data = this.jdbcTemplate.queryForMap(
+				sql.toString(), bbid);
 		ob.put("data", data);
 		return ob;
 	}
 
 	/**
 	 * 业务报备数据汇总-机构人员报备数据分析-报备机构
+	 * 
 	 * @param page
 	 * @param pagesize
 	 * @param map
@@ -1270,14 +1316,15 @@ public class YwglDao extends BaseJdbcDao {
 	public Map<String, Object> getYwbbsjhzYwbbJg(int page, int pagesize,
 			HashMap<String, Object> map) {
 		ArrayList<Object> params = new ArrayList<>();
-		StringBuffer sql=new StringBuffer("SELECT SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 AS 'KEY', sj.* ");
+		StringBuffer sql = new StringBuffer(
+				"SELECT SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 AS 'KEY', sj.* ");
 		sql.append(" from( ");
 		sql.append(" SELECT jg.id, jg.dwmc, jg.fddbr, zt.mc zt ");
 		sql.append("   FROM zs_jg jg, dm_jgzt zt ");
 		sql.append("  WHERE jg.JGZT_DM = zt.ID ");
 		sql.append("    and jg.ID in (select b.JG_ID from zs_ywbb b where b.YXBZ = '1') ");
 		sql.append("    and jg.YXBZ='1' ");
-		if(null!=map.get("dwmc")){
+		if (null != map.get("dwmc")) {
 			sql.append("    and jg.DWMC like ? ");
 			params.add("%" + map.get("dwmc") + "%");
 		}
@@ -1290,9 +1337,10 @@ public class YwglDao extends BaseJdbcDao {
 		params.add(startIndex);
 		params.add(startIndex);
 		params.add(pagesize);
-		
-		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(),params.toArray());
-		
+
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sql.toString(), params.toArray());
+
 		// 获取符合条件的记录数
 		String countSql = " SELECT FOUND_ROWS()";
 		int total = jdbcTemplate.queryForObject(countSql, int.class);
@@ -1307,6 +1355,7 @@ public class YwglDao extends BaseJdbcDao {
 
 	/**
 	 * 业务报备数据汇总-会计所报备数据分析
+	 * 
 	 * @param page
 	 * @param pagesize
 	 * @param map
@@ -1315,15 +1364,16 @@ public class YwglDao extends BaseJdbcDao {
 	public Map<String, Object> getYwbbsjhzSws(int page, int pagesize,
 			HashMap<String, Object> map) {
 		ArrayList<Object> params = new ArrayList<>();
-		String bbnd="";
-		String ywlx="";
-		if(null!=map.get("bbnd")){
-			bbnd=map.get("bbnd").toString();
+		String bbnd = "";
+		String ywlx = "";
+		if (null != map.get("bbnd")) {
+			bbnd = map.get("bbnd").toString();
 		}
-		if(null!=map.get("ywlx")){
-			ywlx=map.get("ywlx").toString();
+		if (null != map.get("ywlx")) {
+			ywlx = map.get("ywlx").toString();
 		}
-		StringBuffer sql=new StringBuffer(" select SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 as 'xh',sj.* ");
+		StringBuffer sql = new StringBuffer(
+				" select SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 as 'xh',sj.* ");
 		sql.append(" from( ");
 		sql.append(" select b.swsmc, ");
 		sql.append("        b.wtdw, ");
@@ -1350,15 +1400,16 @@ public class YwglDao extends BaseJdbcDao {
 		sql.append(" )sj, ");
 		sql.append(" (select @rownum := ? )xh ");
 		sql.append("   limit ?,? ");
-		
+
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
 		params.add(startIndex);
 		params.add(startIndex);
 		params.add(pagesize);
-		
-		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(),params.toArray());
-		
+
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sql.toString(), params.toArray());
+
 		// 获取符合条件的记录数
 		String countSql = " SELECT FOUND_ROWS()";
 		int total = jdbcTemplate.queryForObject(countSql, int.class);
@@ -1373,6 +1424,7 @@ public class YwglDao extends BaseJdbcDao {
 
 	/**
 	 * 业务报备数据汇总-外省报备数据分析
+	 * 
 	 * @param page
 	 * @param pagesize
 	 * @param map
@@ -1381,15 +1433,16 @@ public class YwglDao extends BaseJdbcDao {
 	public Map<String, Object> getYwbbsjhzWs(int page, int pagesize,
 			HashMap<String, Object> map) {
 		ArrayList<Object> params = new ArrayList<>();
-		String bbnd="";
-		String ywlx="";
-		if(null!=map.get("bbnd")){
-			bbnd=map.get("bbnd").toString();
+		String bbnd = "";
+		String ywlx = "";
+		if (null != map.get("bbnd")) {
+			bbnd = map.get("bbnd").toString();
 		}
-		if(null!=map.get("ywlx")){
-			ywlx=map.get("ywlx").toString();
+		if (null != map.get("ywlx")) {
+			ywlx = map.get("ywlx").toString();
 		}
-		StringBuffer sql=new StringBuffer(" select SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 as 'xh',sj.* ");
+		StringBuffer sql = new StringBuffer(
+				" select SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 as 'xh',sj.* ");
 		sql.append(" from( ");
 		sql.append(" select b.swsmc, ");
 		sql.append("        b.wtdw, ");
@@ -1416,15 +1469,16 @@ public class YwglDao extends BaseJdbcDao {
 		sql.append(" )sj, ");
 		sql.append(" (select @rownum := ? )xh ");
 		sql.append("   limit ?,? ");
-		
+
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
 		params.add(startIndex);
 		params.add(startIndex);
 		params.add(pagesize);
-		
-		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(),params.toArray());
-		
+
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sql.toString(), params.toArray());
+
 		// 获取符合条件的记录数
 		String countSql = " SELECT FOUND_ROWS()";
 		int total = jdbcTemplate.queryForObject(countSql, int.class);
@@ -1439,6 +1493,7 @@ public class YwglDao extends BaseJdbcDao {
 
 	/**
 	 * 业务报备数据汇总-业务报备总收费金额数据分析
+	 * 
 	 * @param page
 	 * @param pagesize
 	 * @param map
@@ -1447,31 +1502,32 @@ public class YwglDao extends BaseJdbcDao {
 	public Map<String, Object> getYwbbsjhzJe(int page, int pagesize,
 			HashMap<String, Object> map) {
 		ArrayList<Object> params = new ArrayList<>();
-		String bbnd="";
-		String ywlx="";
-		String fsd="";
-		if(null!=map.get("bbnd")){
-			bbnd=map.get("bbnd").toString();
+		String bbnd = "";
+		String ywlx = "";
+		String fsd = "";
+		if (null != map.get("bbnd")) {
+			bbnd = map.get("bbnd").toString();
 		}
-		if(null!=map.get("ywlx")){
-			ywlx=map.get("ywlx").toString();
+		if (null != map.get("ywlx")) {
+			ywlx = map.get("ywlx").toString();
 		}
-		if(null!=map.get("fsd")){
-			fsd=map.get("fsd").toString();
+		if (null != map.get("fsd")) {
+			fsd = map.get("fsd").toString();
 		}
-		StringBuffer sql=new StringBuffer(" select sql_calc_found_rows @rownum := @rownum + 1 as xh, sj.* ");
+		StringBuffer sql = new StringBuffer(
+				" select sql_calc_found_rows @rownum := @rownum + 1 as xh, sj.* ");
 		sql.append("   from (select b.swsmc, sum(ifnull(b.xyje,0)) xyje, sum(ifnull(b.sjsqje,0)) sjsqje ");
 		sql.append("           from zs_ywbb b, dm_cs c ");
 		sql.append("          where b.cs_dm = c.id ");
-		if(!StringUtils.isEmpty(bbnd)){
+		if (!StringUtils.isEmpty(bbnd)) {
 			sql.append("        and year(b.bbrq) = ? ");
 			params.add(bbnd);
 		}
-		if(!StringUtils.isEmpty(ywlx)){
+		if (!StringUtils.isEmpty(ywlx)) {
 			sql.append("        and b.ywlx_dm = ? ");
 			params.add(ywlx);
 		}
-		if(!StringUtils.isEmpty(fsd)){
+		if (!StringUtils.isEmpty(fsd)) {
 			sql.append("        and b.cs_dm= ? ");
 			params.add(fsd);
 		}
@@ -1479,15 +1535,16 @@ public class YwglDao extends BaseJdbcDao {
 		sql.append("        (select @rownum := ?) xh ");
 		sql.append("        order by sj.xyje desc,sj.sjsqje desc ");
 		sql.append("   limit ?,? ");
-		
+
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
 		params.add(startIndex);
 		params.add(startIndex);
 		params.add(pagesize);
-		
-		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(),params.toArray());
-		
+
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sql.toString(), params.toArray());
+
 		// 获取符合条件的记录数
 		String countSql = " SELECT FOUND_ROWS()";
 		int total = jdbcTemplate.queryForObject(countSql, int.class);
@@ -1499,6 +1556,7 @@ public class YwglDao extends BaseJdbcDao {
 		ob.put("current", page);
 		return ob;
 	}
+
 	
 	public Object getCITY(Object CS_DM) {
 		String sql = "select mc from dm_cs where id = ?";
@@ -1519,6 +1577,137 @@ public class YwglDao extends BaseJdbcDao {
 	public void handleYwQY(Long id, Map<String, Object> data) {
 		String sql  = "update zs_ywbb set sqqyly=:sqqyly, zt=:zt where id = :id";
 		this.namedParameterJdbcTemplate.update(sql, data);
+	}
+
+	/**
+	 * 个人业务统计
+	 * 
+	 * @param map
+	 * @return
+	 */
+	public Map<String, Object> getGrywtj(HashMap<String, Object> map) {
+		String bbnd = "";
+		String jgId = "";
+		if (null != map.get("bbnd")) {
+			bbnd = map.get("bbnd").toString();
+		}
+		if (null != map.get("jgid")) {
+			jgId = map.get("jgid").toString();
+		}
+		List<Map<String, Object>> ls = this.getAllJgRyYwbbsjhz(bbnd, jgId);
+		Map<String, Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		return ob;
+	}
+
+	/**
+	 * 客户端-事务所业务统计
+	 * 
+	 * @param pagesize
+	 * @param page
+	 * @param map
+	 * @return
+	 */
+	public Map<String, Object> getSwsywtj(int page, int pagesize,
+			HashMap<String, Object> map) {
+		ArrayList<Object> params = new ArrayList<>();
+		String jgId = "";
+		if (null != map.get("jgid")) {
+			jgId = map.get("jgid").toString();
+		}
+		StringBuffer sql = new StringBuffer(
+				" select sql_calc_found_rows @rownum := @rownum + 1 as xh, sj.* ");
+		sql.append("   from (select year(b.bbrq) nd, ");
+		sql.append("                sum(if(b.ywlx_dm = '1', 1, 0)) jskf, ");
+		sql.append("                sum(if(b.ywlx_dm = '2', 1, 0)) sqkc, ");
+		sql.append("                sum(if(b.ywlx_dm = '3', 1, 0)) qyhsqj, ");
+		sql.append("                sum(if(b.ywlx_dm = '4', 1, 0)) td, ");
+		sql.append("                sum(if(b.ywlx_dm = '5', 1, 0)) fdc, ");
+		sql.append("                sum(if(b.ywlx_dm = '6', 1, 0)) qt, ");
+		sql.append("                sum(if(b.ywlx_dm = '7', 1, 0)) gxjs, ");
+		sql.append("                sum(if(b.ywlx_dm = '8', 1, 0)) zx, ");
+		sql.append("                sum(if(b.ywlx_dm = '9', 1, 0)) bg, ");
+		sql.append("                sum(if(b.ywlx_dm = '10', 1, 0)) grhsqj ");
+		sql.append("           from zs_ywbb b ");
+		sql.append("          where b.jg_id = ? ");
+		sql.append("            and b.yxbz = '1' ");
+		sql.append("          group by year(b.bbrq) ");
+		sql.append("          order by year(b.bbrq) desc) sj, ");
+		sql.append("        (select @rownum := ? ) xh ");
+		sql.append("   limit ?,? ");
+
+		params.add(jgId);
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		params.add(startIndex);
+		params.add(startIndex);
+		params.add(pagesize);
 		
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sql.toString(), params.toArray());
+
+		// 获取符合条件的记录数
+		String countSql = " SELECT FOUND_ROWS()";
+		int total = jdbcTemplate.queryForObject(countSql, int.class);
+
+		Map<String, Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		ob.put("total", total);
+		return ob;
+	}
+
+	/**
+	 * 事务所业务统计-明细
+	 * @param ywlx
+	 * @param bbnd
+	 * @param jgid
+	 * @param map
+	 * @return
+	 */
+	public Map<String, Object> getSwsywtjMx(String ywlx, String bbnd,
+			String jgid, HashMap<String, Object> map) {
+		ArrayList<Object> params=new ArrayList<>();
+		String swsSql="select jg.dwmc from zs_jg jg where jg.id = ? ";
+		String swsmc=this.jdbcTemplate.queryForObject(swsSql,new Object[]{jgid},String.class);
+		StringBuffer sql=new StringBuffer(" select sql_calc_found_rows @rownum := @rownum + 1 as xh, sj.* ");
+		sql.append(" from( ");
+		sql.append(" select b.wtdw, ");
+		sql.append("        b.swsswdjzh, ");
+		sql.append("        c.mc fsd, ");
+		sql.append("        b.bgwh, ");
+		sql.append("        b.yjfh, ");
+		sql.append("        b.rjfh, ");
+		sql.append("        b.sjfh, ");
+		sql.append("        b.qzsws, ");
+		sql.append("        case b.sb_dm ");
+		sql.append("          when '1' then ");
+		sql.append("           '国税' ");
+		sql.append("          when '2' then ");
+		sql.append("           '地税' ");
+		sql.append("          else ");
+		sql.append("           '' ");
+		sql.append("        end sb, ");
+		sql.append("        b.zgswjg, ");
+		sql.append("        ifnull(b.xyje,0) xyje, ");
+		sql.append("        ifnull(b.sjsqje,0) sjsqje, ");
+		sql.append("        date_format(b.bbrq, '%Y-%m-%d') bbrq, ");
+		sql.append("        ifnull(b.tzvalue1,0) tzvalue1, ");
+		sql.append("        ifnull(b.tjvalue2,0) tjvalue2 ");
+		sql.append("   from dm_cs c, zs_ywbb b ");
+		sql.append("  where c.id = b.cs_dm ");
+		sql.append("    and b.jg_id = ? ");
+		sql.append("    and b.ywlx_dm = ? ");
+		sql.append("    and year(b.bbrq) = ? ");
+		sql.append("    order by b.BBRQ desc ");
+		sql.append(" )sj, ");
+		sql.append(" (select @rownum:=0 ) xh ");
+		params.add(jgid);
+		params.add(ywlx);
+		params.add(bbnd);
+		List<Map<String,Object>> ls=this.jdbcTemplate.queryForList(sql.toString(), params.toArray());
+		Map<String,Object> ob=new HashMap<>();
+		ob.put("data", ls);
+		ob.put("swsmc", swsmc);
+		return ob;
 	}
 }
