@@ -124,7 +124,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		obj.put("id", uuid);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcfzgd ");	
-		sb.append("  ( id,jg_id,use_id,ztbj,kssj,jssj,tjsj,nd,timevalue,ldzc_hj,ldzc_hbzj,ldzc_dqtz,ldzc_yspj,ldzc_ysgl,ldzc_yslx,ldzc_yszk,ldzc_qtys,ldzc_yfzk,ldzc_ysbt,");	
+		sb.append("  ( id,jg_id,use_id,ztbj,tjsj,nd,timevalue,ldzc_hj,ldzc_hbzj,ldzc_dqtz,ldzc_yspj,ldzc_ysgl,ldzc_yslx,ldzc_yszk,ldzc_qtys,ldzc_yfzk,ldzc_ysbt,");	
 		sb.append(" ldzc_ch,ldzc_dtfy,ldzc_dqzj,ldzc_qtldzc,cqtz_gq,cqtz_zq,cqtz_hj,gdzc_yj,gdzc_ljzj,gdzc_jz,gdzc_jzzb,gdzc_je,gdzc_gcwz,gdzc_zjgc,gdzc_ql,gdzc_hj,");
 		sb.append(" wxqt_wxzc,wxqt_cqdt,wxqt_qtcq,wxqt_hj,ydsx_skjx,zczj,ldfz_dqjk,ldfz_yfpj,ldfz_yfzk,ldfz_yszk,ldfz_yfgz,ldfz_yffl,ldfz_yfgl,ldfz_yjsj,");
 		sb.append(" ldfz_qtyj,ldfz_qtyf,ldfz_ytfy,ldfz_yjfz,ldfz_dqfz,ldfz_qtfz,ldfz_hj,cqfz_cqjk,cqfz_yfzq,cqfz_cqyf,cqfz_zxyf,cqfz_zyfxjj,cqfz_qtfz,cqfz_hj,");
@@ -134,7 +134,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		sb.append(" wxqt_wxzc_nc,wxqt_cqdt_nc,wxqt_qtcq_nc,wxqt_hj_nc,ydsx_skjx_nc,zczj_nc,ldfz_dqjk_nc,ldfz_yfpj_nc,ldfz_yfzk_nc,ldfz_yszk_nc,ldfz_yfgz_nc,ldfz_yffl_nc,");
 		sb.append(" ldfz_yfgl_nc,ldfz_yjsj_nc,ldfz_qtyj_nc,ldfz_qtyf_nc,ldfz_ytfy_nc,ldfz_yjfz_nc,ldfz_dqfz_nc,ldfz_qtfz_nc,ldfz_hj_nc,cqfz_cqjk_nc,cqfz_yfzq_nc,cqfz_cqyf_nc,cqfz_zxyf_nc,");
 		sb.append(" cqfz_zyfxjj_nc,cqfz_qtfz_nc,cqfz_hj_nc,dysx_dyskdx_nc,dysx_fzhj_nc,syzqy_sszbje_nc,syzqy_yhtz_nc,syzqy_sszb_nc,syzqy_zbgj_nc,syzqy_yygj_nc,syzqy_wfplr_nc,syzqy_hj_nc,fzsyzqy_hj_nc)");
-		sb.append("values ( :id,:jg_id,:use_id,:ztbj,:kssj,:jssj,sysdate(),:nd,:timevalue,:ldzc_hj,:ldzc_hbzj,:ldzc_dqtz,:ldzc_yspj,:ldzc_ysgl,:ldzc_yslx,:ldzc_yszk,:ldzc_qtys,:ldzc_yfzk,:ldzc_ysbt,");	
+		sb.append("values ( :id,:jg_id,:use_id,:ztbj,sysdate(),:nd,:timevalue,:ldzc_hj,:ldzc_hbzj,:ldzc_dqtz,:ldzc_yspj,:ldzc_ysgl,:ldzc_yslx,:ldzc_yszk,:ldzc_qtys,:ldzc_yfzk,:ldzc_ysbt,");	
 		sb.append(" :ldzc_ch,:ldzc_dtfy,:ldzc_dqzj,:ldzc_qtldzc,:cqtz_gq,:cqtz_zq,:cqtz_hj,:gdzc_yj,:gdzc_ljzj,:gdzc_jz,:gdzc_jzzb,:gdzc_je,:gdzc_gcwz,:gdzc_zjgc,:gdzc_ql,:gdzc_hj,");
 		sb.append(" :wxqt_wxzc,:wxqt_cqdt,:wxqt_qtcq,:wxqt_hj,:ydsx_skjx,:zczj,:ldfz_dqjk,:ldfz_yfpj,:ldfz_yfzk,:ldfz_yszk,:ldfz_yfgz,:ldfz_yffl,:ldfz_yfgl,:ldfz_yjsj,");
 		sb.append(" :ldfz_qtyj,:ldfz_qtyf,:ldfz_ytfy,:ldfz_yjfz,:ldfz_dqfz,:ldfz_qtfz,:ldfz_hj,:cqfz_cqjk,:cqfz_yfzq,:cqfz_cqyf,:cqfz_zxyf,:cqfz_zyfxjj,:cqfz_qtfz,:cqfz_hj,");
