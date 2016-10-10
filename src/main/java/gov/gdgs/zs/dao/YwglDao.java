@@ -85,6 +85,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" and z.RY_ID = r.ID ");
 		sb.append(" and j.ID=? ");
 		sb.append(" and z.RYSPGCZT_DM = 1 ");
+		sb.append("  and z.ID not in (select zysws_id from zs_sdjl_zysws where yxbz = 1) ");
 		sb.append(" and z.YXBZ=1 ");
 		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
 				sb.toString(), new Object[] { id });
