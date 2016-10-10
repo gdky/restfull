@@ -1183,17 +1183,54 @@ public class SPDao extends BaseDao{
 					try {
 						rec.add(jls.get(rowNum).get("id")+"");
 					} catch (Exception e) {
-						continue;
+						String insetnbSql="insert into zs_jl (QZNY,XXXX,ZMR,ID,RY_ID) values(?,?,?,replace(uuid(),'-',''),?)";
+						rec.add((String) ryid);
+						this.jdbcTemplate.update(insetnbSql,rec.toArray());
 					}
 					this.jdbcTemplate.update(nbSql,rec.toArray());
 				}
 			}else{
-				for(List<String> rec:nb){//更新人员简历
-					int rowNum = nb.indexOf(rec);
+				for(List<String> rec:nb){//插入人员简历
 					String nbSql="insert into zs_jl (QZNY,XXXX,ZMR,ID,RY_ID) values(?,?,?,replace(uuid(),'-',''),?)";
 					rec.add((String) ryid);
 					this.jdbcTemplate.update(nbSql,rec.toArray());
 				}
+			}
+		}
+		/**
+		 * 从业人员备案申请
+		 * @param sqxm
+		 * @throws Exception
+		 */
+		public void cyrybasq(Map<String, Object> sqxm) throws Exception{
+			List<List<String>> nb = (List<List<String>>) sqxm.remove("nbjgsz");
+			sqxm.remove("uid");
+			Object jgid = sqxm.remove("jgid");
+			sqxm.remove("ryid");
+			List<Object> cyb = new ArrayList<Object>();
+			cyb.add(sqxm.remove("ZW_DM"));
+			cyb.add(sqxm.remove("xzsngzgw"));
+			cyb.add(sqxm.remove("lrsj"));
+			cyb.add(sqxm.remove("swdlywkssj"));
+			cyb.add(sqxm.remove("zgxlzymc"));
+			cyb.add(sqxm.remove("zgxlfzjgjsj"));
+			List<Object> listValue = new ArrayList<Object>();  //Map转List
+			Iterator<String> it = sqxm.keySet().iterator();  
+			while (it.hasNext()) {  
+				String key = it.next().toString();  
+				listValue.add(sqxm.get(key));  
+			};
+			String sql ="insert into zs_ryjbxx (XMING,CS_DM,XB_DM,MZ_DM,SRI,XL_DM,SFZH,ZZMM_DM,TXDZ,YDDH,YZBM,DHHM,BYYX,BYSJ,"
+					+ "RYDAZT,xpian,RYZT_DM,RYSF_DM,LRRQ,YXBZ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,3,sysdate(),1)";
+			Number rs = this.insertAndGetKeyByJdbc(sql,listValue.toArray(),new String[] {"ID"});
+			String sqlCy="insert into zs_cyry (ZW_DM,XZSNGZGW,LRSJ,SWDLYWKSSJ,ZGXLZYMC,ZGXLFZJGJSJ,RY_ID,JG_ID,CYRYZT_DM,YXBZ) values(?,?,?,?,?,?,?,?,1,1)";
+			cyb.add(rs);
+			cyb.add(jgid);
+			Number rsCy = this.insertAndGetKeyByJdbc(sqlCy,cyb.toArray(),new String[] {"ID"});
+			for(List<String> rec:nb){//插入人员简历
+				String nbSql="insert into zs_jl (QZNY,XXXX,ZMR,ID,RY_ID) values(?,?,?,replace(uuid(),'-',''),?)";
+					rec.add(rsCy.toString());
+				this.jdbcTemplate.update(nbSql,rec.toArray());
 			}
 		}
 

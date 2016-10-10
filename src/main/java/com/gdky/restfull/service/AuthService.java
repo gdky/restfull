@@ -268,4 +268,19 @@ public class AuthService {
 		password1 = encoder.encodePassword(password1, null);
 		authDao.updatePass(password1,user.getId());
 	}
+	
+    public String getForWAddr(HttpServletRequest request) {  
+        String ip = request.getHeader("X-FORWARDED-FOR");  
+        if(ip == null ) {  
+            ip = request.getRemoteAddr();  
+        }  
+        return ip;  
+    } 
+    public String getRealAddr(HttpServletRequest request) {  
+        String ip = request.getHeader("X-Real-IP");  
+        if(ip == null ) {  
+            ip = request.getRemoteAddr();  
+        }  
+        return ip;  
+    }  
 }

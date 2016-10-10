@@ -25,6 +25,7 @@ public class YhdljlbDao extends BaseDao {
 		sb.append(" FROM fw_users u, fw_user_log l, fw_user_role ur , fw_role r ");
 		sb.append( condition.getSql());
 		sb.append(" and r.ID=ur.ROLE_ID AND l.USER_ID=u.ID AND ur.USER_ID=u.ID ");
+		sb.append(" order by l.access_time desc ");
 		
 
 		ArrayList<Object> params = condition.getParams();

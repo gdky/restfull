@@ -151,6 +151,8 @@ public class SPservice {
 				this.spDao.cydrzssq(ptxm);
 			case "cyrybgsq"://从业信息变更
 				this.spDao.cyrybgsq(ptxm);
+			case "cyrybasq"://从业信息变更
+				this.spDao.cyrybasq(ptxm);
 		 }
 	}
 
