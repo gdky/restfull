@@ -85,6 +85,7 @@ public class XttjbbDao extends BaseJdbcDao {
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();
 		ob.put("data", ls);
+		ob.put("total", total);
 		Map<String, Object> meta = new HashMap<>();
 		meta.put("pageNum", page);
 		meta.put("pageSize", pageSize);

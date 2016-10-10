@@ -21,13 +21,14 @@ public class SdjlJG implements Serializable {
 	private String jsrRole;
 	private Timestamp jsTime;
 	private Integer lx;
+	private Boolean yxbz;
+	
 	public Integer getLx() {
 		return lx;
 	}
 	public void setLx(Integer lx) {
 		this.lx = lx;
 	}
-	private Boolean yxbz;
 	public Integer getId() {
 		return id;
 	}

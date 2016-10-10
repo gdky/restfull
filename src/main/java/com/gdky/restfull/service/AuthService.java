@@ -171,7 +171,7 @@ public class AuthService {
 		u.setJgId((Integer) obj.get("jgId"));
 		u.setUname(uname);
 		u.setUsername(username);
-		u.setNames(uname);
+		u.setNames(names);
 		u.setPhone(phone);
 		u.setIdcard(idcard);
 		Integer userId = authDao.addUser(u);
