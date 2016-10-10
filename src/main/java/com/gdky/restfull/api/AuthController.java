@@ -72,7 +72,7 @@ public class AuthController {
 	 * @throws AuthenticationException
 	 */
 	@RequestMapping(value = "/auth", method = RequestMethod.POST)
-	public ResponseEntity<?> login(@RequestBody AuthRequest authReq) throws AuthenticationException{
+	public ResponseEntity<?> login(@RequestBody AuthRequest authReq,HttpServletRequest req) throws AuthenticationException{
 		//进行验证
 	    Authentication authentication = this.authenticationManager.authenticate(
 	      new UsernamePasswordAuthenticationToken(
@@ -90,7 +90,7 @@ public class AuthController {
 	    String token = this.tokenUtils.generateToken(userDetails);
 	    
 	    //登记登录信息
-	    userLogService.addLog(userDetails, httpRequest.getRemoteAddr(), "用户登录");
+	    userLogService.addLog(userDetails, authService.getForWAddr(httpRequest), "用户登录");
 	    
 	    AuthResponse resp = new AuthResponse(token);
 	    resp.setTokenhash(token);
