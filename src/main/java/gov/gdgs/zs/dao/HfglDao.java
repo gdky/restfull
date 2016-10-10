@@ -210,7 +210,7 @@ public class HfglDao extends BaseDao{
 		params.add(ps);
 		StringBuffer sb = new StringBuffer();
 		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.ID as jlid,a.JG_ID as jgid,a.SCJLID as scid,a.ND,a.DWMC,"); 
-		sb.append("		a.JFZE,a.YJTTHF,a.YJGRHF,a.JFRQ,a.DYCS,a.BZ,a.YJE,a.GGR,a.XGR,'"+uname+"' as KPR from zs_hyhfjnqk a,(select @rownum:=?) zs_ry");
+		sb.append("		a.JFZE,a.YJTTHF,a.YJGRHF,a.JFRQ,a.DYCS,a.BZ,a.YJE,a.GGR,a.BCJFRS,a.XGR,'"+uname+"' as KPR from zs_hyhfjnqk a,(select @rownum:=?) zs_ry");
 		sb.append("		"+condition.getSql()+" and a.yxbz=1 order by a.LRRQ desc LIMIT ?, ?");
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
@@ -221,7 +221,7 @@ public class HfglDao extends BaseDao{
 		if(qury.containsKey("nd")){
 			nd=qury.get("nd").toString();
 		}
-		ob.put("jftj", this.jdbcTemplate.queryForMap("select sum(JFZE*DYCS) as dyze,'"+nd+"' as dynd,sum(DYCS) as cs,count(id) as ts  from zs_hyhfjnqk where nd=?",nd));
+		ob.put("jftj", this.jdbcTemplate.queryForMap("select sum(JFZE*DYCS) as dyze,'"+nd+"' as dynd,sum(DYCS) as cs,count(id) as ts  from zs_hyhfjnqk where nd=? and yxbz=1",nd));
 		Map<String, Object> meta = new HashMap<>();
 		meta.put("pageNum", pn);
 		meta.put("pageSize", ps);
@@ -393,6 +393,7 @@ public class HfglDao extends BaseDao{
             	String uuid = new Common().newUUID();
             	String yftt = params.get(5)+"";
             	String yfgr = params.get(6)+"";
+            	Object jfrs = null;
             	if((params.get(5)+"").equals("")&&(params.get(6)+"").equals("")){
             		if((jgs.get("yjtt")+"").equals("null")){
             			yftt=params.get(4)+"";
@@ -401,9 +402,11 @@ public class HfglDao extends BaseDao{
 	            		double syz = new BigDecimal(params.get(4)+"").subtract(new BigDecimal(jgs.get("yjtt")+"")).doubleValue();
 	            		if(syz>0){
 	            			int zys = (int)new BigDecimal(syz).divide(new BigDecimal("800"),1,BigDecimal.ROUND_HALF_EVEN).doubleValue();
-	            			for(Map<String, Object> k:this.jdbcTemplate.queryForList("select ry_id from zs_zysws a where a.jg_id=? and a.yxbz=1 and a.ry_id not in(select b.ry_id from zs_hyhfjfryls b where b.nd=? and b.JG_ID=? and b.yxbz=1) limit ?",
-	            					new Object[]{jgs.get("id"),nd,jgs.get("id"),zys})){
-	            				this.jdbcTemplate.update("insert into zs_hyhfjfryls (ID,ND,RY_ID,JG_ID,JF_ID,SCJLID,LRRQ,YXBZ) values(?,?,?,?,?,?,sysdate(),1)",new Object[]{new Common().newUUID(),nd,k.get("ry_id"),jgs.get("id"),uuid,uuid2});
+	            			List<Map<String, Object>> rys = this.jdbcTemplate.queryForList("select ry_id from zs_zysws a where a.jg_id=? and a.yxbz=1 and a.ry_id not in(select b.ry_id from zs_hyhfjfryls b where b.nd=? and b.JG_ID=? and b.yxbz=1) limit ?",
+	            					new Object[]{jgs.get("id"),nd,jgs.get("id"),zys});
+	            			jfrs=rys.size();
+	            			for(Map<String, Object> k:rys){
+	            				this.jdbcTemplate.update("insert into zs_hyhfjfryls (ID,ND,RY_ID,JG_ID,JF_ID,SCJLID,LRRQ,YXBZ) values(replace(uuid(),'-',''),?,?,?,?,?,sysdate(),1)",new Object[]{nd,k.get("ry_id"),jgs.get("id"),uuid,uuid2});
 	            			}
 	            			yftt=(String) jgs.get("yjtt");
 	            			yfgr=syz+"";
@@ -418,15 +421,15 @@ public class HfglDao extends BaseDao{
             			int zys = (int)new BigDecimal(yfgr).divide(new BigDecimal("800"),1,BigDecimal.ROUND_HALF_EVEN).doubleValue();
             			for(Map<String, Object> k:this.jdbcTemplate.queryForList("select ry_id from zs_zysws a where a.jg_id=? and a.yxbz=1 and a.ry_id not in(select b.ry_id from zs_hyhfjfryls b where b.nd=? and b.JG_ID=? and b.yxbz=1) limit ?",
             					new Object[]{jgs.get("id"),nd,jgs.get("id"),zys})){
-            				this.jdbcTemplate.update("insert into zs_hyhfjfryls (ID,ND,RY_ID,JG_ID,JF_ID,SCJLID,LRRQ,YXBZ) values(?,?,?,?,?,?,sysdate(),1)",new Object[]{new Common().newUUID(),nd,k.get("ry_id"),jgs.get("id"),uuid,uuid2});
+            				this.jdbcTemplate.update("insert into zs_hyhfjfryls (ID,ND,RY_ID,JG_ID,JF_ID,SCJLID,LRRQ,YXBZ) values(replace(uuid(),'-',''),?,?,?,?,?,sysdate(),1)",new Object[]{nd,k.get("ry_id"),jgs.get("id"),uuid,uuid2});
             			}
             		}
             		if(yfgr.equals("")){
             			yfgr="0";
             		}
             	}
-            	this.jdbcTemplate.update("insert into zs_hyhfjnqk (ID,JG_ID,DWMC,ND,JFZE,YJTTHF,YJGRHF,JFRQ,YJRS,SCJLID,YXBZ,BZ,LRRQ) values(?,?,?,?,?,?,?,?,?,?,'1',?,sysdate())",
-            			new Object[]{uuid,jgs.get("id"),params.get(3)+"",nd,params.get(4)+"",yftt,yfgr,params.get(0)+"",jgs.get("yjrs"),uuid2,params.get(2)+""});
+            	this.jdbcTemplate.update("insert into zs_hyhfjnqk (ID,JG_ID,DWMC,ND,JFZE,YJTTHF,YJGRHF,JFRQ,YJRS,SCJLID,YXBZ,BZ,BCJFRS,LRRQ) values(?,?,?,?,?,?,?,?,?,?,'1',?,?,sysdate())",
+            			new Object[]{uuid,jgs.get("id"),params.get(3)+"",nd,params.get(4)+"",yftt,yfgr,params.get(0)+"",jgs.get("yjrs"),uuid2,params.get(2)+"",jfrs});
             	i+=1;
             }
         }
@@ -497,6 +500,27 @@ public class HfglDao extends BaseDao{
 					sb.append("		    order by b.je ");
 				}else{
 					sb.append("		    order by b.je desc");
+				}
+				break;
+			case "key":
+				if(asc){
+					sb.append("		    order by @rownum ");
+				}else{
+					sb.append("		    order by @rownum desc");
+				}
+				break;
+			case "FZYZCRQ":
+				if(asc){
+					sb.append("		    order by a.FZYZCRQ ");
+				}else{
+					sb.append("		    order by a.FZYZCRQ desc");
+				}
+				break;
+			case "ZZDW":
+				if(asc){
+					sb.append("		    order by a.ZZDW ");
+				}else{
+					sb.append("		    order by a.ZZDW desc");
 				}
 				break;
 			}
