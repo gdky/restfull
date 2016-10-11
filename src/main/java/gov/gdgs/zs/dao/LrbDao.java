@@ -41,12 +41,12 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 		sb.append(" cwfy,cwfy1,yylr,yylr1,tzsy,tzsy1,btsr,btsr1,yywsr,yywsr1,yywzc,yywzc1,lrze,lrze1,sds,sds1,jlr,jlr1,");
 		sb.append("  csczsy,csczsy1,zhss,zhss1,zcbglr,zcbglr1,gjbglr,gjbglr1,zwczss,zwczss1,qt,qt1,dlswdjhs,dlswdjsr,");
 		sb.append("  dlswdjsr1,dlnssbhs,dlnssbsr,dlnssbsr1,dlnsschs,dlnsscsr,dlnsscsr1,dljzjzhs,dljzjzsr,dljzjzsr1,spgwzxhs,");
-		sb.append("  spgwzxsr,spgwzxsr1,dlsqswfyhs,dlsqswfysr,dlsqswfysr1,pxhs,pxsr,pxsr1,qtzyywsrhs,qtzyywsr,qtzyywsr1,sz,zgkj,zbr,ztbj)");
+		sb.append("  spgwzxsr,spgwzxsr1,dlsqswfyhs,dlsqswfysr,dlsqswfysr1,pxhs,pxsr,pxsr1,qtzyywsrhs,qtzyywsr,qtzyywsr1,sz,zgkj,zbr,ztbj,tjrq)");
 		sb.append("values (:id,:jg_id,:use_id,:nd,:timevalue,:zgywsr,:zgywsr1,:zgywcb,:zgywcb1,:zgywsj,:zgywsj1,:zgwylr,:zgwylr1,:qtywlr,:qtywlr1,:yyfy,:yyfy1,:glfy,:glfy1,");
 		sb.append("  :cwfy,:cwfy1,:yylr,:yylr1,:tzsy,:tzsy1,:btsr,:btsr1,:yywsr,:yywsr1,:yywzc,:yywzc1,:lrze,:lrze1,:sds,:sds1,:jlr,:jlr1,");
 		sb.append("  :csczsy,:csczsy1,:zhss,:zhss1,:zcbglr,:zcbglr1,:gjbglr,:gjbglr1,:zwczss,:zwczss1,:qt,:qt1,:dlswdjhs,:dlswdjsr,");
 		sb.append("  :dlswdjsr1,:dlnssbhs,:dlnssbsr,:dlnssbsr1,:dlnsschs,:dlnsscsr,:dlnsscsr1,:dljzjzhs,:dljzjzsr,:dljzjzsr1,:spgwzxhs,");
-		sb.append("  :spgwzxsr,:spgwzxsr1,:dlsqswfyhs,:dlsqswfysr,:dlsqswfysr1,:pxhs,:pxsr,:pxsr1,:qtzyywsrhs,:qtzyywsr,:qtzyywsr1,:sz,:zgkj,:zbr,:ztbj)");
+		sb.append("  :spgwzxsr,:spgwzxsr1,:dlsqswfyhs,:dlsqswfysr,:dlsqswfysr1,:pxhs,:pxsr,:pxsr1,:qtzyywsrhs,:qtzyywsr,:qtzyywsr1,:sz,:zgkj,:zbr,:ztbj,now())");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		if(count==0){
@@ -67,7 +67,7 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM    ( SELECT a.id,b.DWMC,a.nd,");
+		sb.append(" FROM    ( SELECT a.id,b.DWMC,a.nd,date_format(a.tjrq,'%Y-%m-%d') zjrq,");
 		sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' ELSE NULL END AS ZTBJ,");
 		sb.append(" CASE a.TIMEVALUE WHEN 0 THEN '半年' WHEN 1 THEN '全年' ELSE NULL END AS TIMEVALUE ");
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
@@ -118,7 +118,7 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 		sb.append(" dlswdjsr1=:dlswdjsr1,dlnssbhs=:dlnssbhs,dlnssbsr=:dlnssbsr,dlnssbsr1=:dlnssbsr1,dlnsschs=:dlnsschs,dlnsscsr=:dlnsscsr,");
 		sb.append(" dlnsscsr1=:dlnsscsr1,dljzjzhs=:dljzjzhs,dljzjzsr=:dljzjzsr,dljzjzsr1=:dljzjzsr1,spgwzxhs=:spgwzxhs,");
 		sb.append(" spgwzxsr=:spgwzxsr,spgwzxsr1=:spgwzxsr1,dlsqswfyhs=:dlsqswfyhs,dlsqswfysr=:dlsqswfysr,dlsqswfysr1=:dlsqswfysr1,pxhs=:pxhs,pxsr=:pxsr,");
-		sb.append(" pxsr1=:pxsr1,qtzyywsrhs=:qtzyywsrhs,qtzyywsr=:qtzyywsr,qtzyywsr1=:qtzyywsr1,sz=:sz,zgkj=:zgkj,zbr=:zbr,ztbj=:ztbj where id=:id");
+		sb.append(" pxsr1=:pxsr1,qtzyywsrhs=:qtzyywsrhs,qtzyywsr=:qtzyywsr,qtzyywsr1=:qtzyywsr1,sz=:sz,zgkj=:zgkj,zbr=:zbr,ztbj=:ztbj,tjrq=now() where id=:id");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
 		
@@ -209,6 +209,31 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 		named.update(sb.toString(), obj);
 		
 	
+	}
+
+	@Override
+	public Map<String, Object> checkLrb(String jgid, HashMap<String, Object> map) {
+		boolean result=true;
+		String sql="select l.id from zs_cwbb_lrgd l where l.JG_ID=? and l.ND=? and l.TIMEVALUE=? ";
+		if(map.get("nd")!=null&&map.get("timevalue")!=null){
+			String nd=map.get("nd").toString();
+			String timevalue=map.get("timevalue").toString();
+			List<Map<String, Object>> ls=this.jdbcTemplate.queryForList(sql,new Object[]{jgid,nd,timevalue});
+			if(ls.size()>0){
+				if(map.get("lrbid")!=null){
+					String lrbid=map.get("lrbid").toString();
+					String id=ls.get(0).get("id").toString();
+					if(!lrbid.equals(id)){
+						result=false;
+					}
+				}else{
+					result=false;
+				}
+			}
+		}
+		Map<String,Object> ob=new HashMap<>();
+		ob.put("result", result);
+		return ob;
 	}
 
 }
