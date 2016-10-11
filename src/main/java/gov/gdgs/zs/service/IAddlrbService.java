@@ -13,6 +13,7 @@ public interface IAddlrbService {
 	
 	public Map<String,Object> addLrfpb ( Map <String,Object> obj);
 	public void updateLrfpb(Map<String,Object> obj);
+	public Map<String, Object> checkLrb(String jgid, String where);
 
 }
 

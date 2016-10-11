@@ -101,5 +101,23 @@ public class AddlrbService implements IAddlrbService{
 			Map<String,Object> obj = lrDao.getLrfpbById(id);
 			return obj;
 		}
+		
+		
+		@Override
+		public Map<String, Object> checkLrb(String jgid, String where) {
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			if (where != null) {
+				try {
+					where = java.net.URLDecoder.decode(where, "UTF-8");
+					ObjectMapper mapper = new ObjectMapper();
+					map = mapper.readValue(where,
+							new TypeReference<Map<String, Object>>() {
+							});
+				} catch (Exception e) {
+				}
+			}		
+			Map<String, Object> rs = lrbDao.checkLrb(jgid, map);
+			return rs;
+		}
 
 }

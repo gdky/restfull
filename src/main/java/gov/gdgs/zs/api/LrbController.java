@@ -126,4 +126,18 @@ public class LrbController {
 
 	}
 	
+	/**
+	 * 校验利润表是否存在
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkLrb", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> checkLrb(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+		String jgid=accountService.getUserFromHeaderToken(request).getJgId().toString();
+		Map<String, Object> obj = addlrbService.checkLrb(jgid,where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
 }
