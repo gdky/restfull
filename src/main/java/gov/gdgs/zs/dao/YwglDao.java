@@ -125,6 +125,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" and y.hy_id = hy.id ");
 		sb.append(" and y.cs_dm = cs.id ");
 		sb.append(" and y.qx_dm = qx.id ");
+		sb.append(" and (y.zt = 1 or y.zt = 3) ");
 		sb.append(" and y.yxbz = 1 ");
 		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),
 				new Object[] { bbhm, yzm },

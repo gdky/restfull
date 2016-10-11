@@ -13,10 +13,10 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -261,12 +261,15 @@ public class YwglService {
 	}
 
 	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
-		if (bbhm == null || bbhm.isEmpty() || yzm == null || yzm.isEmpty()) {
+		if (StringUtils.isBlank(bbhm)|| StringUtils.isBlank(yzm)) {
 			throw new YwbbException("报备号码或者验证码不能为空");
 		}
 		bbhm = bbhm.trim();
 		yzm = yzm.trim();
 		Map<String, Object> rs = ywglDao.getYwbbByYzmAndBbhm(bbhm, yzm);
+		if(rs == null) {
+			throw new YwbbException("无法查询到相应的业务信息，请提供有效的报备号码和验证码。");
+		}
 		return rs;
 	}
 
