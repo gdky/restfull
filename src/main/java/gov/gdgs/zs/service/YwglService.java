@@ -13,10 +13,10 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -113,7 +113,7 @@ public class YwglService {
 
 	public Map<String, Object> getYwbbMiscByJg(String hashId) {
 		Long id = HashIdUtil.decode(hashId);
-		List<Map<String, Object>> zysws = ywglDao.getYwbbMiscByJg(id);
+		List<Map<String, Object>> zysws = ywglDao.getZyswsByJg(id);
 		Map<String, Object> jgxx = swsDao.swsxx(id.intValue());
 
 		HashMap<String, Object> obj = new HashMap<String, Object>();
@@ -261,12 +261,15 @@ public class YwglService {
 	}
 
 	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
-		if (bbhm == null || bbhm.isEmpty() || yzm == null || yzm.isEmpty()) {
+		if (StringUtils.isBlank(bbhm)|| StringUtils.isBlank(yzm)) {
 			throw new YwbbException("报备号码或者验证码不能为空");
 		}
 		bbhm = bbhm.trim();
 		yzm = yzm.trim();
 		Map<String, Object> rs = ywglDao.getYwbbByYzmAndBbhm(bbhm, yzm);
+		if(rs == null) {
+			throw new YwbbException("无法查询到相应的业务信息，请提供有效的报备号码和验证码。");
+		}
 		return rs;
 	}
 
@@ -304,7 +307,7 @@ public class YwglService {
 		} else if (lx != null && lx == 12) {
 			this.ywglDao.updateYwbbZT(id, 5, 0);
 		} else if (lx != null && lx == 3) {
-			this.ywglDao.updateYwbbZT(id, 1, 3);
+			this.handleYwBB(id, data);
 		} else if (lx != null && lx == 4) {
 			this.handleYwSF(id,data);
 		} else if (lx != null && lx == 8) {
@@ -314,6 +317,11 @@ public class YwglService {
 		} else if (lx != null && lx == 10 ){
 			this.handleYwQY(id,data);
 		}
+	}
+	
+	private void handleYwBB(Long id, Map<String,Object> data){
+		//TODO 首先要检测报备资质
+		ywglDao.updateYwbbZT(id, 1, 3);
 	}
 
 	private void handleYwQY(Long id, Map<String, Object> data) {
