@@ -174,5 +174,15 @@ import com.gdky.restfull.service.AccountService;
 			return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
 
 		}
+	 @RequestMapping(value = "/checkzcfz", method = RequestMethod.GET) 
+	 	public  ResponseEntity<Boolean> checkZcfz( 
+	 			 
+	 			@RequestParam(value="where", required=false) String where,HttpServletRequest request)
+	 			throws Exception{ 
+		    User user =  accountService.getUserFromHeaderToken(request);
+	 		boolean obj = addcwbbService.checkZcfz(user.getJgId(), where);
+	 		return new ResponseEntity<>(obj,HttpStatus.OK); 
+	 	}
+	 
 
 }

@@ -134,6 +134,24 @@ public class AddcwbbService implements IAddcwbbService {
 			Map<String,Object> obj = addcwbbDao.getZcmxbById(id);
 			return obj;
 		}
+
+		public boolean checkZcfz(Integer jgId, String where) {
+			// TODO Auto-generated method stub
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			if (where != null) {
+				try {
+					where = java.net.URLDecoder.decode(where, "UTF-8");
+					ObjectMapper mapper = new ObjectMapper();
+					map = mapper.readValue(where,
+							new TypeReference<Map<String, Object>>() {
+							});
+				} catch (Exception e) {
+				}
+			}
+			
+			boolean rs = addcwbbDao.checkZcfzb(jgId, map);
+			return rs;
+		}
 	
 	
 

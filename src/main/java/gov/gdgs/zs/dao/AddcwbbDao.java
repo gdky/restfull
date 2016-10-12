@@ -323,5 +323,24 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
+	
+	public boolean checkZcfzb(Integer jgId, Map where){
+		String nd=(String) where.get("nd");
+		String  timevalue=(String) where.get("timevalue");
+		String sql="select a.nd,a.TIMEVALUE from zs_cwbb_zcfzgd a where a.JG_ID=? and a.nd=? and a.timevalue=?";
+		List<Map<String, Object>> rs = this.jdbcTemplate.queryForList(sql.toString(),new Object[]{jgId,nd,timevalue});
+		
+		// Map<String, Object> ob = new HashMap<>();
+		// ob.put("data", rs);
+      if(rs.size()>0){
+    	  return true;
+    	  }
+      else return false;
+		
+		
+		
+		
+	}
+	
 
 }
