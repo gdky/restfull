@@ -225,7 +225,7 @@ public class ClientsdsbController {
 	@RequestMapping(value = "/client /swsjbqk", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getSwsjbb(
 			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value = "pagesize", required = true) int pageSize,
 			@RequestParam(value = "where", required = false) String where)
 			throws Exception {
 		User user = accountService.getUserFromHeaderToken(request);
