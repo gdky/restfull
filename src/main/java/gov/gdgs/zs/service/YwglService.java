@@ -113,7 +113,7 @@ public class YwglService {
 
 	public Map<String, Object> getYwbbMiscByJg(String hashId) {
 		Long id = HashIdUtil.decode(hashId);
-		List<Map<String, Object>> zysws = ywglDao.getYwbbMiscByJg(id);
+		List<Map<String, Object>> zysws = ywglDao.getZyswsByJg(id);
 		Map<String, Object> jgxx = swsDao.swsxx(id.intValue());
 
 		HashMap<String, Object> obj = new HashMap<String, Object>();
@@ -307,7 +307,7 @@ public class YwglService {
 		} else if (lx != null && lx == 12) {
 			this.ywglDao.updateYwbbZT(id, 5, 0);
 		} else if (lx != null && lx == 3) {
-			this.ywglDao.updateYwbbZT(id, 1, 3);
+			this.handleYwBB(id, data);
 		} else if (lx != null && lx == 4) {
 			this.handleYwSF(id,data);
 		} else if (lx != null && lx == 8) {
@@ -317,6 +317,11 @@ public class YwglService {
 		} else if (lx != null && lx == 10 ){
 			this.handleYwQY(id,data);
 		}
+	}
+	
+	private void handleYwBB(Long id, Map<String,Object> data){
+		//TODO 首先要检测报备资质
+		ywglDao.updateYwbbZT(id, 1, 3);
 	}
 
 	private void handleYwQY(Long id, Map<String, Object> data) {
