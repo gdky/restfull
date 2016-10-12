@@ -376,4 +376,90 @@ public class SWSDao extends BaseDao{
 					}
 				});
 	}
+
+	public List<Map<String, Object>> getCzrxx(Long jgId) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select @rownum:=@rownum+1 as id, r.xming,if(r.XB_DM=1 ,'男','女')as xb,z.zyzgzsbh,z.zyzsbh,xl.MC as xl,zw.MC as zw ");
+		sb.append(" from zs_zysws z , zs_jg j , zs_ryjbxx r,dm_xl xl,dm_zw zw,(SELECT @rownum:=0) tmp ");
+		sb.append(" where z.JG_ID = j.ID ");
+		sb.append(" and r.ID = z.RY_ID ");
+		sb.append(" and r.XL_DM = xl.ID ");
+		sb.append(" and z.ZW_DM = zw.ID ");
+		sb.append(" and j.id = ? ");
+		sb.append(" and z.CZR_DM = 1 ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId});
+		return ls;
+	}
+
+	public List<Map<String, Object>> getFqrxx(Long jgId) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select @rownum:=@rownum+1 as id, r.xming,if(r.XB_DM=1 ,'男','女')as xb,z.zyzgzsbh,z.zyzsbh,xl.MC as xl,zw.MC as zw ");
+		sb.append(" from zs_zysws z , zs_jg j , zs_ryjbxx r,dm_xl xl,dm_zw zw,(SELECT @rownum:=0) tmp ");
+		sb.append(" where z.JG_ID = j.ID ");
+		sb.append(" and r.ID = z.RY_ID ");
+		sb.append(" and r.XL_DM = xl.ID ");
+		sb.append(" and z.ZW_DM = zw.ID ");
+		sb.append(" and j.id = ? ");
+		sb.append(" and z.FQR_DM = 1 ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId});
+		return ls;
+	}
+
+	public Map<String, Object> getSumZysws(Long jgId, int page, int pagesize) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT sql_calc_found_rows  @rownum:=@rownum+1 as id ,r.xming,xb.MC AS xb, YEAR(FROM_DAYS(DATEDIFF(NOW(),r.SRI))) AS age, xl.mc AS xl,  ");
+		sb.append(" z.cze , concat(round((z.cze/j.zczj)*100,2),'%')  as bl ");
+		sb.append(" FROM zs_zysws z, zs_ryjbxx r, dm_xb xb, dm_xl xl, zs_jg j,(SELECT @rownum:=0) tmp ");
+		sb.append(" WHERE z.JG_ID = ?  ");
+		sb.append(" AND z.JG_ID = j.ID  ");
+		sb.append(" AND z.RY_ID = r.ID  ");
+		sb.append(" AND r.XB_DM = xb.ID  ");
+		sb.append(" AND r.XL_DM = xl.ID  ");
+		sb.append(" AND z.yxbz = 1  ");
+		sb.append(" AND z.ZYZT_DM = 1 ");
+		sb.append(" limit ?,? ");
+		
+		int startIndex = pagesize * (page - 1);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId,startIndex,pagesize});
+		
+		String sql = "select FOUND_ROWS()";
+		Integer total = jdbcTemplate.queryForObject(sql,  Integer.class);
+		
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+		
+		return obj;
+	}
+	
+	public Map<String, Object> getSumCyry(Long jgId, int page, int pagesize) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT sql_calc_found_rows  @rownum:=@rownum+1 as id , r.xming,xb.MC AS xb, YEAR(FROM_DAYS(DATEDIFF(NOW(),r.SRI))) AS age, xl.mc AS xl,  ");
+		sb.append(" z.zgxlzymc,z.xzsngzgw ");
+		sb.append(" FROM zs_cyry z, zs_ryjbxx r, dm_xb xb, dm_xl xl, zs_jg j,(SELECT @rownum:=0) tmp ");
+		sb.append(" WHERE z.JG_ID = ? ");
+		sb.append(" AND z.JG_ID = j.ID  ");
+		sb.append(" AND z.RY_ID = r.ID  ");
+		sb.append(" AND r.XB_DM = xb.ID  ");
+		sb.append(" AND r.XL_DM = xl.ID  ");
+		sb.append(" AND z.yxbz = 1  ");
+		sb.append(" and z.CYRYZT_DM = 1 ");
+		sb.append(" limit ?,? ");
+		
+		int startIndex = pagesize * (page - 1);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{jgId,startIndex,pagesize});
+		
+		String sql = "select FOUND_ROWS()";
+		Integer total = jdbcTemplate.queryForObject(sql,  Integer.class);
+		
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+		
+		return obj;
+	}
 }

@@ -357,7 +357,7 @@ public class RyglDao extends BaseDao{
 		sb.append("		d.MC AS cs,");
 		sb.append("		b.MC as xb,");
 		sb.append("		e.MC AS mz,");
-		sb.append("		DATE_FORMAT(h.sri,'%Y-%m-%d') AS csrq, ");
+		sb.append("		DATE_FORMAT(h.sri,'%Y-%m-%d') AS csny, ");
 		sb.append("		c.MC as xl,");
 		sb.append("		h.sfzh,");
 		sb.append("		f.MC AS zzmm,");
@@ -469,7 +469,7 @@ public class RyglDao extends BaseDao{
 		sb.append("		f.MC as cs,");
 		sb.append("		d.MC as xb,");
 		sb.append("		g.MC as mz,");
-		sb.append("		date_format(b.SRI,'%Y-%m-%d') as sri,");
+		sb.append("		date_format(b.SRI,'%Y-%m-%d') as csny,");
 		sb.append("		e.MC as xl,");
 		sb.append("		b.sfzh,");
 		sb.append("		h.MC as zzmm,");

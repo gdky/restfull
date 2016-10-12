@@ -151,6 +151,16 @@ public class SPservice {
 				this.spDao.cydrzssq(ptxm);
 			case "cyrybgsq"://从业信息变更
 				this.spDao.cyrybgsq(ptxm);
+			case "cyrybasq"://从业备案申请
+				this.spDao.cyrybasq(ptxm);
+			case "cyzxsq"://从业注销申请
+				this.spDao.cyzxsq(ptxm);
+			case "cydcsq"://从业调出申请
+				this.spDao.cydcsq(ptxm);
+			case "cyzcsq"://从业转出申请
+				this.spDao.cyzcsq(ptxm);
+			case "cyzrfssq"://从业转入分所
+				this.spDao.cyzrfssq(ptxm);
 		 }
 	}
 

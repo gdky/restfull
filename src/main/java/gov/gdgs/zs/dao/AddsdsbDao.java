@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository;
 import com.gdky.restfull.dao.BaseJdbcDao;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.service.AccountService;
+import com.gdky.restfull.utils.HashIdUtil;
 
 @Repository
 public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
@@ -111,8 +112,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 	}
 	
 	public Map<String, Object> getLrze(String jgid) {
-		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
-		int gid = (int)hashids.decode(jgid)[0];
+		Long gid = HashIdUtil.decode(jgid);
 		String sql = "select b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_cwbb_lrgd a,zs_jg b where jg_id=?  and timevalue='1' and a.JG_ID=b.ID and nd=( select max(nd) as mnd from zs_cwbb_lrgd where  timevalue='1')";
 		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,gid);
 		Map<String,Object> ob = new HashMap<>();

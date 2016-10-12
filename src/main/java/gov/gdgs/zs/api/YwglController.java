@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.YwglService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.entity.ResponseMessage;
+import com.gdky.restfull.entity.User;
 import com.gdky.restfull.service.AccountService;
 
 /**
@@ -34,9 +36,10 @@ public class YwglController {
 
 	@Resource
 	private YwglService ywglService;
-
-	@Resource
+	
+	@Autowired
 	private AccountService accountService;
+
 
 	/**
 	 * 获取有效的业务报备
@@ -119,10 +122,10 @@ public class YwglController {
 	/*
 	 * 客户端用业务报备查询
 	 */
-	@RequestMapping(value = "/jg/{hashId}/yw", method = RequestMethod.GET)
+	@RequestMapping(value = "/jgyw/{hashId}", method = RequestMethod.GET)
 	public ResponseEntity<?> getYwbbByJg(@PathVariable("hashId") String hashId,
 			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value = "pagesize", required = true) int pageSize,
 			@RequestParam(value = "where", required = false) String where) {
 		Map<String, Object> obj = ywglService.getYwbbByJg(hashId, page,
 				pageSize, where);
@@ -143,11 +146,13 @@ public class YwglController {
 	 * 客户端提交业务报备信息
 	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> addYwbb(
-			@RequestBody Map<String, Object> values) {
-
-		Map<String, Object> obj = ywglService.addYwbb(values);
-		return new ResponseEntity<>(obj, HttpStatus.CREATED);
+	public  ResponseEntity<Map<String,Object>> addYwbb(
+			@RequestBody Map<String,Object> values,
+			HttpServletRequest request){ 
+		
+		User user =  accountService.getUserFromHeaderToken(request);
+		Map<String,Object> obj = ywglService.addYwbb(values,user);
+		return new ResponseEntity<>(obj,HttpStatus.CREATED);
 	}
 	
 	/**
@@ -164,6 +169,7 @@ public class YwglController {
 		Map<String, Object> map = ywglService.getGrywtj(jgid,where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
+
 
 	/**
 	 * 客户端-事务所业务统计
