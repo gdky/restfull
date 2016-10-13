@@ -130,11 +130,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		// if (log.isDebugEnabled()) {
 		// log.warn(ex.getMessage());
 		// }
-		log.error(ex.getMessage());
+		log.error(ex.toString());
 		ex.printStackTrace();
 		return new ResponseEntity<>(new ResponseMessage(
-				ResponseMessage.Type.danger, ex.getMessage()),
-				HttpStatus.BAD_REQUEST);
+				ResponseMessage.Type.danger, ex.toString()),
+				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	/*
