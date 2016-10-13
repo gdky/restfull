@@ -1,5 +1,8 @@
 package gov.gdgs.zs.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.dao.CheckingDao;
 
@@ -7,6 +10,9 @@ import javax.annotation.Resource;
 
 import org.hashids.Hashids;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class CheckingService {
@@ -61,5 +67,13 @@ public class CheckingService {
 	//检查身份证身份证是否已存在
 	public boolean checkSFZH(String sfzh){
 		return this.chDao.checkHadSFZH(sfzh);
+	}
+	//检查是否可以提交报表
+	public Object checkIfTJBB(String bblx,Integer jgid,String timevalue,String nd){
+		switch (bblx) {
+		case "zcmxb":
+			return chDao.checkIfZCMXB(jgid,timevalue,nd);
+		}
+		return null;
 	}
 }

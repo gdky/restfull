@@ -113,4 +113,22 @@ public class CheckingDao extends BaseJdbcDao{
 		}
 		return true;
 	}
+	/**
+	 * 判断是否可创建支出明细表
+	 * @param sfzh
+	 * @return false--存在同时期表单
+	 */
+	public boolean checkIfZCMXB(Integer jgid,String timevalue,String nd){
+		String jssj="";
+		if(timevalue.equals("0")){
+			jssj=nd+"-06-30";
+		}else if(timevalue.equals("1")){
+			jssj=nd+"-12-31";
+		};
+		List<Map<String, Object>> qq = this.jdbcTemplate.queryForList("select id from zs_cwbb_zcmx where JG_ID=? and ND=? and jssj=?",new Object[]{jgid,nd,jssj});
+		if(this.jdbcTemplate.queryForList("select id from zs_cwbb_zcmx where JG_ID=? and ND=? and jssj=?",new Object[]{jgid,nd,jssj}).size()!=0){
+			return false;
+		}
+		return true;
+	}
 }
