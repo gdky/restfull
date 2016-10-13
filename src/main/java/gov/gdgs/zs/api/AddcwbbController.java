@@ -298,7 +298,6 @@ public class AddcwbbController {
 
 	/**
 	 * 校验利润表是否存在
-	 * 
 	 * @param where
 	 * @param request
 	 * @return
@@ -310,6 +309,38 @@ public class AddcwbbController {
 		String jgid = accountService.getUserFromHeaderToken(request).getJgId()
 				.toString();
 		Map<String, Object> obj = addlrbService.checkLrb(jgid, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	/**
+	 * 校验利润分配表是否存在
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkLrfpb", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> checkLrfpb(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+		String jgid = accountService.getUserFromHeaderToken(request).getJgId()
+				.toString();
+		Map<String, Object> obj = addlrbService.checkLrfpb(jgid, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	/**
+	 * 获取利润分配表中机构信息
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/lrfpb/getJgxx", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getLrfpbJgxx(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+		String jgid = accountService.getUserFromHeaderToken(request).getJgId()
+				.toString();
+		Map<String, Object> obj = addlrbService.getLrfpbJgxx(jgid, where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
