@@ -10,13 +10,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import gov.gdgs.zs.configuration.Config;
-
-
-
-
-
-
-
 import gov.gdgs.zs.untils.Condition;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -26,13 +19,11 @@ import org.springframework.stereotype.Repository;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
 
-
-
 @Repository
-public class LrbDao extends BaseJdbcDao implements ILrbDao{
-	 
+public class LrbDao extends BaseJdbcDao implements ILrbDao {
+
 	@Override
-	public String addLrb( Map <String,Object> obj){
+	public String addLrb(Map<String, Object> obj) {
 		String uuid = UUID.randomUUID().toString().replace("-", "");
 		obj.put("id", uuid);
 		final StringBuffer sb = new StringBuffer("insert into "
@@ -47,17 +38,17 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 		sb.append("  :csczsy,:csczsy1,:zhss,:zhss1,:zcbglr,:zcbglr1,:gjbglr,:gjbglr1,:zwczss,:zwczss1,:qt,:qt1,:dlswdjhs,:dlswdjsr,");
 		sb.append("  :dlswdjsr1,:dlnssbhs,:dlnssbsr,:dlnssbsr1,:dlnsschs,:dlnsscsr,:dlnsscsr1,:dljzjzhs,:dljzjzsr,:dljzjzsr1,:spgwzxhs,");
 		sb.append("  :spgwzxsr,:spgwzxsr1,:dlsqswfyhs,:dlsqswfysr,:dlsqswfysr1,:pxhs,:pxsr,:pxsr1,:qtzyywsrhs,:qtzyywsr,:qtzyywsr1,:sz,:zgkj,:zbr,:ztbj,now())");
-		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
-		int count=named.update(sb.toString(), obj);
-		if(count==0){
-		return null;
-	}else {
-		return uuid;
-	}
+		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
+		int count = named.update(sb.toString(), obj);
+		if (count == 0) {
+			return null;
+		} else {
+			return uuid;
+		}
 	}
 
-
-	public Map<String, Object> getlrb(int page, int pageSize,int Jgid,
+	public Map<String, Object> getlrb(int page, int pageSize, int Jgid,
 			Map<String, Object> where) {
 
 		Condition condition = new Condition();
@@ -79,7 +70,7 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 		int startIndex = pageSize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
 		params.add(0, pageSize * (page - 1));
-		params.add(Jgid);	
+		params.add(Jgid);
 		params.add(startIndex);
 		params.add(pageSize);
 
@@ -100,15 +91,19 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 		obj.put("jg_id", Jgid);
 		return obj;
 	}
+
 	public Map<String, Object> getLrbById(String id) {
-		String sql = "select b.DWMC,CASE a.TIMEVALUE WHEN 0 THEN '半年' WHEN 1 THEN '全年' ELSE NULL END AS TIMEVALUE,a.* from "+Config.PROJECT_SCHEMA+"zs_cwbb_lrgd a, zs_jg b where a.jg_id = b.id and a.id = ?";
-		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
+		String sql = "select b.DWMC,CASE a.TIMEVALUE WHEN 0 THEN '半年' WHEN 1 THEN '全年' ELSE NULL END AS TIMEVALUE,a.* from "
+				+ Config.PROJECT_SCHEMA
+				+ "zs_cwbb_lrgd a, zs_jg b where a.jg_id = b.id and a.id = ?";
+		Map<String, Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
+
 	@Override
-	public void updateLrb(Map <String,Object> obj) {
-		 StringBuffer sb = new StringBuffer("update "
-				+ Config.PROJECT_SCHEMA + "zs_cwbb_lrgd ");
+	public void updateLrb(Map<String, Object> obj) {
+		StringBuffer sb = new StringBuffer("update " + Config.PROJECT_SCHEMA
+				+ "zs_cwbb_lrgd ");
 		sb.append(" set jg_id=:jg_id,use_id=:use_id,nd=:nd,timevalue=:timevalue,zgywsr=:zgywsr,zgywsr1=:zgywsr1,zgywcb=:zgywcb,zgywcb1=:zgywcb1,zgywsj=:zgywsj,zgywsj1=:zgywsj1,");
 		sb.append(" zgwylr=:zgwylr,zgwylr1=:zgwylr1,qtywlr=:qtywlr,qtywlr1=:qtywlr1,yyfy=:yyfy,yyfy1=:yyfy1,glfy=:glfy,glfy1=:glfy1,");
 		sb.append(" cwfy=:cwfy,cwfy1=:cwfy1,yylr=:yylr,yylr1=:yylr1,tzsy=:tzsy,tzsy1=:tzsy1,btsr=:btsr,btsr1=:btsr1,yywsr=:yywsr,yywsr1=:yywsr1,");
@@ -119,13 +114,13 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 		sb.append(" dlnsscsr1=:dlnsscsr1,dljzjzhs=:dljzjzhs,dljzjzsr=:dljzjzsr,dljzjzsr1=:dljzjzsr1,spgwzxhs=:spgwzxhs,");
 		sb.append(" spgwzxsr=:spgwzxsr,spgwzxsr1=:spgwzxsr1,dlsqswfyhs=:dlsqswfyhs,dlsqswfysr=:dlsqswfysr,dlsqswfysr1=:dlsqswfysr1,pxhs=:pxhs,pxsr=:pxsr,");
 		sb.append(" pxsr1=:pxsr1,qtzyywsrhs=:qtzyywsrhs,qtzyywsr=:qtzyywsr,qtzyywsr1=:qtzyywsr1,sz=:sz,zgkj=:zgkj,zbr=:zbr,ztbj=:ztbj,tjrq=now() where id=:id");
-		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
-		
-	
+
 	}
-	
-	public Map<String, Object> getLrfpb(int page, int pageSize,int Jgid,
+
+	public Map<String, Object> getLrfpb(int page, int pageSize, int Jgid,
 			Map<String, Object> where) {
 
 		Condition condition = new Condition();
@@ -166,72 +161,112 @@ public class LrbDao extends BaseJdbcDao implements ILrbDao{
 		obj.put("jg_id", Jgid);
 		return obj;
 	}
-	
+
 	public Map<String, Object> getLrfpbById(String id) {
-		String sql = "select b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_cwbb_lrfp a, zs_jg b where a.jg_id = b.id and a.id = ?";
-		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
+		String sql = "select b.DWMC,a.* from " + Config.PROJECT_SCHEMA
+				+ "zs_cwbb_lrfp a, zs_jg b where a.jg_id = b.id and a.id = ?";
+		Map<String, Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
-  
+
 	@Override
-	public String addLrfpb( Map <String,Object> obj){
+	public String addLrfpb(Map<String, Object> obj) {
 		String uuid = UUID.randomUUID().toString().replace("-", "");
 		obj.put("id", uuid);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_lrfp ");
-		sb.append("(id,jg_id,use_id,nd,dwfzr,ckfzr,fhr,zbr,jlr,jlrupyear,ncwfplr,ncwfplrupyear,qtzr,qtzrupyear,");	
+		sb.append("(id,jg_id,use_id,nd,dwfzr,ckfzr,fhr,zbr,jlr,jlrupyear,ncwfplr,ncwfplrupyear,qtzr,qtzrupyear,");
 		sb.append(" kfplr,kfplrupyear,yygj,yygjupyear,jlfljj,jlfljjupyear,cbjj,cbjjupyear,qyfzjj,qyfzjjupyear,");
-		sb.append(" lrghtz,lrghtzupyear,tzzfplr,tzzfplrupyear,yxgl,yxglupyear,ptgl,ptglupyear,zhptgl,zhptglupyear,wfplr,wfplrupyear,ztbj)");
+		sb.append(" lrghtz,lrghtzupyear,tzzfplr,tzzfplrupyear,yxgl,yxglupyear,ptgl,ptglupyear,zhptgl,zhptglupyear,wfplr,wfplrupyear,ztbj,tjrq)");
 		sb.append("values (:id,:jg_id,:use_id,:nd,:dwfzr,:ckfzr,:fhr,:zbr,:jlr,:jlrupyear,:ncwfplr,:ncwfplrupyear,:qtzr,:qtzrupyear,");
 		sb.append(" :kfplr,:kfplrupyear,:yygj,:yygjupyear,:jlfljj,:jlfljjupyear,:cbjj,:cbjjupyear,:qyfzjj,:qyfzjjupyear,");
 		sb.append(" :lrghtz,:lrghtzupyear,:tzzfplr,:tzzfplrupyear,:yxgl,:yxglupyear,:ptgl,:ptglupyear,");
-		sb.append(" :zhptgl,:zhptglupyear,:wfplr,:wfplrupyear,:ztbj)");
-		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
-		int count=named.update(sb.toString(), obj);
-		if(count==0){
-		return null;
-	}else {
-		return uuid;
+		sb.append(" :zhptgl,:zhptglupyear,:wfplr,:wfplrupyear,:ztbj,now())");
+		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
+		int count = named.update(sb.toString(), obj);
+		if (count == 0) {
+			return null;
+		} else {
+			return uuid;
+		}
 	}
-	}
-	
+
 	@Override
-	public void updateLrfpb(Map <String,Object> obj) {
-		 StringBuffer sb = new StringBuffer("update "
-				+ Config.PROJECT_SCHEMA + "zs_cwbb_lrfp ");
+	public void updateLrfpb(Map<String, Object> obj) {
+		StringBuffer sb = new StringBuffer("update " + Config.PROJECT_SCHEMA
+				+ "zs_cwbb_lrfp ");
 		sb.append(" set jg_id=:jg_id,use_id=:use_id,nd=:nd,dwfzr=:dwfzr,ckfzr=:ckfzr,fhr=:fhr,zbr=:zbr,jlr=:jlr,jlrupyear=:jlrupyear,");
 		sb.append(" ncwfplr=:ncwfplr,ncwfplrupyear=:ncwfplrupyear,qtzr=:qtzr,qtzrupyear=:qtzrupyear,kfplr=:kfplr,");
 		sb.append(" kfplrupyear=:kfplrupyear,yygj=:yygj,yygjupyear=:yygjupyear,jlfljj=:jlfljj,jlfljjupyear=:jlfljjupyear,cbjj=:cbjj,");
 		sb.append(" cbjjupyear=:cbjjupyear,qyfzjj=:qyfzjj,qyfzjjupyear=:qyfzjjupyear,lrghtz=:lrghtz,lrghtzupyear=:lrghtzupyear,tzzfplr=:tzzfplr,");
 		sb.append(" tzzfplrupyear=:tzzfplrupyear,yxgl=:yxgl,yxglupyear=:yxglupyear,ptgl=:ptgl,ptglupyear=:ptglupyear,zhptgl=:zhptgl,");
-		sb.append(" zhptglupyear=:zhptglupyear,wfplr=:wfplr,wfplrupyear=:wfplrupyear,ztbj=:ztbj where id=:id");
-		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+		sb.append(" zhptglupyear=:zhptglupyear,wfplr=:wfplr,wfplrupyear=:wfplrupyear,ztbj=:ztbj,tjrq=now() where id=:id");
+		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
-		
-	
+
 	}
 
 	@Override
 	public Map<String, Object> checkLrb(String jgid, HashMap<String, Object> map) {
-		boolean result=true;
-		String sql="select l.id from zs_cwbb_lrgd l where l.JG_ID=? and l.ND=? and l.TIMEVALUE=? ";
-		if(map.get("nd")!=null&&map.get("timevalue")!=null){
-			String nd=map.get("nd").toString();
-			String timevalue=map.get("timevalue").toString();
-			List<Map<String, Object>> ls=this.jdbcTemplate.queryForList(sql,new Object[]{jgid,nd,timevalue});
-			if(ls.size()>0){
-				if(map.get("lrbid")!=null){
-					String lrbid=map.get("lrbid").toString();
-					String id=ls.get(0).get("id").toString();
-					if(!lrbid.equals(id)){
-						result=false;
+		boolean result = true;
+		String sql = "select l.id from zs_cwbb_lrgd l where l.JG_ID=? and l.ND=? and l.TIMEVALUE=? ";
+		if (map.get("nd") != null && map.get("timevalue") != null) {
+			String nd = map.get("nd").toString();
+			String timevalue = map.get("timevalue").toString();
+			List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
+					new Object[] { jgid, nd, timevalue });
+			if (ls.size() > 0) {
+				if (map.get("lrbid") != null) {
+					String lrbid = map.get("lrbid").toString();
+					String id = ls.get(0).get("id").toString();
+					if (!lrbid.equals(id)) {
+						result = false;
 					}
-				}else{
-					result=false;
+				} else {
+					result = false;
 				}
 			}
 		}
-		Map<String,Object> ob=new HashMap<>();
+		Map<String, Object> ob = new HashMap<>();
+		ob.put("result", result);
+		return ob;
+	}
+
+	@Override
+	public Map<String, Object> getLrfpbJgxx(String jgid,
+			HashMap<String, Object> map) {
+		String sql = "select j.DWMC from zs_jg j where j.ID=? ";
+		Map<String, Object> jgxx = this.jdbcTemplate.queryForMap(sql,
+				new Object[] { jgid });
+		Map<String, Object> ob = new HashMap<>();
+		ob.put("data", jgxx);
+		return ob;
+	}
+
+	@Override
+	public Map<String, Object> checkLrfpb(String jgid,
+			HashMap<String, Object> map) {
+		boolean result = true;
+		String sql = "select l.id from zs_cwbb_lrfp l where l.JG_ID=? and l.ND=? ";
+		if (map.get("nd") != null) {
+			String nd = map.get("nd").toString();
+			List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
+					new Object[] { jgid, nd });
+			if (ls.size() > 0) {
+				if (map.get("lrfpbid") != null) {
+					String lrfpbid = map.get("lrfpbid").toString();
+					String id = ls.get(0).get("id").toString();
+					if (!lrfpbid.equals(id)) {
+						result = false;
+					}
+				} else {
+					result = false;
+				}
+			}
+		}
+		Map<String, Object> ob = new HashMap<>();
 		ob.put("result", result);
 		return ob;
 	}
