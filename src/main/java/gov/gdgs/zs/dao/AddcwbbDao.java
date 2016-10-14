@@ -124,7 +124,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		obj.put("id", uuid);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcfzgd ");	
-		sb.append("  ( id,jg_id,use_id,ztbj,kssj,jssj,tjsj,nd,timevalue,ldzc_hj,ldzc_hbzj,ldzc_dqtz,ldzc_yspj,ldzc_ysgl,ldzc_yslx,ldzc_yszk,ldzc_qtys,ldzc_yfzk,ldzc_ysbt,");	
+		sb.append("  ( id,jg_id,use_id,ztbj,tjsj,nd,timevalue,ldzc_hj,ldzc_hbzj,ldzc_dqtz,ldzc_yspj,ldzc_ysgl,ldzc_yslx,ldzc_yszk,ldzc_qtys,ldzc_yfzk,ldzc_ysbt,");	
 		sb.append(" ldzc_ch,ldzc_dtfy,ldzc_dqzj,ldzc_qtldzc,cqtz_gq,cqtz_zq,cqtz_hj,gdzc_yj,gdzc_ljzj,gdzc_jz,gdzc_jzzb,gdzc_je,gdzc_gcwz,gdzc_zjgc,gdzc_ql,gdzc_hj,");
 		sb.append(" wxqt_wxzc,wxqt_cqdt,wxqt_qtcq,wxqt_hj,ydsx_skjx,zczj,ldfz_dqjk,ldfz_yfpj,ldfz_yfzk,ldfz_yszk,ldfz_yfgz,ldfz_yffl,ldfz_yfgl,ldfz_yjsj,");
 		sb.append(" ldfz_qtyj,ldfz_qtyf,ldfz_ytfy,ldfz_yjfz,ldfz_dqfz,ldfz_qtfz,ldfz_hj,cqfz_cqjk,cqfz_yfzq,cqfz_cqyf,cqfz_zxyf,cqfz_zyfxjj,cqfz_qtfz,cqfz_hj,");
@@ -134,7 +134,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		sb.append(" wxqt_wxzc_nc,wxqt_cqdt_nc,wxqt_qtcq_nc,wxqt_hj_nc,ydsx_skjx_nc,zczj_nc,ldfz_dqjk_nc,ldfz_yfpj_nc,ldfz_yfzk_nc,ldfz_yszk_nc,ldfz_yfgz_nc,ldfz_yffl_nc,");
 		sb.append(" ldfz_yfgl_nc,ldfz_yjsj_nc,ldfz_qtyj_nc,ldfz_qtyf_nc,ldfz_ytfy_nc,ldfz_yjfz_nc,ldfz_dqfz_nc,ldfz_qtfz_nc,ldfz_hj_nc,cqfz_cqjk_nc,cqfz_yfzq_nc,cqfz_cqyf_nc,cqfz_zxyf_nc,");
 		sb.append(" cqfz_zyfxjj_nc,cqfz_qtfz_nc,cqfz_hj_nc,dysx_dyskdx_nc,dysx_fzhj_nc,syzqy_sszbje_nc,syzqy_yhtz_nc,syzqy_sszb_nc,syzqy_zbgj_nc,syzqy_yygj_nc,syzqy_wfplr_nc,syzqy_hj_nc,fzsyzqy_hj_nc)");
-		sb.append("values ( :id,:jg_id,:use_id,:ztbj,:kssj,:jssj,sysdate(),:nd,:timevalue,:ldzc_hj,:ldzc_hbzj,:ldzc_dqtz,:ldzc_yspj,:ldzc_ysgl,:ldzc_yslx,:ldzc_yszk,:ldzc_qtys,:ldzc_yfzk,:ldzc_ysbt,");	
+		sb.append("values ( :id,:jg_id,:use_id,:ztbj,sysdate(),:nd,:timevalue,:ldzc_hj,:ldzc_hbzj,:ldzc_dqtz,:ldzc_yspj,:ldzc_ysgl,:ldzc_yslx,:ldzc_yszk,:ldzc_qtys,:ldzc_yfzk,:ldzc_ysbt,");	
 		sb.append(" :ldzc_ch,:ldzc_dtfy,:ldzc_dqzj,:ldzc_qtldzc,:cqtz_gq,:cqtz_zq,:cqtz_hj,:gdzc_yj,:gdzc_ljzj,:gdzc_jz,:gdzc_jzzb,:gdzc_je,:gdzc_gcwz,:gdzc_zjgc,:gdzc_ql,:gdzc_hj,");
 		sb.append(" :wxqt_wxzc,:wxqt_cqdt,:wxqt_qtcq,:wxqt_hj,:ydsx_skjx,:zczj,:ldfz_dqjk,:ldfz_yfpj,:ldfz_yfzk,:ldfz_yszk,:ldfz_yfgz,:ldfz_yffl,:ldfz_yfgl,:ldfz_yjsj,");
 		sb.append(" :ldfz_qtyj,:ldfz_qtyf,:ldfz_ytfy,:ldfz_yjfz,:ldfz_dqfz,:ldfz_qtfz,:ldfz_hj,:cqfz_cqjk,:cqfz_yfzq,:cqfz_cqyf,:cqfz_zxyf,:cqfz_zyfxjj,:cqfz_qtfz,:cqfz_hj,");
@@ -157,7 +157,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 	public void UpdateZcfzb(Map <String,Object> obj) {
 		 StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcfzgd ");
-		sb.append(" set jg_id=:jg_id,use_id=:use_id,ztbj=:ztbj,kssj=:kssj,jssj=:jssj,tjsj=sysdate(),nd=:nd,timevalue=:timevalue,ldzc_hj=:ldzc_hj,ldzc_hbzj=:ldzc_hbzj,ldzc_dqtz=:ldzc_dqtz,");		
+		sb.append(" set jg_id=:jg_id,use_id=:use_id,ztbj=:ztbj,tjsj=sysdate(),nd=:nd,timevalue=:timevalue,ldzc_hj=:ldzc_hj,ldzc_hbzj=:ldzc_hbzj,ldzc_dqtz=:ldzc_dqtz,");		
 		sb.append(" ldzc_yspj=:ldzc_yspj,ldzc_ysgl=:ldzc_ysgl,ldzc_yslx=:ldzc_yslx,ldzc_yszk=:ldzc_yszk,ldzc_qtys=:ldzc_qtys,ldzc_yfzk=:ldzc_yfzk,ldzc_ysbt=:ldzc_ysbt,");
 		sb.append(" ldzc_ch=:ldzc_ch,ldzc_dtfy=:ldzc_dtfy,ldzc_dqzj=:ldzc_dqzj,ldzc_qtldzc=:ldzc_qtldzc,cqtz_gq=:cqtz_gq,cqtz_zq=:cqtz_zq,cqtz_hj=:cqtz_hj,");
 		sb.append(" gdzc_yj=:gdzc_yj,gdzc_ljzj=:gdzc_ljzj,gdzc_jz=:gdzc_jz,gdzc_jzzb=:gdzc_jzzb,gdzc_je=:gdzc_je,gdzc_gcwz=:gdzc_gcwz,gdzc_zjgc=:gdzc_zjgc,gdzc_ql=:gdzc_ql,gdzc_hj=:gdzc_hj,");
@@ -237,12 +237,6 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 	public String AddZcmxb( Map <String,Object> obj){
 		String uuid = UUID.randomUUID().toString().replace("-", "");
 		obj.put("id", uuid);
-		obj.put("kssj",obj.get("nd")+"-01-01" );
-		if(obj.get("timevalue").equals("0")){
-			obj.put("jssj",obj.get("nd")+"-06-30" );
-		}else if(obj.get("timevalue").equals("1")){
-			obj.put("jssj",obj.get("nd")+"-12-31" );
-		};
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcmx ");	
 		sb.append("  ( id,jg_id,use_id,ztbj,kssj,jssj,tjrq,nd,zyywcb1,zyywcb,zyywsjfj1,zyywsjfj,gzfy1,gzfy,qtywzc1,qtywzc,flf1,flf,");
@@ -266,12 +260,6 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 	
 	@Override
 	public void UpdateZcmxb(Map <String,Object> obj) {
-		obj.put("kssj",obj.get("nd")+"-01-01" );
-		if(obj.get("timevalue").equals("0")){
-			obj.put("jssj",obj.get("nd")+"-06-30" );
-		}else if(obj.get("timevalue").equals("1")){
-			obj.put("jssj",obj.get("nd")+"-12-31" );
-		};
 		 StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcmx ");
 		sb.append(" set jg_id=:jg_id,use_id=:use_id,ztbj=:ztbj,kssj=:kssj,jssj=:jssj,tjrq=sysdate(),nd=:nd,zyywcb1=:zyywcb1,zyywcb=:zyywcb,zyywsjfj1=:zyywsjfj1,zyywsjfj=:zyywsjfj,");		
@@ -297,11 +285,11 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM    ( SELECT b.DWMC,DATE_FORMAT(a.KSSJ,'%Y-%m-%d') AS A,DATE_FORMAT(a.JSSJ,'%Y-%m-%d') AS B,a.*,");
-		sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' ELSE NULL END AS zt");
+		sb.append(" FROM    ( SELECT a.id,b.DWMC,a.nd,ZYYWCB,");
+		sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' ELSE NULL END AS ZTBJ");
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_cwbb_zcmx a,zs_jg b,(SELECT @rownum:=?) temp");
-		sb.append(condition.getSql());
+		sb.append(condition.getSql());// 相当元 where b.DWMC like '%%'
 		sb.append(" AND a.JG_ID=b.ID  and a.JG_ID=? ORDER BY a.nd DESC ) AS t");
 		sb.append("    LIMIT ?, ? ");
 		// 装嵌传值数组
@@ -335,5 +323,39 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
+	
+	public boolean checkZcfzb(Integer jgId, Map where){
+		String nd=(String) where.get("nd");
+		String  timevalue=(String) where.get("timevalue");
+		String sql="select a.id, a.nd,a.TIMEVALUE from zs_cwbb_zcfzgd a where a.JG_ID=? and a.nd=? and a.timevalue=?";
+		List<Map<String, Object>> rs = this.jdbcTemplate.queryForList(sql.toString(),new Object[]{jgId,nd,timevalue});
+		
+		// Map<String, Object> ob = new HashMap<>();
+		// ob.put("data", rs);
+      if(rs.size()>0){
+    	  
+    	  //如果sbid是null，说明前台没有传过来，此时进行的是添加操作
+    	  if(null==where.get("sbid")){}
+    	  //不是空，说明进行的是编辑操作.true不能再编辑
+    	  else{
+    		  String sbid = (String) where.get("sbid");
+    		  Integer ztbj=(Integer) where.get("ztbj");
+			  String dbid = (String) rs.get(0).get("ID");
+			  //前台传过来的id和后台id作比较，如果是相同的话说明是原条记录，原条记录可以编辑，返回false；不同的话就不是原条记录，不能编辑
+			  if(!sbid.equals(dbid)){
+				  return true;
+				  
+			  }
+			  else return false;
+			  }
+    	  return true;
+    	  }
+      else return false;
+		
+		
+		
+		
+	}
+	
 
 }

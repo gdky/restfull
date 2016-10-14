@@ -45,7 +45,7 @@ public class YhdljlbDao extends BaseDao {
      	obj.put("total", total);
 		obj.put("pageSize", 1);
 		obj.put("current", 1);
-        System.out.print(obj);
+     
 		return obj;
 		
 		
