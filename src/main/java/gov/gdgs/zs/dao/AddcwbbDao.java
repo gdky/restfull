@@ -157,7 +157,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 	public void UpdateZcfzb(Map <String,Object> obj) {
 		 StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcfzgd ");
-		sb.append(" set jg_id=:jg_id,use_id=:use_id,ztbj=:ztbj,kssj=:kssj,jssj=:jssj,tjsj=sysdate(),nd=:nd,timevalue=:timevalue,ldzc_hj=:ldzc_hj,ldzc_hbzj=:ldzc_hbzj,ldzc_dqtz=:ldzc_dqtz,");		
+		sb.append(" set jg_id=:jg_id,use_id=:use_id,ztbj=:ztbj,tjsj=sysdate(),nd=:nd,timevalue=:timevalue,ldzc_hj=:ldzc_hj,ldzc_hbzj=:ldzc_hbzj,ldzc_dqtz=:ldzc_dqtz,");		
 		sb.append(" ldzc_yspj=:ldzc_yspj,ldzc_ysgl=:ldzc_ysgl,ldzc_yslx=:ldzc_yslx,ldzc_yszk=:ldzc_yszk,ldzc_qtys=:ldzc_qtys,ldzc_yfzk=:ldzc_yfzk,ldzc_ysbt=:ldzc_ysbt,");
 		sb.append(" ldzc_ch=:ldzc_ch,ldzc_dtfy=:ldzc_dtfy,ldzc_dqzj=:ldzc_dqzj,ldzc_qtldzc=:ldzc_qtldzc,cqtz_gq=:cqtz_gq,cqtz_zq=:cqtz_zq,cqtz_hj=:cqtz_hj,");
 		sb.append(" gdzc_yj=:gdzc_yj,gdzc_ljzj=:gdzc_ljzj,gdzc_jz=:gdzc_jz,gdzc_jzzb=:gdzc_jzzb,gdzc_je=:gdzc_je,gdzc_gcwz=:gdzc_gcwz,gdzc_zjgc=:gdzc_zjgc,gdzc_ql=:gdzc_ql,gdzc_hj=:gdzc_hj,");
@@ -327,12 +327,27 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 	public boolean checkZcfzb(Integer jgId, Map where){
 		String nd=(String) where.get("nd");
 		String  timevalue=(String) where.get("timevalue");
-		String sql="select a.nd,a.TIMEVALUE from zs_cwbb_zcfzgd a where a.JG_ID=? and a.nd=? and a.timevalue=?";
+		String sql="select a.id, a.nd,a.TIMEVALUE from zs_cwbb_zcfzgd a where a.JG_ID=? and a.nd=? and a.timevalue=?";
 		List<Map<String, Object>> rs = this.jdbcTemplate.queryForList(sql.toString(),new Object[]{jgId,nd,timevalue});
 		
 		// Map<String, Object> ob = new HashMap<>();
 		// ob.put("data", rs);
       if(rs.size()>0){
+    	  
+    	  //如果sbid是null，说明前台没有传过来，此时进行的是添加操作
+    	  if(null==where.get("sbid")){}
+    	  //不是空，说明进行的是编辑操作.true不能再编辑
+    	  else{
+    		  String sbid = (String) where.get("sbid");
+    		  Integer ztbj=(Integer) where.get("ztbj");
+			  String dbid = (String) rs.get(0).get("ID");
+			  //前台传过来的id和后台id作比较，如果是相同的话说明是原条记录，原条记录可以编辑；不同的话就不是原条记录，不能编辑
+			  if(!sbid.equals(dbid)){
+				  return true;
+				  
+			  }
+			  else return false;
+			  }
     	  return true;
     	  }
       else return false;
