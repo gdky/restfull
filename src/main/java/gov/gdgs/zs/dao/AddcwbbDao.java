@@ -341,7 +341,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
     		  String sbid = (String) where.get("sbid");
     		  Integer ztbj=(Integer) where.get("ztbj");
 			  String dbid = (String) rs.get(0).get("ID");
-			  //前台传过来的id和后台id作比较，如果是相同的话说明是原条记录，原条记录可以编辑；不同的话就不是原条记录，不能编辑
+			  //前台传过来的id和后台id作比较，如果是相同的话说明是原条记录，原条记录可以编辑，返回false；不同的话就不是原条记录，不能编辑
 			  if(!sbid.equals(dbid)){
 				  return true;
 				  

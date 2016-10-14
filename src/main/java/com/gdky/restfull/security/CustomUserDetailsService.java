@@ -33,7 +33,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {
 		User user = authService.getUser(username);
-
+		if (user == null){
+			user = authService.getUserByUname(username);
+		}
 		if (user == null) {
 			log.warn("用户不正确");
 			throw new UsernameNotFoundException("User not found");

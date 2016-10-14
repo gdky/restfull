@@ -7,6 +7,7 @@ import org.hashids.Hashids;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 
 import com.gdky.restfull.configuration.Constants;
+import com.gdky.restfull.utils.HashIdUtil;
 
 public class AuthResponse implements Serializable {
 
@@ -15,6 +16,9 @@ public class AuthResponse implements Serializable {
 	private String tokenhash;
 	private String jgId;
 	private String permission;
+	private Integer lo; //角色代码
+	private List<AsideMenu> menu;
+	private String names;
 
 	public String getPermission() {
 		return permission;
@@ -31,9 +35,7 @@ public class AuthResponse implements Serializable {
 	public void setJgId(Integer jgId) {
 		this.jgId = null;
 		if (jgId != null) {
-			Hashids hashids = new Hashids(Constants.HASHID_SALT,
-					Constants.HASHID_LEN);
-			this.jgId = hashids.encode(jgId.longValue());
+			this.jgId = HashIdUtil.encode(jgId.longValue());
 		}
 	}
 
@@ -63,5 +65,29 @@ public class AuthResponse implements Serializable {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public Integer getLo() {
+		return lo;
+	}
+
+	public void setLo(Integer lo) {
+		this.lo = lo;
+	}
+
+	public List<AsideMenu> getMenu() {
+		return menu;
+	}
+
+	public void setMenu(List<AsideMenu> menu) {
+		this.menu = menu;
+	}
+
+	public String getNames() {
+		return names;
+	}
+
+	public void setNames(String names) {
+		this.names = names;
 	}
 }

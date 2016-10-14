@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.service.AccountService;
 
@@ -129,6 +130,14 @@ public class RyglController {
 			@PathVariable(value = "rylx") int rylx,HttpServletRequest request)  {
 		User user =  accountService.getUserFromHeaderToken(request);
 		return new ResponseEntity<>(ryglService.zyglscdy(rylx,where,user.getJgId()),HttpStatus.OK);
+		
+	}
+	@RequestMapping(value = "/rygl/ryxpgx/{ryid}", method = RequestMethod.PUT )
+	public ResponseEntity<ResponseMessage> ryxpgx(
+			@RequestParam(value="path", required=true) String path,
+			@PathVariable(value = "ryid") String ryid)  {
+		ryglService.ryxpgx(ryid,path);
+		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
 		
 	}
 }
