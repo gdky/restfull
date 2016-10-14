@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.gdky.restfull.configuration.ApiErrors;
 import com.gdky.restfull.entity.ResponseMessage;
+import com.gdky.restfull.exception.BbtbException;
 import com.gdky.restfull.exception.InvalidRequestException;
 import com.gdky.restfull.exception.ResourceAlreadyExistsExcepiton;
 import com.gdky.restfull.exception.ResourceNotFoundException;
@@ -192,6 +193,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				ResponseMessage.Type.warning, exMessage),
 				HttpStatus.FORBIDDEN);
 	}
+	/*
+	 * 处理报表填报的异常 
+	 */
+	@ExceptionHandler(value = { BbtbException.class })
+	@ResponseBody
+	public ResponseEntity<?> handleBbtbExcepiton(
+			BbtbException ex) {
 
+		log.error(ex.getMessage());
+		String exMessage = ex.getMessage();
+
+		return new ResponseEntity<>(new ResponseMessage(
+				ResponseMessage.Type.warning, exMessage),
+				HttpStatus.FORBIDDEN);
+	}
 
 }

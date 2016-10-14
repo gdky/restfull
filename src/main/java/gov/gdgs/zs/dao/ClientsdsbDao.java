@@ -3,6 +3,7 @@ package gov.gdgs.zs.dao;
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.untils.Condition;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -274,6 +275,27 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		Map<String,Object> ob = new HashMap<>();
 		ob.put("upyear", rs);
 			return ob;
+	}
+
+	public List<Map<String, Object>> getSwsTj(Integer jgId, int nd) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select j.dwmc,j.jgxz_dm,t.zysws_sfnum ");
+		sb.append(" from zs_jg j, zs_tj_jgjbqk t ");
+		sb.append(" where j.ID = t.jg_id ");
+		sb.append(" and t.nd = ? ");
+		sb.append(" and t.jg_id = ? ");
+		
+		return this.jdbcTemplate.queryForList(sb.toString(), new Object[]{nd,jgId});
+	}
+	
+	public BigDecimal getSrze (int nd, Integer jgid){
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select zgywsr from zs_cwbb_lrgd  ");
+		sb.append(" where nd = ? ");
+		sb.append(" and jg_id = ? ");
+		sb.append(" and timevalue = 1 ");
+		sb.append(" and ztbj= 1 ");
+		return this.jdbcTemplate.queryForObject(sb.toString(), new Object[]{nd,jgid}, BigDecimal.class);
 	}
 
 }
