@@ -119,5 +119,37 @@ public class AddlrbService implements IAddlrbService{
 			Map<String, Object> rs = lrbDao.checkLrb(jgid, map);
 			return rs;
 		}
+		@Override
+		public Map<String, Object> getLrfpbJgxx(String jgid, String where) {
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			if (where != null) {
+				try {
+					where = java.net.URLDecoder.decode(where, "UTF-8");
+					ObjectMapper mapper = new ObjectMapper();
+					map = mapper.readValue(where,
+							new TypeReference<Map<String, Object>>() {
+							});
+				} catch (Exception e) {
+				}
+			}		
+			Map<String, Object> rs = lrbDao.getLrfpbJgxx(jgid, map);
+			return rs;
+		}
+		@Override
+		public Map<String, Object> checkLrfpb(String jgid, String where) {
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			if (where != null) {
+				try {
+					where = java.net.URLDecoder.decode(where, "UTF-8");
+					ObjectMapper mapper = new ObjectMapper();
+					map = mapper.readValue(where,
+							new TypeReference<Map<String, Object>>() {
+							});
+				} catch (Exception e) {
+				}
+			}		
+			Map<String, Object> rs = lrbDao.checkLrfpb(jgid, map);
+			return rs;
+		}
 
 }

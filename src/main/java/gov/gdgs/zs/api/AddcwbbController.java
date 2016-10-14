@@ -273,11 +273,23 @@ public class AddcwbbController {
 			User user = accountService.getUserFromHeaderToken(request);
 			obj.put("use_id", user.getId());
 			obj.put("jg_id", user.getJgId());
-		} catch (Exception e) {
+		} catch (Exception e) {}
+			Map<String, Object> rs = addlrbService.addLrfpb(obj);
+			return new ResponseEntity<>(rs, HttpStatus.CREATED);
 		}
-		Map<String, Object> rs = addlrbService.addLrfpb(obj);
-		return new ResponseEntity<>(rs, HttpStatus.CREATED);
-	}
+
+	 @RequestMapping(value = "/checkzcfz", method = RequestMethod.GET) 
+	 	public  ResponseEntity<Boolean> checkZcfz( 
+	 			 
+	 			@RequestParam(value="where", required=false) String where,HttpServletRequest request)
+	 			throws Exception{ 
+		    User user =  accountService.getUserFromHeaderToken(request);
+	 		boolean obj = addcwbbService.checkZcfz(user.getJgId(), where);
+	 		return new ResponseEntity<>(obj,HttpStatus.OK); 
+	 	}
+	 
+
+		
 
 	@RequestMapping(value = "/addlrfpb/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateLrfpb(
@@ -298,7 +310,6 @@ public class AddcwbbController {
 
 	/**
 	 * 校验利润表是否存在
-	 * 
 	 * @param where
 	 * @param request
 	 * @return
@@ -312,5 +323,38 @@ public class AddcwbbController {
 		Map<String, Object> obj = addlrbService.checkLrb(jgid, where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
+	
+	/**
+	 * 校验利润分配表是否存在
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkLrfpb", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> checkLrfpb(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+		String jgid = accountService.getUserFromHeaderToken(request).getJgId()
+				.toString();
+		Map<String, Object> obj = addlrbService.checkLrfpb(jgid, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	/**
+	 * 获取利润分配表中机构信息
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/lrfpb/getJgxx", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getLrfpbJgxx(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+		String jgid = accountService.getUserFromHeaderToken(request).getJgId()
+				.toString();
+		Map<String, Object> obj = addlrbService.getLrfpbJgxx(jgid, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+
 
 }
