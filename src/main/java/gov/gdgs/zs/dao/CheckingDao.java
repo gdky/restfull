@@ -1,5 +1,8 @@
 package gov.gdgs.zs.dao;
 
+import gov.gdgs.zs.untils.Condition;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -109,6 +112,27 @@ public class CheckingDao extends BaseJdbcDao{
 	 */
 	public boolean checkHadSFZH(String sfzh){
 		if(this.jdbcTemplate.queryForList("select id from zs_ryjbxx where SFZH = ? and ryzt_dm not in(2,5,6)",new Object[]{sfzh}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * 判断是否可创建支出明细表
+	 * @param sfzh
+	 * @return false--存在同时期表单
+	 */
+	public boolean checkIfZCMXB(Integer jgid,Map<String,Object> map){
+		Condition condition = new Condition();
+		condition.add("JG_ID", Condition.EQUAL, jgid);
+		condition.add("ND", Condition.EQUAL, map.get("nd"));
+		condition.add("id", Condition.NOT_EQUAL, map.get("id"));
+		if(map.get("timevalue").equals("0")){
+			condition.add("jssj", Condition.EQUAL, map.get("nd")+"-06-30");
+		}else if(map.get("timevalue").equals("1")){
+			condition.add("jssj", Condition.EQUAL, map.get("nd")+"-12-31");
+		};
+		ArrayList<Object> params = condition.getParams();
+		if(this.jdbcTemplate.queryForList("select id from zs_cwbb_zcmx "+condition.getSql().toString(),params.toArray()).size()!=0){
 			return false;
 		}
 		return true;

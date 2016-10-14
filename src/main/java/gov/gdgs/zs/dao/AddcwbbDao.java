@@ -297,11 +297,11 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM    ( SELECT a.id,b.DWMC,a.nd,ZYYWCB,");
-		sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' ELSE NULL END AS ZTBJ");
+		sb.append(" FROM    ( SELECT b.DWMC,DATE_FORMAT(a.KSSJ,'%Y-%m-%d') AS A,DATE_FORMAT(a.JSSJ,'%Y-%m-%d') AS B,a.*,");
+		sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' ELSE NULL END AS zt");
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_cwbb_zcmx a,zs_jg b,(SELECT @rownum:=?) temp");
-		sb.append(condition.getSql());// 相当元 where b.DWMC like '%%'
+		sb.append(condition.getSql());
 		sb.append(" AND a.JG_ID=b.ID  and a.JG_ID=? ORDER BY a.nd DESC ) AS t");
 		sb.append("    LIMIT ?, ? ");
 		// 装嵌传值数组
