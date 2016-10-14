@@ -69,10 +69,21 @@ public class CheckingService {
 		return this.chDao.checkHadSFZH(sfzh);
 	}
 	//检查是否可以提交报表
-	public Object checkIfTJBB(String bblx,Integer jgid,String timevalue,String nd){
+	public Object checkIfTJBB(String bblx,Integer jgid,String checked){
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (checked != null) {
+			try {
+				checked = java.net.URLDecoder.decode(checked, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(checked,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+			}
+		}		
 		switch (bblx) {
 		case "zcmxb":
-			return chDao.checkIfZCMXB(jgid,timevalue,nd);
+			return chDao.checkIfZCMXB(jgid,map);
 		}
 		return null;
 	}
