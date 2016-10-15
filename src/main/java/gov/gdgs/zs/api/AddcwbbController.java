@@ -343,5 +343,37 @@ public class AddcwbbController {
 		Map<String, Object> obj = addlrbService.getLrfpbJgxx(jgid, where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
+	
+	/**
+	 * 获取机构信息
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/cwbb/getJgxx", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getJgxx(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+		String jgid = accountService.getUserFromHeaderToken(request).getJgId()
+				.toString();
+		Map<String, Object> obj = addcwbbService.getJgxx(jgid, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	/**
+	 * 验证某年度的现金流量表是否已存在
+	 * @param where
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkXjllb", method = RequestMethod.GET)
+	public ResponseEntity<Boolean> checkXjllb(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+		String jgid = accountService.getUserFromHeaderToken(request).getJgId()
+				.toString();
+		boolean obj=addcwbbService.checkXjllb(jgid,where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
 
 }
