@@ -273,11 +273,23 @@ public class AddcwbbController {
 			User user = accountService.getUserFromHeaderToken(request);
 			obj.put("use_id", user.getId());
 			obj.put("jg_id", user.getJgId());
-		} catch (Exception e) {
+		} catch (Exception e) {}
+			Map<String, Object> rs = addlrbService.addLrfpb(obj);
+			return new ResponseEntity<>(rs, HttpStatus.CREATED);
 		}
-		Map<String, Object> rs = addlrbService.addLrfpb(obj);
-		return new ResponseEntity<>(rs, HttpStatus.CREATED);
-	}
+
+	 @RequestMapping(value = "/checkzcfz", method = RequestMethod.GET) 
+	 	public  ResponseEntity<Boolean> checkZcfz( 
+	 			 
+	 			@RequestParam(value="where", required=false) String where,HttpServletRequest request)
+	 			throws Exception{ 
+		    User user =  accountService.getUserFromHeaderToken(request);
+	 		boolean obj = addcwbbService.checkZcfz(user.getJgId(), where);
+	 		return new ResponseEntity<>(obj,HttpStatus.OK); 
+	 	}
+	 
+
+		
 
 	@RequestMapping(value = "/addlrfpb/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateLrfpb(
@@ -375,5 +387,6 @@ public class AddcwbbController {
 		boolean obj=addcwbbService.checkXjllb(jgid,where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
+
 
 }
