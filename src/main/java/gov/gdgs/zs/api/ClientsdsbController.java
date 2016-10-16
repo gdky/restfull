@@ -234,14 +234,10 @@ public class ClientsdsbController {
 	 */
 	@RequestMapping(value = "/client/swsjbqk", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> addSwsjbb(
-			@RequestBody Map<String, Object> obj)
-			throws Exception {
-		try {
+			@RequestBody Map<String, Object> obj){
 			User user = accountService.getUserFromHeaderToken(request);
 			obj.put("use_id", user.getId());
 			obj.put("jg_id", user.getJgId());
-		} catch (Exception e) {
-		}
 		return new ResponseEntity<>(addsdsbService.AddSwsjbqkb(obj),
 				HttpStatus.CREATED);
 	}

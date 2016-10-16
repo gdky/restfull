@@ -35,6 +35,7 @@ public class AddsdsbService implements IAddsdsbService{
 	@Override
 	public Map<String, Object> AddSwsjbqkb (Map<String, Object> obj) {	
 		Map<String,Object> map = new LinkedHashMap<String,Object>();
+		//判断是否已存在同年的基本情况表
 		String rs= iaddsdsbDao.AddSwsjbqkb(obj);
 		map.put("id", rs);
 		return map;

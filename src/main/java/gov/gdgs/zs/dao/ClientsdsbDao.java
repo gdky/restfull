@@ -295,7 +295,13 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		sb.append(" and jg_id = ? ");
 		sb.append(" and timevalue = 1 ");
 		sb.append(" and ztbj= 1 ");
-		return this.jdbcTemplate.queryForObject(sb.toString(), new Object[]{nd,jgid}, BigDecimal.class);
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{nd,jgid});
+		if (ls.size() == 0) {
+			return null;
+		}else {
+			Map<String,Object> map = ls.get(0);
+			return (BigDecimal) map.get("zgywsr");
+		}
 	}
 
 }
