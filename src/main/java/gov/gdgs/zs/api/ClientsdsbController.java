@@ -202,30 +202,15 @@ public class ClientsdsbController {
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
-	/*
-	 * 客户端添加事务所基本情况表
-	 */
-	@RequestMapping(value = "/client/addswsjbb", method = RequestMethod.POST)
-	public ResponseEntity<Map<String, Object>> addSwsjbb(
-			@RequestBody Map<String, Object> obj, HttpServletRequest request)
-			throws Exception {
-		try {
-			User user = accountService.getUserFromHeaderToken(request);
-			obj.put("use_id", user.getId());
-			obj.put("jg_id", user.getJgId());
-		} catch (Exception e) {
-		}
-		return new ResponseEntity<>(addsdsbService.AddSwsjbqkb(obj),
-				HttpStatus.CREATED);
-	}
+	
 
 	/*
 	 * 客户端获取事务所基本情况表
 	 */
 	@RequestMapping(value = "/client /swsjbqk", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, Object>> getSwsjbb(
+	public ResponseEntity<Map<String, Object>> getSwsjbqk(
 			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value = "pagesize", required = true) int pageSize,
 			@RequestParam(value = "where", required = false) String where)
 			throws Exception {
 		User user = accountService.getUserFromHeaderToken(request);
@@ -237,28 +222,41 @@ public class ClientsdsbController {
 	 * 客户端获取事务所基本情况表明细
 	 */
 	@RequestMapping(value = "/client/swsjbqk/{id}", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, Object>> getSwsjbbById(
+	public ResponseEntity<Map<String, Object>> getSwsjbqkById(
 			@PathVariable("id") String id) {
 
 		Map<String, Object> obj = addsdsbService.getSwsjbqkbById(id);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
+	
+	/*
+	 * 客户端添加事务所基本情况表
+	 */
+	@RequestMapping(value = "/client/swsjbqk", method = RequestMethod.POST)
+	public ResponseEntity<Map<String, Object>> addSwsjbb(
+			@RequestBody Map<String, Object> obj){
+			User user = accountService.getUserFromHeaderToken(request);
+			obj.put("use_id", user.getId());
+			obj.put("jg_id", user.getJgId());
+		return new ResponseEntity<>(addsdsbService.AddSwsjbqkb(obj),
+				HttpStatus.CREATED);
+	}
 
 	/*
-	 * 客户端判断是否可以添加事务所情况表
+	 * 客户端获取填报基本情况表所需基本信息
 	 */
-	@RequestMapping(value = "/client/swsjbbok/{jg_id}", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, Object>> isSwsjbqkCouldAdd(
-			@PathVariable("jg_id") String jgid) {
+	@RequestMapping(value = "/client/swsjbqkinit", method = RequestMethod.GET)
+	public ResponseEntity<?> getSwsjbqkInit() {
 
-		Map<String, Object> obj = addsdsbService.getOK(jgid);
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> obj = addsdsbService.getSwsjbqkInit(user);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
 	/*
 	 * 客户端修改事务所基本情况表
 	 */
-	@RequestMapping(value = "/client/addswsjbb/{id}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/client/swsjbqk/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateSwsjbb(
 			@PathVariable("id") String id,
 			@RequestBody Map<String, Object> obj, HttpServletRequest request)
