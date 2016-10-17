@@ -34,9 +34,9 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_sdsb_swsjbqk ");	
 		sb.append("  ( id,jg_id,use_id,nd,jgxz_dm,frdbxm,czrs,hhrs,ryzs,zyzcswsrs,zczj,yysr,zcze,srze,lrze,cs_dm,");
-		sb.append(" wths,sbrq,ztbj,tianbiaoren,suozhang)");
+		sb.append(" wths,sbrq,ztbj,tianbiaoren,suozhang,jgszd)");
 		sb.append("values ( :id,:jg_id,:use_id,:nd,:jgxz_dm,:frdbxm,:czrs,:hhrs,:ryzs,:zyzcswsrs,:zczj,:yysr,:zcze,");	
-		sb.append("  :srze,:lrze,:cs_dm,:wths,sysdate(),:ztbj,:tianbiaoren,:suozhang)");
+		sb.append("  :srze,:lrze,:cs_dm,:wths,sysdate(),:ztbj,:tianbiaoren,:suozhang,:jgszd)");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		if(count==0){

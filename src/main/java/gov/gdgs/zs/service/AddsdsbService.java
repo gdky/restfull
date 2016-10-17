@@ -40,6 +40,10 @@ public class AddsdsbService implements IAddsdsbService {
 				"zs_sdsb_swsjbqk")) {
 			throw new BbtbException("该年度报表已存在，请勿重复添加");
 		}
+		//将提交上来的城市信息拆分成代码及城市名
+		Map<String,Object> cs = (Map<String,Object>)obj.get("cs_dm");
+		obj.put("cs_dm", cs.get("key"));
+		obj.put("jgszd", cs.get("label"));
 		String rs = addsdsbDao.AddSwsjbqkb(obj);
 		map.put("id", rs);
 		return map;
