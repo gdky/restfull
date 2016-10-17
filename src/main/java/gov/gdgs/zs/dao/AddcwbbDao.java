@@ -23,14 +23,14 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		obj.put("id", uuid);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_xjll ");	
-		sb.append("  ( id,jg_id,use_id,kssj,jssj,tjrq,nd,jyhd_xjlr_xslw,jyhd_xjlr_skfh,jyhd_xjlr_qtjy,jyhd_xjlr_xj,jyhd_xjlc_gmlw,jyhd_xjlc_zfzg,jyhd_xjlc_sf,");
+		sb.append("  ( id,jg_id,use_id,tjrq,nd,jyhd_xjlr_xslw,jyhd_xjlr_skfh,jyhd_xjlr_qtjy,jyhd_xjlr_xj,jyhd_xjlc_gmlw,jyhd_xjlc_zfzg,jyhd_xjlc_sf,");
 		sb.append(" jyhd_xjlc_qtjy,jyhd_xjlc_xj,jyhd_je,tzhd_xjlr_shtz,tzhd_xjlr_tzsy,tzhd_xjlr_czzc,tzhd_xjlr_qttz,tzhd_xjlr_xj,");
 		sb.append(" tzhd_xjlc_gjzc,tzhd_xjlc_tz,tzhd_xjlc_qttz,tzhd_xjlc_xj,tzhd_je,czhd_xjlr_xstz,czhd_xjlr_jk,czhd_xjlr_qtcz,");
 		sb.append(" czhd_xjlr_xj,czhd_xjlc_chzw,czhd_xjlc_fplr,czhd_xjlc_qtcz,czhd_xjlc_xj,czhd_je,hlbdyx,xjjzzj,bczl_jlr,bczl_jtzcjz,");
 		sb.append(" bczl_gdzczj,bczl_wxzctx,bczl_cqdtfy,bczl_dtfyjs,bczl_ytfyjs,bczl_zcss,bczl_gdzcbf,bczl_cwfy,bczl_tzss,bczl_dysddx,");
 		sb.append(" bczl_chjs,bczl_ysxmjs,bczl_yfxmzj,bczl_qt,bczl_xjllje,bczl_zwzwzb,bczl_yndqzj,bczl_rzzrzc,bczl_xjqmye,");
 		sb.append(" bczl_xjdjwqmye,bczl_xjqcye,bczl_xjdjwqcye,bczl_xjdjwjezj,ztbj)");
-		sb.append("values ( :id,:jg_id,:use_id,:kssj,:jssj,sysdate(),:nd,:jyhd_xjlr_xslw,:jyhd_xjlr_skfh,:jyhd_xjlr_qtjy,:jyhd_xjlr_xj,:jyhd_xjlc_gmlw,:jyhd_xjlc_zfzg,:jyhd_xjlc_sf,");
+		sb.append("values ( :id,:jg_id,:use_id,sysdate(),:nd,:jyhd_xjlr_xslw,:jyhd_xjlr_skfh,:jyhd_xjlr_qtjy,:jyhd_xjlr_xj,:jyhd_xjlc_gmlw,:jyhd_xjlc_zfzg,:jyhd_xjlc_sf,");
 		sb.append(" :jyhd_xjlc_qtjy,:jyhd_xjlc_xj,:jyhd_je,:tzhd_xjlr_shtz,:tzhd_xjlr_tzsy,:tzhd_xjlr_czzc,:tzhd_xjlr_qttz,:tzhd_xjlr_xj,");
 		sb.append(" :tzhd_xjlc_gjzc,:tzhd_xjlc_tz,:tzhd_xjlc_qttz,:tzhd_xjlc_xj,:tzhd_je,:czhd_xjlr_xstz,:czhd_xjlr_jk,:czhd_xjlr_qtcz,");
 		sb.append(" :czhd_xjlr_xj,:czhd_xjlc_chzw,:czhd_xjlc_fplr,:czhd_xjlc_qtcz,:czhd_xjlc_xj,:czhd_je,:hlbdyx,:xjjzzj,:bczl_jlr,:bczl_jtzcjz,");
@@ -50,7 +50,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 	public void UpdateXjllb(Map <String,Object> obj) {
 		 StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_xjll ");
-		sb.append(" set jg_id=:jg_id,use_id=:use_id,kssj=:kssj,jssj=:jssj,tjrq=sysdate(),nd=:nd,jyhd_xjlr_xslw=:jyhd_xjlr_xslw,jyhd_xjlr_skfh=:jyhd_xjlr_skfh,jyhd_xjlr_qtjy=:jyhd_xjlr_qtjy,");	
+		sb.append(" set jg_id=:jg_id,use_id=:use_id,tjrq=sysdate(),nd=:nd,jyhd_xjlr_xslw=:jyhd_xjlr_xslw,jyhd_xjlr_skfh=:jyhd_xjlr_skfh,jyhd_xjlr_qtjy=:jyhd_xjlr_qtjy,");	
 		sb.append(" jyhd_xjlr_xj=:jyhd_xjlr_xj,jyhd_xjlc_gmlw=:jyhd_xjlc_gmlw,jyhd_xjlc_zfzg=:jyhd_xjlc_zfzg,jyhd_xjlc_sf=:jyhd_xjlc_sf,");
 		sb.append(" jyhd_xjlc_qtjy=:jyhd_xjlc_qtjy,jyhd_xjlc_xj=:jyhd_xjlc_xj,jyhd_je=:jyhd_je,tzhd_xjlr_shtz=:tzhd_xjlr_shtz,");
 		sb.append(" tzhd_xjlr_tzsy=:tzhd_xjlr_tzsy,tzhd_xjlr_czzc=:tzhd_xjlr_czzc,tzhd_xjlr_qttz=:tzhd_xjlr_qttz,tzhd_xjlr_xj=:tzhd_xjlr_xj,");
@@ -79,7 +79,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM    ( SELECT a.id,b.DWMC,a.nd,DATE_FORMAT(a.JSSJ,'%Y-%m-%d') AS JSSJ,");
+		sb.append(" FROM    ( SELECT a.id,b.DWMC,a.nd,DATE_FORMAT(a.TJRQ,'%Y-%m-%d') AS TJRQ,");
 		sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' ELSE NULL END AS ZTBJ");		
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_cwbb_xjll a,zs_jg b,(SELECT @rownum:=?) temp");
@@ -357,5 +357,36 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		
 	}
 	
+
+	public Map<String, Object> getJgxx(String jgid, HashMap<String, Object> map) {
+		String sql = "select j.DWMC from zs_jg j where j.ID=? ";
+		Map<String, Object> jgxx = this.jdbcTemplate.queryForMap(sql,
+				new Object[] { jgid });
+		Map<String, Object> ob = new HashMap<>();
+		ob.put("data", jgxx);
+		return ob;
+	}
+
+	public boolean checkXjllb(String jgid, HashMap<String, Object> map) {
+		boolean result = true;
+		String sql = "select l.id from zs_cwbb_xjll l where l.JG_ID=? and l.ND=? ";
+		if (map.get("nd") !=null) {
+			String nd = map.get("nd").toString();
+			List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
+					new Object[] { jgid, nd });
+			if (ls.size() > 0) {
+				if (map.get("xjllbid") != null) {
+					String xjllbid = map.get("xjllbid").toString();
+					String id = ls.get(0).get("id").toString();
+					if (!xjllbid.equals(id)) {
+						result = false;
+					}
+				} else {
+					result = false;
+				}
+			}
+		} 
+		return result; 
+	}
 
 }
