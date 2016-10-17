@@ -70,7 +70,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
 		sb.append(" FROM   ( select a.id,b.DWMC,a.nd,a.FRDBXM,a.CZRS,a.HHRS,a.ZYZCSWSRS,a.RYZS,a.ZCZJ,a.YYSR,");	
 		sb.append(" case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else null end as JGXZ,");	
-		sb.append(" case a.ZTBJ when 0 then '保存' when 2 then '提交' else '未知' end as ZTBJ");		
+		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
 		sb.append(" FROM " + "zs_sdsb_swsjbqk a,zs_jg b,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());// 相当元 where b.DWMC like '%%'
 		sb.append(" AND a.JG_ID=b.ID  and a.JG_ID=? ORDER BY a.nd DESC ) AS t");
