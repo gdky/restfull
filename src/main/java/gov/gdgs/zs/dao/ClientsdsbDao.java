@@ -304,4 +304,13 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		}
 	}
 
+	public boolean isExists(Object nd, Object jgId, String tableName) {
+		String sql = "select id from " + tableName+ " where jg_id = ? and nd = ? ";
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql, new Object[]{jgId,nd});
+		if (ls.size()>0){
+			return true;
+		}
+		return false;
+	}
+
 }

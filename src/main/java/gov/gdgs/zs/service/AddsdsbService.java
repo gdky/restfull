@@ -36,7 +36,10 @@ public class AddsdsbService implements IAddsdsbService{
 	public Map<String, Object> AddSwsjbqkb (Map<String, Object> obj) {	
 		Map<String,Object> map = new LinkedHashMap<String,Object>();
 		//判断是否已存在同年的基本情况表
-		String rs= iaddsdsbDao.AddSwsjbqkb(obj);
+		if(clientSdsbDao.isExists(obj.get("nd"),obj.get("jg_id"),"zs_sdsb_swsjbqk")){
+			throw new BbtbException("该年度报表已存在，请勿重复添加");
+		}
+		String rs= addsdsbDao.AddSwsjbqkb(obj);
 		map.put("id", rs);
 		return map;
 
