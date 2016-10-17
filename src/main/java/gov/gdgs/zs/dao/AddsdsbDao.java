@@ -102,7 +102,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 	}
 	
 	public Map<String, Object> getSwsjbqkbById(String id) {
-		String sql = "select b.DWMC,c.MC as cs,a.JGXZ_DM as jgxzdm,b.CS_DM as csdm,case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else null end as JGXZ,"
+		String sql = "select b.DWMC,c.MC as cs, case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else '无' end as JGXZ,"
 				+ "a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_swsjbqk a, zs_jg b,dm_cs c where a.jg_id = b.id and b.CS_DM=c.ID and a.id = ?";
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;

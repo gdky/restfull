@@ -202,8 +202,6 @@ public class ClientsdsbController {
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
-	
-
 	/*
 	 * 客户端获取事务所基本情况表
 	 */
@@ -228,16 +226,16 @@ public class ClientsdsbController {
 		Map<String, Object> obj = addsdsbService.getSwsjbqkbById(id);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
-	
+
 	/*
 	 * 客户端添加事务所基本情况表
 	 */
 	@RequestMapping(value = "/client/swsjbqk", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> addSwsjbb(
-			@RequestBody Map<String, Object> obj){
-			User user = accountService.getUserFromHeaderToken(request);
-			obj.put("use_id", user.getId());
-			obj.put("jg_id", user.getJgId());
+			@RequestBody Map<String, Object> obj) {
+		User user = accountService.getUserFromHeaderToken(request);
+		obj.put("use_id", user.getId());
+		obj.put("jg_id", user.getJgId());
 		return new ResponseEntity<>(addsdsbService.AddSwsjbqkb(obj),
 				HttpStatus.CREATED);
 	}
@@ -258,15 +256,11 @@ public class ClientsdsbController {
 	 */
 	@RequestMapping(value = "/client/swsjbqk/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateSwsjbb(
-			@PathVariable("id") String id,
-			@RequestBody Map<String, Object> obj, HttpServletRequest request)
-			throws Exception {
-		try {
-			User user = accountService.getUserFromHeaderToken(request);
-			obj.put("use_id", user.getId());
-			obj.put("jg_id", user.getJgId());
-		} catch (Exception e) {
-		}
+			@PathVariable("id") String id, @RequestBody Map<String, Object> obj) {
+
+		User user = accountService.getUserFromHeaderToken(request);
+		obj.put("use_id", user.getId());
+		obj.put("jg_id", user.getJgId());
 
 		addsdsbService.UpdateSwsjbqkb(obj);
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),

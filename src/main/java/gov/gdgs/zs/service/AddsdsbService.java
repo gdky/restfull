@@ -52,7 +52,7 @@ public class AddsdsbService implements IAddsdsbService {
 
 	@Override
 	public void UpdateSwsjbqkb(Map<String, Object> obj) {
-		iaddsdsbDao.UpdateSwsjbqkb(obj);
+		addsdsbDao.UpdateSwsjbqkb(obj);
 	}
 
 	public Map<String, Object> getSwsjbqkb(int page, int pageSize, int Jgid,
