@@ -40,8 +40,8 @@ public class AddsdsbService implements IAddsdsbService {
 				"zs_sdsb_swsjbqk")) {
 			throw new BbtbException("该年度报表已存在，请勿重复添加");
 		}
-		//将提交上来的城市信息拆分成代码及城市名
-		Map<String,Object> cs = (Map<String,Object>)obj.get("cs_dm");
+		// 将提交上来的城市信息拆分成代码及城市名
+		Map<String, Object> cs = (Map<String, Object>) obj.get("cs_dm");
 		obj.put("cs_dm", cs.get("key"));
 		obj.put("jgszd", cs.get("label"));
 		String rs = addsdsbDao.AddSwsjbqkb(obj);
@@ -52,6 +52,10 @@ public class AddsdsbService implements IAddsdsbService {
 
 	@Override
 	public void UpdateSwsjbqkb(Map<String, Object> obj) {
+		// 将提交上来的城市信息拆分成代码及城市名
+		Map<String, Object> cs = (Map<String, Object>) obj.get("cs_dm");
+		obj.put("cs_dm", cs.get("key"));
+		obj.put("jgszd", cs.get("label"));
 		addsdsbDao.UpdateSwsjbqkb(obj);
 	}
 
@@ -68,8 +72,10 @@ public class AddsdsbService implements IAddsdsbService {
 		return obj;
 	}
 
+	/*
+	 * 新建基本情况表取初始数据
+	 */
 	public Map<String, Object> getSwsjbqkInit(User user) {
-
 		// 获取去年年度
 		Calendar cal = Calendar.getInstance();
 		int last_y = cal.get(Calendar.YEAR) - 1;
@@ -101,8 +107,38 @@ public class AddsdsbService implements IAddsdsbService {
 		obj.put("srze", srze);
 		return obj;
 	}
+	
+	/*
+	 * 修改基本情况表取初始数据
+	 */
+	public Map<String, Object> getSwsjbqkInit(User user, String id) {
+		//获取本记录的年度和执业人数
+		Map<String,Object> rs = clientSdsbDao.getJbqkNd(id);
+		//获取税务师数量
+		List<Map<String, Object>> ls = clientSdsbDao.getSwsTj(user.getJgId(),
+				(Integer)rs.get("nd"));
+		Map<String, Object> swstj = new HashMap<String,Object>();
+		if (ls.size() == 0) {
+			swstj.put("zysws_sfnum",rs.get("zyzcswsrs"));
+		}else {
+			swstj = ls.get(0);
+		}
+		
+		// 获取去年全年营业收入
+		BigDecimal srze = clientSdsbDao.getSrze((Integer)rs.get("nd"), user.getJgId());
+		if (srze == null) {
+			throw new BbtbException("没法获取" + rs.get("nd").toString() + "年主营收入总额，请先提交该年度利润表");
+		}
+		BigDecimal b1 = new BigDecimal(10000);
+		srze = srze.divide(b1, 2, BigDecimal.ROUND_HALF_UP);
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("zyzcswsrs", swstj.get("zysws_sfnum"));
+		obj.put("srze", srze);
+		return obj;
+	}
+	
+	
 
-	@Override
 	public Map<String, Object> AddJygmtjb(Map<String, Object> obj) {
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		String rs = iaddsdsbDao.AddJygmtjb(obj);

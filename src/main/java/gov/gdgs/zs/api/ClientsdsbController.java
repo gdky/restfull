@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -244,23 +245,30 @@ public class ClientsdsbController {
 	 * 客户端获取填报基本情况表所需基本信息
 	 */
 	@RequestMapping(value = "/client/swsjbqkinit", method = RequestMethod.GET)
-	public ResponseEntity<?> getSwsjbqkInit() {
-
+	public ResponseEntity<?> getSwsjbqkInit(
+			@RequestParam(value = "id", required = false) String id ) {
 		User user = accountService.getUserFromHeaderToken(request);
-		Map<String, Object> obj = addsdsbService.getSwsjbqkInit(user);
+		if (id == null && StringUtils.isEmpty(id)){
+			Map<String, Object> obj = addsdsbService.getSwsjbqkInit(user);
+			return new ResponseEntity<>(obj, HttpStatus.OK);
+		}
+		Map<String,Object> obj = addsdsbService.getSwsjbqkInit(user,id);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
+		
+		
 	}
 
 	/*
 	 * 客户端修改事务所基本情况表
 	 */
 	@RequestMapping(value = "/client/swsjbqk/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<ResponseMessage> updateSwsjbb(
+	public ResponseEntity<ResponseMessage> updateSwsjbqk(
 			@PathVariable("id") String id, @RequestBody Map<String, Object> obj) {
 
 		User user = accountService.getUserFromHeaderToken(request);
 		obj.put("use_id", user.getId());
 		obj.put("jg_id", user.getJgId());
+		obj.put("id", id);
 
 		addsdsbService.UpdateSwsjbqkb(obj);
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),

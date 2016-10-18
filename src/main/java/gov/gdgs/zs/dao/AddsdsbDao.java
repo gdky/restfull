@@ -50,8 +50,8 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 	public void UpdateSwsjbqkb(Map <String,Object> obj) {
 		 StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_sdsb_swsjbqk ");
-		sb.append(" set jg_id=:jg_id,use_id=:use_id,nd=:nd,jgxz_dm=:jgxz_dm,frdbxm=:frdbxm,czrs=:czrs,hhrs=:hhrs,ryzs=:ryzs,");	
-		sb.append(" zyzcswsrs=:zyzcswsrs,zczj=:zczj,yysr=:yysr,zcze=:zcze,srze=:srze,lrze=:lrze,cs_dm=:cs_dm,");
+		sb.append(" set use_id=:use_id,frdbxm=:frdbxm,czrs=:czrs,hhrs=:hhrs,ryzs=:ryzs,");	
+		sb.append(" zyzcswsrs=:zyzcswsrs,zczj=:zczj,yysr=:yysr,zcze=:zcze,lrze=:lrze,cs_dm=:cs_dm,");
 		sb.append(" wths=:wths,sbrq=sysdate(),ztbj=:ztbj,tianbiaoren=:tianbiaoren,suozhang=:suozhang where id=:id");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);

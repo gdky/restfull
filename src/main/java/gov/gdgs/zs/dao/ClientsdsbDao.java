@@ -313,4 +313,9 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		return false;
 	}
 
+	public Map<String,Object> getJbqkNd(String id) {
+		String sql = "select nd,zyzcswsrs from zs_sdsb_swsjbqk where id = ?";
+		return this.jdbcTemplate.queryForMap(sql, new Object[]{id});
+	}
+
 }
