@@ -279,7 +279,7 @@ public class ClientsdsbDao extends BaseJdbcDao{
 
 	public List<Map<String, Object>> getSwsTj(Integer jgId, int nd) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select j.dwmc,j.jgxz_dm,t.zysws_sfnum ");
+		sb.append(" select j.dwmc,j.jgxz_dm,t.zysws_sfnum,j.fddbr,j.cs_dm ");
 		sb.append(" from zs_jg j, zs_tj_jgjbqk t ");
 		sb.append(" where j.ID = t.jg_id ");
 		sb.append(" and t.nd = ? ");

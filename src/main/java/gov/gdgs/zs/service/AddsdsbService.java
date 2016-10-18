@@ -83,6 +83,7 @@ public class AddsdsbService implements IAddsdsbService {
 		// 获取事务所名称
 		// 获取事务所执业税务师人数
 		// 获取事务所性质
+		// 获取法人、城市
 		List<Map<String, Object>> ls = clientSdsbDao.getSwsTj(user.getJgId(),
 				last_y);
 		if (ls.size() == 0) {
@@ -102,6 +103,9 @@ public class AddsdsbService implements IAddsdsbService {
 		Map<String, Object> obj = new HashMap<String, Object>();
 		obj.put("nd", last_y);
 		obj.put("dwmc", swstj.get("dwmc"));
+		obj.put("frdbxm", swstj.get("fddbr"));
+		obj.put("suozhang", swstj.get("fddbr"));
+		obj.put("cs_dm", swstj.get("cs_dm"));
 		obj.put("jgxz_dm", String.valueOf(swstj.get("jgxz_dm")));
 		obj.put("zyzcswsrs", swstj.get("zysws_sfnum"));
 		obj.put("srze", srze);
