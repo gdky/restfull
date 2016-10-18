@@ -34,9 +34,9 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_sdsb_swsjbqk ");	
 		sb.append("  ( id,jg_id,use_id,nd,jgxz_dm,frdbxm,czrs,hhrs,ryzs,zyzcswsrs,zczj,yysr,zcze,srze,lrze,cs_dm,");
-		sb.append(" wths,sbrq,ztbj,tianbiaoren,suozhang)");
+		sb.append(" wths,sbrq,ztbj,tianbiaoren,suozhang,jgszd)");
 		sb.append("values ( :id,:jg_id,:use_id,:nd,:jgxz_dm,:frdbxm,:czrs,:hhrs,:ryzs,:zyzcswsrs,:zczj,:yysr,:zcze,");	
-		sb.append("  :srze,:lrze,:cs_dm,:wths,sysdate(),:ztbj,:tianbiaoren,:suozhang)");
+		sb.append("  :srze,:lrze,:cs_dm,:wths,sysdate(),:ztbj,:tianbiaoren,:suozhang,:jgszd)");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		if(count==0){
@@ -50,8 +50,8 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 	public void UpdateSwsjbqkb(Map <String,Object> obj) {
 		 StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_sdsb_swsjbqk ");
-		sb.append(" set jg_id=:jg_id,use_id=:use_id,nd=:nd,jgxz_dm=:jgxz_dm,frdbxm=:frdbxm,czrs=:czrs,hhrs=:hhrs,ryzs=:ryzs,");	
-		sb.append(" zyzcswsrs=:zyzcswsrs,zczj=:zczj,yysr=:yysr,zcze=:zcze,srze=:srze,lrze=:lrze,cs_dm=:cs_dm,");
+		sb.append(" set use_id=:use_id,frdbxm=:frdbxm,czrs=:czrs,hhrs=:hhrs,ryzs=:ryzs,");	
+		sb.append(" zyzcswsrs=:zyzcswsrs,zczj=:zczj,yysr=:yysr,zcze=:zcze,lrze=:lrze,cs_dm=:cs_dm,");
 		sb.append(" wths=:wths,sbrq=sysdate(),ztbj=:ztbj,tianbiaoren=:tianbiaoren,suozhang=:suozhang where id=:id");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
@@ -68,9 +68,9 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,b.DWMC,a.nd,a.FRDBXM,a.CZRS,a.HHRS,a.ZYZCSWSRS,a.RYZS,a.ZCZJ,a.YYSR,");	
+		sb.append(" FROM   ( select a.id,b.DWMC,a.nd,a.FRDBXM,a.CZRS,a.HHRS,a.ZYZCSWSRS,a.RYZS,a.ZCZJ,a.YYSR,a.ztbj as ztdm, ");	
 		sb.append(" case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else null end as JGXZ,");	
-		sb.append(" case a.ZTBJ when 0 then '保存' when 2 then '提交' else '未知' end as ZTBJ");		
+		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
 		sb.append(" FROM " + "zs_sdsb_swsjbqk a,zs_jg b,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());// 相当元 where b.DWMC like '%%'
 		sb.append(" AND a.JG_ID=b.ID  and a.JG_ID=? ORDER BY a.nd DESC ) AS t");
@@ -102,7 +102,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 	}
 	
 	public Map<String, Object> getSwsjbqkbById(String id) {
-		String sql = "select b.DWMC,c.MC as cs,a.JGXZ_DM as jgxzdm,b.CS_DM as csdm,case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else null end as JGXZ,"
+		String sql = "select b.DWMC,c.MC as cs, case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else '无' end as JGXZ,"
 				+ "a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_swsjbqk a, zs_jg b,dm_cs c where a.jg_id = b.id and b.CS_DM=c.ID and a.id = ?";
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
