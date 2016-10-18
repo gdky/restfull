@@ -183,10 +183,9 @@ public class ClientsdsbController {
 	/*
 	 * 客户端获取上年经营收入表数据
 	 */
-	@RequestMapping(value = "/add/upyear1/{jg_id}", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, Object>> getUpyear1(
-			@PathVariable("jg_id") String jgid) {
-
+	@RequestMapping(value = "/add/upyear1", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getUpyear1() {
+        String jgid=accountService.getUserFromHeaderToken(request).getJgId().toString();
 		Map<String, Object> obj = clientsdsbService.getUpyear(jgid);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}

@@ -166,8 +166,8 @@ public class ClientsdsbDao extends BaseJdbcDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.SRZE,a.ZCZE,a.LRZE,");	
-		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
+		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.SRZE,a.ZCZE,a.LRZE,a.ZTBJ,");	
+		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTMC");		
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_sdsb_jysrqk a,zs_jg b,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());// 相当元 where 1=1;
@@ -268,13 +268,23 @@ public class ClientsdsbDao extends BaseJdbcDao{
 	
 	}
 	public Map<String, Object> getUpyear(String jgid) {
-		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
-		int gid = (int)hashids.decode(jgid)[0];
-		String sql = "select a.nd,b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_jysrqk a,zs_jg b where a.jg_id=b.id and jg_id=? and a.ND=( date_format(sysdate(),'%Y')-2)";
-		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,gid);
+		StringBuffer sql=new StringBuffer(" select year(sysdate()) - 1 tbnd, ");
+		sql.append("        j.dwmc, ");
+		sql.append("        jb.srze bn_srze, ");
+		sql.append("        jb.lrze bn_lrze, ");
+		sql.append("        jy.* ");
+		sql.append("   from zs_jg j ");
+		sql.append("   left join zs_sdsb_jysrqk jy ");
+		sql.append("     on j.id = jy.jg_id ");
+		sql.append("    and jy.nd = (date_format(sysdate(), '%Y') - 2) ");
+		sql.append("   left join zs_sdsb_swsjbqk jb ");
+		sql.append("     on j.id = jb.jg_id ");
+		sql.append("    and jb.nd = (date_format(sysdate(), '%Y') - 1) ");
+		sql.append("  where j.id = ? ");
+		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql.toString(),jgid);
 		Map<String,Object> ob = new HashMap<>();
-		ob.put("upyear", rs);
-			return ob;
+		ob.put("upyear", rs.get(0));
+		return ob;
 	}
 
 	public List<Map<String, Object>> getSwsTj(Integer jgId, int nd) {
