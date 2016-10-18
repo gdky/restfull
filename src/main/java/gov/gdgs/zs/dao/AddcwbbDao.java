@@ -237,6 +237,12 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 	public String AddZcmxb( Map <String,Object> obj){
 		String uuid = UUID.randomUUID().toString().replace("-", "");
 		obj.put("id", uuid);
+		obj.put("kssj",obj.get("nd")+"-01-01" );
+		if(obj.get("timevalue").equals("0")){
+			obj.put("jssj",obj.get("nd")+"-06-30" );
+		}else if(obj.get("timevalue").equals("1")){
+			obj.put("jssj",obj.get("nd")+"-12-31" );
+		};
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcmx ");	
 		sb.append("  ( id,jg_id,use_id,ztbj,kssj,jssj,tjrq,nd,zyywcb1,zyywcb,zyywsjfj1,zyywsjfj,gzfy1,gzfy,qtywzc1,qtywzc,flf1,flf,");
@@ -260,6 +266,12 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 	
 	@Override
 	public void UpdateZcmxb(Map <String,Object> obj) {
+		obj.put("kssj",obj.get("nd")+"-01-01" );
+		if(obj.get("timevalue").equals("0")){
+			obj.put("jssj",obj.get("nd")+"-06-30" );
+		}else if(obj.get("timevalue").equals("1")){
+			obj.put("jssj",obj.get("nd")+"-12-31" );
+		};
 		 StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_cwbb_zcmx ");
 		sb.append(" set jg_id=:jg_id,use_id=:use_id,ztbj=:ztbj,kssj=:kssj,jssj=:jssj,tjrq=sysdate(),nd=:nd,zyywcb1=:zyywcb1,zyywcb=:zyywcb,zyywsjfj1=:zyywsjfj1,zyywsjfj=:zyywsjfj,");		
@@ -285,11 +297,11 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM    ( SELECT a.id,b.DWMC,a.nd,ZYYWCB,");
-		sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' ELSE NULL END AS ZTBJ");
+		sb.append(" FROM    ( SELECT b.DWMC,DATE_FORMAT(a.KSSJ,'%Y-%m-%d') AS A,DATE_FORMAT(a.JSSJ,'%Y-%m-%d') AS B,a.*,");
+		sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' ELSE NULL END AS zt");
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_cwbb_zcmx a,zs_jg b,(SELECT @rownum:=?) temp");
-		sb.append(condition.getSql());// 相当元 where b.DWMC like '%%'
+		sb.append(condition.getSql());
 		sb.append(" AND a.JG_ID=b.ID  and a.JG_ID=? ORDER BY a.nd DESC ) AS t");
 		sb.append("    LIMIT ?, ? ");
 		// 装嵌传值数组
