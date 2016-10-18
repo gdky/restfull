@@ -207,7 +207,7 @@ public class ClientsdsbController {
 	/*
 	 * 客户端获取事务所基本情况表
 	 */
-	@RequestMapping(value = "/client /swsjbqk", method = RequestMethod.GET)
+	@RequestMapping(value = "/client/swsjbqk", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getSwsjbqk(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pageSize,
@@ -277,7 +277,7 @@ public class ClientsdsbController {
 	/*
 	 * 客户端获取经营规模表
 	 */
-	@RequestMapping(value = "/add/jygmtjb", method = RequestMethod.GET)
+	@RequestMapping(value = "/client/jygmtjb", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getJygmtjb(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pageSize", required = true) int pageSize,
@@ -292,7 +292,7 @@ public class ClientsdsbController {
 	/*
 	 * 客户端获取经营规模表明细
 	 */
-	@RequestMapping(value = "/add/jygmtjb/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/client/jygmtjb/{id}", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getJygmtjbById(
 			@PathVariable("id") String id) {
 
@@ -303,18 +303,18 @@ public class ClientsdsbController {
 	/*
 	 * 客户端获取经营规模表上年数据
 	 */
-	@RequestMapping(value = "/add/jygmtjbok/{jg_id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/client/jygmtjinit", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getOk1(
 			@PathVariable("jg_id") String jgid) {
-
-		Map<String, Object> obj = addsdsbService.getOK1(jgid);
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> obj = addsdsbService.getOK1(user.getJgId().toString());
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
 	/*
 	 * 客户端添加经营规模表
 	 */
-	@RequestMapping(value = "/addjygmtjb", method = RequestMethod.POST)
+	@RequestMapping(value = "/client/jygmtjb", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> addJygmtjb(
 			@RequestBody Map<String, Object> obj, HttpServletRequest request)
 			throws Exception {
@@ -331,7 +331,7 @@ public class ClientsdsbController {
 	/*
 	 * 客户端修改经营规模表
 	 */
-	@RequestMapping(value = "/addjygmtjb/{id}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/client/jygmtjb/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateJygmtjb(
 			@PathVariable("id") String id,
 			@RequestBody Map<String, Object> obj, HttpServletRequest request)

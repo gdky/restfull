@@ -154,7 +154,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,a.SNSRZE,a.nd,a.BNSRZE_HJ,a.BNSRZE_SSFW,a.BNSRZE_SSJZ,a.BNSRZE_QTYW,");	
+		sb.append(" FROM   ( select a.id,a.SNSRZE,a.nd,a.BNSRZE_HJ,a.BNSRZE_SSFW,a.BNSRZE_SSJZ,a.BNSRZE_QTYW,b.DWMC,");	
 		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_sdsb_jygmtjb a,zs_jg b,(SELECT @rownum:=?) temp");
