@@ -31,7 +31,7 @@ public class ClientsdsbDao extends BaseJdbcDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.RYZS_RY_ZJ,a.ZYSWS_RY_ZJ,a.QTCYRY_RY_ZJ,");	
+		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.RYZS_RY_ZJ,a.ZYSWS_RY_ZJ,a.QTCYRY_RY_ZJ,a.ZTBJ as ztdm,");	
 		sb.append(" DATE_FORMAT(a.SBRQ,'%Y-%m-%d') as SBRQ,");	
 		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
@@ -65,7 +65,7 @@ public class ClientsdsbDao extends BaseJdbcDao{
 	}
 	
 	public Map<String, Object> getHyryqktjbById(String id) {
-		String sql = "select b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_hyryqktj a, zs_jg b where a.jg_id = b.id and a.id = ?";
+		String sql = "select b.DWMC,a.*,DATE_FORMAT(a.SBRQ,'%Y-%m-%d') as sbrqM from "+Config.PROJECT_SCHEMA+"zs_sdsb_hyryqktj a, zs_jg b where a.jg_id = b.id and a.id = ?";
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
