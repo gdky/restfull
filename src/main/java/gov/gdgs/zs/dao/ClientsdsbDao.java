@@ -5,6 +5,8 @@ import gov.gdgs.zs.untils.Condition;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,7 +172,7 @@ public class ClientsdsbDao extends BaseJdbcDao {
 
 		Condition condition = new Condition();
 		condition.add("a.nd", "FUZZY", where.get("nd"));
-		condition.add("a.ZTBJ", "FUZZY", where.get("ZTBJ"));
+		condition.add("a.ZTBJ", "FUZZY", where.get("ztbj"));
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
@@ -214,9 +216,9 @@ public class ClientsdsbDao extends BaseJdbcDao {
 	}
 
 	public String AddJysrqkb(Map<String, Object> obj) {
-		// if (isExists(obj.get("nd"), obj.get("jg_id"), "zs_sdsb_jysrqk")) {
-		// throw new BbtbException("该年度报表已存在，请勿重复添加");
-		// }
+		 if (isExists(obj.get("nd"), obj.get("jg_id"), "zs_sdsb_jysrqk")) {
+		 throw new BbtbException("该年度报表已存在，请勿重复添加");
+		 }
 		String uuid = UUID.randomUUID().toString().replace("-", "");
 		obj.put("id", uuid);
 		final StringBuffer sb = new StringBuffer("insert into "
@@ -315,7 +317,7 @@ public class ClientsdsbDao extends BaseJdbcDao {
 		}
 	}
 
-	public Map<String, Object> getUpyear(String jgid) {
+	public Map<String, Object> getJysrqkbUpyear(String jgid) {
 		StringBuffer sql = new StringBuffer(
 				" select year(sysdate()) - 1 tbnd, ");
 		sql.append("        j.dwmc, ");
@@ -381,6 +383,23 @@ public class ClientsdsbDao extends BaseJdbcDao {
 	public Map<String, Object> getJbqkNd(String id) {
 		String sql = "select nd,zyzcswsrs from zs_sdsb_swsjbqk where id = ?";
 		return this.jdbcTemplate.queryForMap(sql, new Object[] { id });
+	}
+
+	
+	public boolean checkAddJysrqkb(String jgid) {
+		// TODO Auto-generated method stub
+		int nd=(Calendar.getInstance().get(Calendar.YEAR))-1;
+		String swsqkSql="select b.ID from zs_sdsb_swsjbqk b where b.JG_ID=? and b.ZTBJ='2' and b.ND=year(sysdate())-1 ";
+		List<String> ls=this.jdbcTemplate.queryForList(swsqkSql, new Object[]{jgid}, String.class);
+		if(ls.size()>0){
+			if(isExists(nd, jgid, "zs_sdsb_jysrqk")){
+				return false;
+			}else{
+				return true;
+			}
+		}else{
+			return false;			
+		}
 	}
 
 }
