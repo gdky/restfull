@@ -174,7 +174,7 @@ public class ClientsdsbController {
 			obj.put("jg_id", user.getJgId());
 		} catch (Exception e) {
 		}
-
+		obj.put("id", id);
 		clientsdsbService.UpdateJysrqkb(obj);
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),
 				HttpStatus.OK);
