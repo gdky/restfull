@@ -229,4 +229,23 @@ public class AddsdsbService implements IAddsdsbService {
 		return obj;
 	}
 
+	
+	
+	public Map<String, Object> getEditJygmtjInit(String jgid, String where) {
+		// TODO Auto-generated method stub
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+			}
+		}
+		Map<String, Object> rs=clientSdsbDao.getEditJygmtjInit(jgid,map);
+		return rs;
+	}
+
 }

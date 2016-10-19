@@ -318,4 +318,27 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		return this.jdbcTemplate.queryForMap(sql, new Object[]{id});
 	}
 
+	public Map<String, Object> getEditJygmtjInit(String jgid,
+			HashMap<String, Object> map) {
+		// TODO Auto-generated method stub
+		StringBuffer sb=new StringBuffer();
+		sb.append("select a.nd,b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_jygmtjb a,zs_jg b where a.jg_id=b.id and a.jg_id=? and a.ND=( date_format(sysdate(),'%Y')-1)");
+		// 装嵌传值数组
+				
+				ArrayList<Object> params = new ArrayList<Object>();
+				
+				params.add(jgid);	
+				
+			
+
+				// 获取符合条件的记录
+				return this.jdbcTemplate.queryForMap(sb.toString(), params.toArray());
+			//	List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+					//	params.toArray());
+			//	Map<String,Object> obj = new HashMap<>();
+			//	obj.put("data", ls);
+				//	return obj;
+				
+	}
+
 }
