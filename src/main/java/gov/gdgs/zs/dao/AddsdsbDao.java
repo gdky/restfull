@@ -125,7 +125,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_sdsb_jygmtjb ");	
 		sb.append("  ( id,jg_id,use_id,snsrze,bnsrze_hj,bnsrze_ssfw,bnsrze_ssjz,bnsrze_qtyw,nd,sbrq,ztbj,tbr,sz)");
-		sb.append("values ( :id,:jg_id,:use_id,:snsrze,:bnsrze_hj,:bnsrze_ssfw,:bnsrze_ssjz,:bnsrze_qtyw,:nd,sysdate(),:ztbj,:tbr,:sz)");	
+		sb.append("values (:id,:jg_id,:use_id,:snsrze,:bnsrze_hj,:bnsrze_ssfw,:bnsrze_ssjz,:bnsrze_qtyw,:nd,sysdate(),:ztbj,:tbr,:sz)");	
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		if(count==0){
@@ -150,12 +150,12 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 
 		Condition condition = new Condition();
 		condition.add("a.nd", "FUZZY", where.get("nd"));
-		condition.add("a.ZTBJ", "FUZZY", where.get("ZTBJ"));		
+		condition.add("a.ZTBJ", "FUZZY", where.get("ztbj"));		
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,a.SNSRZE,a.nd,a.BNSRZE_HJ,a.BNSRZE_SSFW,a.BNSRZE_SSJZ,a.BNSRZE_QTYW,b.DWMC,");	
-		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
+		sb.append(" FROM   ( select a.id,a.SNSRZE,a.TBR,a.SZ,date_format(a.SBRQ,'%Y-%m-%d') as SBRQ,a.nd,a.BNSRZE_HJ,a.BNSRZE_SSFW,a.BNSRZE_SSJZ,a.BNSRZE_QTYW,b.DWMC,a.ZTBJ,");	
+		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTDM");		
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_sdsb_jygmtjb a,zs_jg b,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());// 相当元 where b.DWMC like '%%'

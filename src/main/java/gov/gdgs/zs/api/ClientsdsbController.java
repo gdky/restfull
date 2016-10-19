@@ -305,13 +305,17 @@ public class ClientsdsbController {
 	/*
 	 * 客户端获取经营规模表上年数据
 	 */
+	
 	@RequestMapping(value = "/client/jygmtjinit", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, Object>> getOk1(
-			@PathVariable("jg_id") String jgid) {
-		User user = accountService.getUserFromHeaderToken(request);
-		Map<String, Object> obj = addsdsbService.getOK1(user.getJgId().toString());
+	public ResponseEntity<Map<String, Object>> checkLrb(
+			@RequestParam(value = "where", required = false) String where,
+			HttpServletRequest request) {
+		String jgid = accountService.getUserFromHeaderToken(request).getJgId()
+				.toString();
+		Map<String, Object> obj = addsdsbService.getEditJygmtjInit(jgid, where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
+	
 
 	/*
 	 * 客户端添加经营规模表
