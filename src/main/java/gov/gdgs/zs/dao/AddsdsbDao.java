@@ -255,12 +255,12 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 
 		Condition condition = new Condition();
 		condition.add("a.nd", "FUZZY", where.get("nd"));
-		condition.add("a.ZTBJ", "FUZZY", where.get("ZTBJ"));		
+		condition.add("a.ztbj", "FUZZY", where.get("ztbj"));		
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
 		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.HSQJJE_HS,a.HSQJJE_JE,a.TZYNSDSE_HS,a.TZYNSDSE_JE,");	
-		sb.append("  a.TJYNSDSE_JE,a.TJYNSDSE_HS,");
+		sb.append("  a.TJYNSDSE_JE,a.TJYNSDSE_HS,a.ztbj as ztdm,");
 		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_sdsb_jzywqktjb a,zs_jg b,(SELECT @rownum:=?) temp");

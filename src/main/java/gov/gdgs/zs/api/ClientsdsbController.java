@@ -357,13 +357,23 @@ public class ClientsdsbController {
 	@RequestMapping(value = "/client/jzywqktjb", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getJzywqktjb(
 			@RequestParam(value = "page", required = true) int page,
-			@RequestParam(value = "pageSize", required = true) int pageSize,
-			@RequestParam(value = "where", required = false) String where,
-			HttpServletRequest request) throws Exception {
+			@RequestParam(value = "pagesize", required = true) int pageSize,
+			@RequestParam(value = "where", required = false) String where) {
 		User user = accountService.getUserFromHeaderToken(request);
 		Map<String, Object> obj = addsdsbService.getJzywqktjb(page, pageSize,
 				user.getId(), user.getJgId(), where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	/*
+	 * 获取表6填报初始数据
+	 */
+	@RequestMapping(value = "/client/jzywqktjbinit", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getJzywqktjbinit(
+			@RequestParam(value = "id", required = false) String id ) {
+		User user = accountService.getUserFromHeaderToken(request);
+			Map<String, Object> obj = addsdsbService.getJzywqktjbinit(user);
+			return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
 	/*
