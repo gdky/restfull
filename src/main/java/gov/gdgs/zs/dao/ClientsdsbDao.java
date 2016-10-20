@@ -36,9 +36,9 @@ public class ClientsdsbDao extends BaseJdbcDao {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.RYZS_RY_ZJ,a.ZYSWS_RY_ZJ,a.QTCYRY_RY_ZJ,");
-		sb.append(" DATE_FORMAT(a.SBRQ,'%Y-%m-%d') as SBRQ,");
-		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");
+		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.RYZS_RY_ZJ,a.ZYSWS_RY_ZJ,a.QTCYRY_RY_ZJ,a.ZTBJ as ztdm,");	
+		sb.append(" DATE_FORMAT(a.SBRQ,'%Y-%m-%d') as SBRQ,");	
+		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_sdsb_hyryqktj a,zs_jg b,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());// 相当元 where 1=1;
@@ -70,10 +70,8 @@ public class ClientsdsbDao extends BaseJdbcDao {
 	}
 
 	public Map<String, Object> getHyryqktjbById(String id) {
-		String sql = "select b.DWMC,a.* from "
-				+ Config.PROJECT_SCHEMA
-				+ "zs_sdsb_hyryqktj a, zs_jg b where a.jg_id = b.id and a.id = ?";
-		Map<String, Object> rs = jdbcTemplate.queryForMap(sql, id);
+		String sql = "select b.DWMC,a.*,DATE_FORMAT(a.SBRQ,'%Y-%m-%d') as sbrqM from "+Config.PROJECT_SCHEMA+"zs_sdsb_hyryqktj a, zs_jg b where a.jg_id = b.id and a.id = ?";
+		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
 
@@ -150,21 +148,16 @@ public class ClientsdsbDao extends BaseJdbcDao {
 		named.update(sb.toString(), obj);
 
 	}
-
-	public Map<String, Object> getOk(String jgid) {
-		Hashids hashids = new Hashids(Config.HASHID_SALT, Config.HASHID_LEN);
-		int gid = (int) hashids.decode(jgid)[0];
-		String sql = "select b.DWMC,a.* from "
-				+ Config.PROJECT_SCHEMA
-				+ "zs_sdsb_swsjbqk a,zs_jg b where jg_id=? and a.JG_ID=b.ID and nd=(select max(nd) from zs_sdsb_swsjbqk )";
-		List<Map<String, Object>> rs = jdbcTemplate.queryForList(sql, gid);
-		Map<String, Object> ob = new HashMap<>();
-		ob.put("data", rs);
-		if (ob.size() > 0) {
-			return ob;
-		} else {
-			return null;
-		}
+	
+	public List<Map<String, Object>> hyryqktjCheck(Integer jgid,int nd) {
+		String sql = "select id from zs_sdsb_hyryqktj a where jg_id=? and nd=?";
+		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,new Object[]{jgid,nd});
+		return rs;
+	}
+	public List<Map<String, Object>> hyryqktjIntit(Integer jgid,int nd) {
+		String sql = "select b.DWMC,b.fddbr as sz,a.nd,a.ryzs as ryzs_ry_zj,a.zyzcswsrs as zysws_ry_zj,a.ryzs-a.zyzcswsrs as qtcyry_ry_zj from zs_sdsb_swsjbqk a,zs_jg b where jg_id=? and a.JG_ID=b.ID and nd=?";
+		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,new Object[]{jgid,nd});
+		return rs;
 	}
 
 	public Map<String, Object> getJysrqkb(int page, int pageSize, int Jgid,

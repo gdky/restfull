@@ -1229,7 +1229,7 @@ public class SPDao extends BaseDao{
 						rec.add(jls.get(rowNum).get("id")+"");
 					} catch (Exception e) {
 						String insetnbSql="insert into zs_jl (QZNY,XXXX,ZMR,ID,RY_ID) values(?,?,?,replace(uuid(),'-',''),?)";
-						rec.add((String) ryid);
+						rec.add(ryid.toString());
 						this.jdbcTemplate.update(insetnbSql,rec.toArray());
 					}
 					this.jdbcTemplate.update(nbSql,rec.toArray());
@@ -1237,7 +1237,7 @@ public class SPDao extends BaseDao{
 			}else{
 				for(List<String> rec:nb){//插入人员简历
 					String nbSql="insert into zs_jl (QZNY,XXXX,ZMR,ID,RY_ID) values(?,?,?,replace(uuid(),'-',''),?)";
-					rec.add((String) ryid);
+					rec.add(ryid.toString());
 					this.jdbcTemplate.update(nbSql,rec.toArray());
 				}
 			}

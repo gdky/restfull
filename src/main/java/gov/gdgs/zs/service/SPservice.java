@@ -140,27 +140,27 @@ public class SPservice {
 	public void fspsq(Map<String,Object> ptxm,String splx)throws Exception {
 		 switch (splx) {
 			case "jgbgsq"://机构信息变更
-				this.spDao.updatePTXM(ptxm);
+				this.spDao.updatePTXM(ptxm);break;
 			case "zyzrfs"://执业转入分所
-				this.spDao.zyzrfssq(ptxm);
+				this.spDao.zyzrfssq(ptxm);break;
 			case "cydrsq"://从业转入分所
-				this.spDao.cydrsq(ptxm);
+				this.spDao.cydrsq(ptxm);break;
 			case "zydrzssq"://执业调入主所
-				this.spDao.zydrzssq(ptxm);
+				this.spDao.zydrzssq(ptxm);break;
 			case "cydrzssq"://从业调入主所
-				this.spDao.cydrzssq(ptxm);
+				this.spDao.cydrzssq(ptxm);break;
 			case "cyrybgsq"://从业信息变更
-				this.spDao.cyrybgsq(ptxm);
+				this.spDao.cyrybgsq(ptxm);break;
 			case "cyrybasq"://从业备案申请
-				this.spDao.cyrybasq(ptxm);
+				this.spDao.cyrybasq(ptxm);break;
 			case "cyzxsq"://从业注销申请
-				this.spDao.cyzxsq(ptxm);
+				this.spDao.cyzxsq(ptxm);break;
 			case "cydcsq"://从业调出申请
-				this.spDao.cydcsq(ptxm);
+				this.spDao.cydcsq(ptxm);break;
 			case "cyzcsq"://从业转出申请
-				this.spDao.cyzcsq(ptxm);
+				this.spDao.cyzcsq(ptxm);break;
 			case "cyzrfssq"://从业转入分所
-				this.spDao.cyzrfssq(ptxm);
+				this.spDao.cyzrfssq(ptxm);break;
 		 }
 	}
 
