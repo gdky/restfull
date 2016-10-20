@@ -5,35 +5,40 @@ import gov.gdgs.zs.untils.Condition;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import javax.annotation.Resource;
 
 import org.hashids.Hashids;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
+import com.gdky.restfull.exception.BbtbException;
 
 @Repository
-public class ClientsdsbDao extends BaseJdbcDao{
+public class ClientsdsbDao extends BaseJdbcDao {
 
 	/*
 	 * 行业人员统计表
 	 */
-	public Map<String, Object> getHyryqktjb(int page, int pageSize,int Jgid,
+	public Map<String, Object> getHyryqktjb(int page, int pageSize, int Jgid,
 			Map<String, Object> where) {
 
 		Condition condition = new Condition();
 		condition.add("a.nd", "FUZZY", where.get("nd"));
-		condition.add("a.ZTBJ", "FUZZY", where.get("ZTBJ"));		
+		condition.add("a.ZTBJ", "FUZZY", where.get("ZTBJ"));
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.RYZS_RY_ZJ,a.ZYSWS_RY_ZJ,a.QTCYRY_RY_ZJ,");	
-		sb.append(" DATE_FORMAT(a.SBRQ,'%Y-%m-%d') as SBRQ,");	
-		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
+		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.RYZS_RY_ZJ,a.ZYSWS_RY_ZJ,a.QTCYRY_RY_ZJ,");
+		sb.append(" DATE_FORMAT(a.SBRQ,'%Y-%m-%d') as SBRQ,");
+		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_sdsb_hyryqktj a,zs_jg b,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());// 相当元 where 1=1;
@@ -63,19 +68,21 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		obj.put("current", page);
 		return obj;
 	}
-	
+
 	public Map<String, Object> getHyryqktjbById(String id) {
-		String sql = "select b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_hyryqktj a, zs_jg b where a.jg_id = b.id and a.id = ?";
-		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
+		String sql = "select b.DWMC,a.* from "
+				+ Config.PROJECT_SCHEMA
+				+ "zs_sdsb_hyryqktj a, zs_jg b where a.jg_id = b.id and a.id = ?";
+		Map<String, Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
-	
-	public String AddHyryqktjb( Map <String,Object> obj){
-		String uuid = UUID.randomUUID().toString().replace("-", "");		
+
+	public String AddHyryqktjb(Map<String, Object> obj) {
+		String uuid = UUID.randomUUID().toString().replace("-", "");
 		obj.put("id", uuid);
-		
+
 		final StringBuffer sb = new StringBuffer("insert into "
-				+ Config.PROJECT_SCHEMA + "zs_sdsb_hyryqktj ");	
+				+ Config.PROJECT_SCHEMA + "zs_sdsb_hyryqktj ");
 		sb.append("  ( id,jg_id,use_id,nd,sbrq,ztbj,zbr,sz,ryzs_ry_zj,ryzs_ry_nv,ryzs_xl_yjs,ryzs_xl_bk,ryzs_xl_dz,ryzs_xl_zz,ryzs_nl_35,");
 		sb.append(" ryzs_nl_50,ryzs_nl_60l,ryzs_nl_60u,ryzs_zzmm_gcd,ryzs_zzmm_mzp,bz1,bz2,bz3,bz4,bz5,bz6,bz7,bz8,zysws_ry_zj,zysws_ry_nv,");
 		sb.append(" zysws_xl_yjs,zysws_xl_bk,zysws_xl_dz,zysws_xl_zz,zysws_nl_35,zysws_nl_50,zysws_nl_60l,zysws_nl_60u,zysws_zzmm_gcd,");
@@ -102,18 +109,19 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		sb.append(" :zcpgs_ry_nv,:zcpgs_xl_yjs,:zcpgs_xl_bk,:zcpgs_xl_dz,:zcpgs_xl_zz,:zcpgs_nl_35,:zcpgs_nl_50,:zcpgs_nl_60l,:zcpgs_nl_60u,:zcpgs_zzmm_gcd,");
 		sb.append(" :zcpgs_zzmm_mzp,:bz49,:bz50,:bz51,:bz52,:bz53,:bz54,:bz55,:bz56,:ls_ry_zj,:ls_ry_nv,:ls_xl_yjs,:ls_xl_bk,:ls_xl_dz,:ls_xl_zz,:ls_nl_35,:ls_nl_50,");
 		sb.append(" :ls_nl_60l,:ls_nl_60u,:ls_zzmm_gcd,:ls_zzmm_mzp,:bz57,:bz58,:bz59,:bz60,:bz61,:bz62,:bz63,:bz64)");
-		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
-		int count=named.update(sb.toString(), obj);
-		if(count==0){
-		return null;
-	 }else {
-		return uuid;
-	 }
+		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
+		int count = named.update(sb.toString(), obj);
+		if (count == 0) {
+			return null;
+		} else {
+			return uuid;
+		}
 	}
-	
-	public void UpdateHyryqktjb(Map <String,Object> obj) {
-		 StringBuffer sb = new StringBuffer("update "
-				+ Config.PROJECT_SCHEMA + "zs_sdsb_hyryqktj ");
+
+	public void UpdateHyryqktjb(Map<String, Object> obj) {
+		StringBuffer sb = new StringBuffer("update " + Config.PROJECT_SCHEMA
+				+ "zs_sdsb_hyryqktj ");
 		sb.append(" set jg_id=:jg_id,use_id=:use_id,nd=:nd,sbrq=sysdate(),ztbj=:ztbj,zbr=:zbr,sz=:sz,ryzs_ry_zj=:ryzs_ry_zj,ryzs_ry_nv=:ryzs_ry_nv,");
 		sb.append(" ryzs_xl_yjs=:ryzs_xl_yjs,ryzs_xl_bk=:ryzs_xl_bk,ryzs_xl_dz=:ryzs_xl_dz,ryzs_xl_zz=:ryzs_xl_zz,ryzs_nl_35=:ryzs_nl_35,ryzs_nl_50=:ryzs_nl_50,");
 		sb.append(" ryzs_nl_60l=:ryzs_nl_60l,ryzs_nl_60u=:ryzs_nl_60u,ryzs_zzmm_gcd=:ryzs_zzmm_gcd,ryzs_zzmm_mzp=:ryzs_zzmm_mzp,bz1=:bz1,bz2=:bz2,bz3=:bz3,bz4=:bz4,");
@@ -137,37 +145,39 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		sb.append(" bz49=:bz49,bz50=:bz50,bz51=:bz51,bz52=:bz52,bz53=:bz53,bz54=:bz54,bz55=:bz55,bz56=:bz56,ls_ry_zj=:ls_ry_zj,ls_ry_nv=:ls_ry_nv,ls_xl_yjs=:ls_xl_yjs,");
 		sb.append(" ls_xl_bk=:ls_xl_bk,ls_xl_dz=:ls_xl_dz,ls_xl_zz=:ls_xl_zz,ls_nl_35=:ls_nl_35,ls_nl_50=:ls_nl_50,ls_nl_60l=:ls_nl_60l,ls_nl_60u=:ls_nl_60u,");
 		sb.append(" ls_zzmm_gcd=:ls_zzmm_gcd,ls_zzmm_mzp=:ls_zzmm_mzp,bz57=:bz57,bz58=:bz58,bz59=:bz59,bz60=:bz60,bz61=:bz61,bz62=:bz62,bz63=:bz63,bz64=:bz64 where id=:id");
-		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
+		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
-		
-	
+
 	}
-	
+
 	public Map<String, Object> getOk(String jgid) {
-		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
-		int gid = (int)hashids.decode(jgid)[0];
-		String sql = "select b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_swsjbqk a,zs_jg b where jg_id=? and a.JG_ID=b.ID and nd=(select max(nd) from zs_sdsb_swsjbqk )";
-		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,gid);
-		Map<String,Object> ob = new HashMap<>();
+		Hashids hashids = new Hashids(Config.HASHID_SALT, Config.HASHID_LEN);
+		int gid = (int) hashids.decode(jgid)[0];
+		String sql = "select b.DWMC,a.* from "
+				+ Config.PROJECT_SCHEMA
+				+ "zs_sdsb_swsjbqk a,zs_jg b where jg_id=? and a.JG_ID=b.ID and nd=(select max(nd) from zs_sdsb_swsjbqk )";
+		List<Map<String, Object>> rs = jdbcTemplate.queryForList(sql, gid);
+		Map<String, Object> ob = new HashMap<>();
 		ob.put("data", rs);
-		if(ob.size()>0){
+		if (ob.size() > 0) {
 			return ob;
-		}else{
+		} else {
 			return null;
 		}
 	}
-	
-	public Map<String, Object> getJysrqkb(int page, int pageSize,int Jgid,
+
+	public Map<String, Object> getJysrqkb(int page, int pageSize, int Jgid,
 			Map<String, Object> where) {
 
 		Condition condition = new Condition();
 		condition.add("a.nd", "FUZZY", where.get("nd"));
-		condition.add("a.ZTBJ", "FUZZY", where.get("ZTBJ"));		
+		condition.add("a.ZTBJ", "FUZZY", where.get("ztbj"));
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.SRZE,a.ZCZE,a.LRZE,");	
-		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
+		sb.append(" FROM   ( select a.id,a.nd,b.DWMC,a.SRZE,a.ZCZE,a.LRZE,a.ZTBJ,");
+		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTMC");
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_sdsb_jysrqk a,zs_jg b,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());// 相当元 where 1=1;
@@ -197,19 +207,22 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		obj.put("current", page);
 		return obj;
 	}
-	
+
 	public Map<String, Object> getJysrqkbById(String id) {
-		String sql = "select b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_jysrqk a, zs_jg b where a.jg_id = b.id and a.id = ?";
-		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
+		String sql = "select b.DWMC,a.* from " + Config.PROJECT_SCHEMA
+				+ "zs_sdsb_jysrqk a, zs_jg b where a.jg_id = b.id and a.id = ?";
+		Map<String, Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
-	
-	public String AddJysrqkb( Map <String,Object> obj){
-		String uuid = UUID.randomUUID().toString().replace("-", "");		
+
+	public String AddJysrqkb(Map<String, Object> obj) {
+		 if (isExists(obj.get("nd"), obj.get("jg_id"), "zs_sdsb_jysrqk")) {
+		 throw new BbtbException("该年度报表已存在，请勿重复添加");
+		 }
+		String uuid = UUID.randomUUID().toString().replace("-", "");
 		obj.put("id", uuid);
-		
 		final StringBuffer sb = new StringBuffer("insert into "
-				+ Config.PROJECT_SCHEMA + "zs_sdsb_jysrqk ");	
+				+ Config.PROJECT_SCHEMA + "zs_sdsb_jysrqk ");
 		sb.append("  ( id,jg_id,use_id,nd,sbrq,ztbj,tbr,sz,srze0,srze,zyywsrhj_hs0,zyywsrhj_je0,zyywsrhj_hs,zyywsrhj_je,ssfwyw_hs0,");
 		sb.append("  ssfwyw_je0,ssfwyw_hs,ssfwyw_je,dlswdj_hs0,dlswdj_je0,dlswdj_hs,dlswdj_je,dlnssb_hs0,dlnssb_je0,dlnssb_hs,");
 		sb.append("  dlnssb_je,dljzjz_hs0,dljzjz_je0,dljzjz_hs,dljzjz_je,dlsqjmts_hs0,dlsqjmts_je0,dlsqjmts_hs,dlsqjmts_je,");
@@ -232,18 +245,36 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		sb.append(" :qtssjz_hs,:qtssjz_je,:qtssywsr_hs10,:qtssywsr_je10,:qtssywsr_hs1,:qtssywsr_je1,:qtssywsr_hs20,:qtssywsr_je20,:qtssywsr_hs2,");
 		sb.append(" :qtssywsr_je2,:qtssywsr_hs30,:qtssywsr_je30,:qtssywsr_hs3,:qtssywsr_je3,:qtywsrhj0,:qtywsrhj,:zcze0,:zcze,:zyywcb0,:zyywcb,");
 		sb.append(" :zyywsjfj0,:zyywsjfj,:yyfy0,:yyfy,:glfy0,:glfy,:cwfy0,:cwfy,:yywzc0,:yywzc,:qtzc0,:qtzc,:lrze0,:lrze)");
-		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
-		int count=named.update(sb.toString(), obj);
-		if(count==0){
-		return null;
-	 }else {
-		return uuid;
-	 }
+		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
+		int count = named.update(sb.toString(), obj);
+		if (count == 0) {
+			return null;
+		} else {
+			String ztbj = obj.get("ztbj").toString();
+			if ("1".equals(ztbj)) {
+				String id = UUID.randomUUID().toString().replace("-", "");
+				Map<String, Object> data = new HashMap<>();
+				data.put("id", id);
+				data.put("jg_id", obj.get("jg_id"));
+				data.put("use_id", obj.get("use_id"));
+				data.put("nd", obj.get("nd"));
+				data.put("ztbj", "0");
+				data.put("tbr", obj.get("tbr"));
+				data.put("sz", obj.get("sz"));
+				String sql = "insert into zs_sdsb_jygmtjb (id,jg_id,use_id,nd,sbrq,ztbj,tbr,sz)values(:id,:jg_id,:use_id,:nd,sysdate(),:ztbj,:tbr,:sz)";
+				if (!isExists(data.get("nd"), data.get("jg_id"),
+						"zs_sdsb_jygmtjb")) {
+					int rs = named.update(sql, data);
+				}
+			}
+			return uuid;
+		}
 	}
-	
-	public void UpdateJysrqkb(Map <String,Object> obj) {
-		 StringBuffer sb = new StringBuffer("update "
-				+ Config.PROJECT_SCHEMA + "zs_sdsb_jysrqk ");
+
+	public void UpdateJysrqkb(Map<String, Object> obj) {
+		StringBuffer sb = new StringBuffer("update " + Config.PROJECT_SCHEMA
+				+ "zs_sdsb_jysrqk ");
 		sb.append(" set jg_id=:jg_id,use_id=:use_id,nd=:nd,sbrq=sysdate(),ztbj=:ztbj,tbr=:tbr,sz=:sz,srze0=:srze0,srze=:srze,zyywsrhj_hs0=:zyywsrhj_hs0,");
 		sb.append(" zyywsrhj_je0=:zyywsrhj_je0,zyywsrhj_hs=:zyywsrhj_hs,zyywsrhj_je=:zyywsrhj_je,ssfwyw_hs0=:ssfwyw_hs0,ssfwyw_je0=:ssfwyw_je0,");
 		sb.append(" ssfwyw_hs=:ssfwyw_hs,ssfwyw_je=:ssfwyw_je,dlswdj_hs0=:dlswdj_hs0,dlswdj_je0=:dlswdj_je0,dlswdj_hs=:dlswdj_hs,dlswdj_je=:dlswdj_je,");
@@ -262,60 +293,113 @@ public class ClientsdsbDao extends BaseJdbcDao{
 		sb.append(" qtssywsr_je30=:qtssywsr_je30,qtssywsr_hs3=:qtssywsr_hs3,qtssywsr_je3=:qtssywsr_je3,qtywsrhj0=:qtywsrhj0,qtywsrhj=:qtywsrhj,zcze0=:zcze0,");
 		sb.append(" zcze=:zcze,zyywcb0=:zyywcb0,zyywcb=:zyywcb,zyywsjfj0=:zyywsjfj0,zyywsjfj=:zyywsjfj,yyfy0=:yyfy0,yyfy=:yyfy,glfy0=:glfy0,glfy=:glfy,cwfy0=:cwfy0,");
 		sb.append(" cwfy=:cwfy,yywzc0=:yywzc0,yywzc=:yywzc,qtzc0=:qtzc0,qtzc=:qtzc,lrze0=:lrze0,lrze=:lrze where id=:id");
-		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
-		named.update(sb.toString(), obj);
-		
-	
+		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
+				jdbcTemplate.getDataSource());
+		int count = named.update(sb.toString(), obj);
+		if (count > 0) {
+			String ztbj = obj.get("ztbj").toString();
+			if ("1".equals(ztbj)) {
+				String id = UUID.randomUUID().toString().replace("-", "");
+				Map<String, Object> data = new HashMap<>();
+				data.put("id", id);
+				data.put("jg_id", obj.get("jg_id"));
+				data.put("use_id", obj.get("use_id"));
+				data.put("nd", obj.get("nd"));
+				data.put("ztbj", "0");
+				data.put("tbr", obj.get("tbr"));
+				data.put("sz", obj.get("sz"));
+				String sql = "insert into zs_sdsb_jygmtjb (id,jg_id,use_id,nd,sbrq,ztbj,tbr,sz)values(:id,:jg_id,:use_id,:nd,sysdate(),:ztbj,:tbr,:sz)";
+				if (!isExists(data.get("nd"), data.get("jg_id"),
+						"zs_sdsb_jygmtjb")) {
+					int rs = named.update(sql, data);
+				}
+			}
+		}
 	}
-	public Map<String, Object> getUpyear(String jgid) {
-		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
-		int gid = (int)hashids.decode(jgid)[0];
-		String sql = "select a.nd,b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_jysrqk a,zs_jg b where a.jg_id=b.id and jg_id=? and a.ND=( date_format(sysdate(),'%Y')-2)";
-		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,gid);
-		Map<String,Object> ob = new HashMap<>();
-		ob.put("upyear", rs);
-			return ob;
+
+	public Map<String, Object> getJysrqkbUpyear(String jgid) {
+		StringBuffer sql = new StringBuffer(
+				" select year(sysdate()) - 1 tbnd, ");
+		sql.append("        j.dwmc, ");
+		sql.append("        j.FDDBR tbsz, ");
+		sql.append("        jb.srze bn_srze, ");
+		sql.append("        jb.lrze bn_lrze, ");
+		sql.append("        jy.* ");
+		sql.append("   from zs_jg j ");
+		sql.append("   left join zs_sdsb_jysrqk jy ");
+		sql.append("     on j.id = jy.jg_id ");
+		sql.append("    and jy.nd = (date_format(sysdate(), '%Y') - 2) ");
+		sql.append("   left join zs_sdsb_swsjbqk jb ");
+		sql.append("     on j.id = jb.jg_id ");
+		sql.append("    and jb.nd = (date_format(sysdate(), '%Y') - 1) ");
+		sql.append("  where j.id = ? ");
+		List<Map<String, Object>> rs = jdbcTemplate.queryForList(
+				sql.toString(), jgid);
+		Map<String, Object> ob = new HashMap<>();
+		ob.put("upyear", rs.get(0));
+		return ob;
 	}
 
 	public List<Map<String, Object>> getSwsTj(Integer jgId, int nd) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select j.dwmc,j.jgxz_dm,t.zysws_sfnum ");
+		sb.append(" select j.dwmc,j.jgxz_dm,t.zysws_sfnum,j.fddbr,j.cs_dm ");
 		sb.append(" from zs_jg j, zs_tj_jgjbqk t ");
 		sb.append(" where j.ID = t.jg_id ");
 		sb.append(" and t.nd = ? ");
 		sb.append(" and t.jg_id = ? ");
-		
-		return this.jdbcTemplate.queryForList(sb.toString(), new Object[]{nd,jgId});
+
+		return this.jdbcTemplate.queryForList(sb.toString(), new Object[] { nd,
+				jgId });
 	}
-	
-	public BigDecimal getSrze (int nd, Integer jgid){
+
+	public BigDecimal getSrze(int nd, Integer jgid) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select zgywsr from zs_cwbb_lrgd  ");
 		sb.append(" where nd = ? ");
 		sb.append(" and jg_id = ? ");
 		sb.append(" and timevalue = 1 ");
 		sb.append(" and ztbj= 1 ");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(), new Object[]{nd,jgid});
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sb.toString(), new Object[] { nd, jgid });
 		if (ls.size() == 0) {
 			return null;
-		}else {
-			Map<String,Object> map = ls.get(0);
+		} else {
+			Map<String, Object> map = ls.get(0);
 			return (BigDecimal) map.get("zgywsr");
 		}
 	}
 
 	public boolean isExists(Object nd, Object jgId, String tableName) {
-		String sql = "select id from " + tableName+ " where jg_id = ? and nd = ? ";
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql, new Object[]{jgId,nd});
-		if (ls.size()>0){
+		String sql = "select id from " + tableName
+				+ " where jg_id = ? and nd = ? ";
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
+				new Object[] { jgId, nd });
+		if (ls.size() > 0) {
 			return true;
 		}
 		return false;
 	}
 
-	public Map<String,Object> getJbqkNd(String id) {
+	public Map<String, Object> getJbqkNd(String id) {
 		String sql = "select nd,zyzcswsrs from zs_sdsb_swsjbqk where id = ?";
-		return this.jdbcTemplate.queryForMap(sql, new Object[]{id});
+		return this.jdbcTemplate.queryForMap(sql, new Object[] { id });
+	}
+
+	
+	public boolean checkAddJysrqkb(String jgid) {
+		// TODO Auto-generated method stub
+		int nd=(Calendar.getInstance().get(Calendar.YEAR))-1;
+		String swsqkSql="select b.ID from zs_sdsb_swsjbqk b where b.JG_ID=? and b.ZTBJ='2' and b.ND=year(sysdate())-1 ";
+		List<String> ls=this.jdbcTemplate.queryForList(swsqkSql, new Object[]{jgid}, String.class);
+		if(ls.size()>0){
+			if(isExists(nd, jgid, "zs_sdsb_jysrqk")){
+				return false;
+			}else{
+				return true;
+			}
+		}else{
+			return false;			
+		}
 	}
 
 	public Map<String, Object> getEditJygmtjInit(String jgid,

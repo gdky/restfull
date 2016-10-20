@@ -116,17 +116,26 @@ public class ClientsdsbController {
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
+	/**
+	 * 客户端判断是否可以添加经营收入情况统计表
+	 * @return
+	 */
+	@RequestMapping(value = "/client/jysrqkb/checkAdd", method = RequestMethod.GET)
+	public ResponseEntity<Boolean> checkAddJysrqkb() {
+		String jgid=accountService.getUserFromHeaderToken(request).getJgId().toString();
+		boolean result = clientsdsbService.checkAddJysrqkb(jgid);
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
 	/*
 	 * 客户端获取经营收入统计表
 	 */
-	@RequestMapping(value = "/add/jysrqkb", method = RequestMethod.GET)
+	@RequestMapping(value = "/client/jysrqkb", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getJysrqkb(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pageSize", required = true) int pageSize,
-			@RequestParam(value = "where", required = false) String where,
-			HttpServletRequest request) throws Exception {
+			@RequestParam(value = "where", required = false) String where
+			) throws Exception {
 		User user = accountService.getUserFromHeaderToken(request);
-
 		return new ResponseEntity<>(clientsdsbService.getJysrqkb(page,
 				pageSize, user.getJgId(), where), HttpStatus.OK);
 	}
@@ -134,10 +143,9 @@ public class ClientsdsbController {
 	/*
 	 * 客户端获取经营收入情况表明细
 	 */
-	@RequestMapping(value = "/add/jysrqkb/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/client/jysrqkb/{id}", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getJysrqkbById(
-			@PathVariable("id") String id) {
-
+			@PathVariable("id") String id) { 
 		Map<String, Object> obj = clientsdsbService.getJysrqkbById(id);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
@@ -145,9 +153,9 @@ public class ClientsdsbController {
 	/*
 	 * 客户端添加经营收入情况表
 	 */
-	@RequestMapping(value = "/addjysrqkb", method = RequestMethod.POST)
+	@RequestMapping(value = "/client/jysrqkb", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> addJysrqkb(
-			@RequestBody Map<String, Object> obj, HttpServletRequest request)
+			@RequestBody Map<String, Object> obj)
 			throws Exception {
 		try {
 			User user = accountService.getUserFromHeaderToken(request);
@@ -155,7 +163,6 @@ public class ClientsdsbController {
 			obj.put("jg_id", user.getJgId());
 		} catch (Exception e) {
 		}
-
 		return new ResponseEntity<>(clientsdsbService.AddJysrqkb(obj),
 				HttpStatus.CREATED);
 	}
@@ -163,10 +170,10 @@ public class ClientsdsbController {
 	/*
 	 * 客户端修改经营收入情况表
 	 */
-	@RequestMapping(value = "/addjysrqkb/{id}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/client/jysrqkb/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateJysrqkb(
 			@PathVariable("id") String id,
-			@RequestBody Map<String, Object> obj, HttpServletRequest request)
+			@RequestBody Map<String, Object> obj)
 			throws Exception {
 		try {
 			User user = accountService.getUserFromHeaderToken(request);
@@ -174,21 +181,19 @@ public class ClientsdsbController {
 			obj.put("jg_id", user.getJgId());
 		} catch (Exception e) {
 		}
-
+		obj.put("id", id);
 		clientsdsbService.UpdateJysrqkb(obj);
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),
 				HttpStatus.OK);
-
 	}
 
 	/*
 	 * 客户端获取上年经营收入表数据
 	 */
-	@RequestMapping(value = "/add/upyear1/{jg_id}", method = RequestMethod.GET)
-	public ResponseEntity<Map<String, Object>> getUpyear1(
-			@PathVariable("jg_id") String jgid) {
-
-		Map<String, Object> obj = clientsdsbService.getUpyear(jgid);
+	@RequestMapping(value = "/client/jysrqkb/getUpyear", method = RequestMethod.GET)
+	public ResponseEntity<Map<String, Object>> getJysrqkbUpyear() {
+        String jgid=accountService.getUserFromHeaderToken(request).getJgId().toString();
+		Map<String, Object> obj = clientsdsbService.getJysrqkbUpyear(jgid);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
@@ -204,7 +209,7 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端获取事务所基本情况表
+	 * 客户端获取事务所基本情况表1
 	 */
 	@RequestMapping(value = "/client/swsjbqk", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getSwsjbqk(
@@ -218,7 +223,7 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端获取事务所基本情况表明细
+	 * 客户端获取事务所基本情况表1明细
 	 */
 	@RequestMapping(value = "/client/swsjbqk/{id}", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getSwsjbqkById(
@@ -229,7 +234,7 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端添加事务所基本情况表
+	 * 客户端添加事务所基本情况表1
 	 */
 	@RequestMapping(value = "/client/swsjbqk", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> addSwsjbb(
@@ -242,7 +247,7 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端获取填报基本情况表所需基本信息
+	 * 客户端获取填报基本情况表1所需基本信息
 	 */
 	@RequestMapping(value = "/client/swsjbqkinit", method = RequestMethod.GET)
 	public ResponseEntity<?> getSwsjbqkInit(
@@ -259,7 +264,7 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端修改事务所基本情况表
+	 * 客户端修改事务所基本情况表1
 	 */
 	@RequestMapping(value = "/client/swsjbqk/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateSwsjbqk(
@@ -356,9 +361,9 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端获取鉴证业务情况统计表
+	 * 客户端获取鉴证业务情况统计表6
 	 */
-	@RequestMapping(value = "/add/jzywqktjb", method = RequestMethod.GET)
+	@RequestMapping(value = "/client/jzywqktjb", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getJzywqktjb(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pageSize", required = true) int pageSize,
@@ -371,9 +376,9 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端获取鉴证业务表的明细
+	 * 客户端获取鉴证业务表6的明细
 	 */
-	@RequestMapping(value = "/add/jzywqktjb/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/client/jzywqktjb/{id}", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getJzywqktjbById(
 			@PathVariable("id") String id) {
 
@@ -382,9 +387,9 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端添加鉴证业务表
+	 * 客户端添加鉴证业务表6
 	 */
-	@RequestMapping(value = "/addjzywqktjb", method = RequestMethod.POST)
+	@RequestMapping(value = "/client/jzywqktjb", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> addJzywqktjb(
 			@RequestBody Map<String, Object> obj, HttpServletRequest request)
 			throws Exception {
@@ -399,9 +404,9 @@ public class ClientsdsbController {
 	}
 
 	/*
-	 * 客户端修改鉴证业务表
+	 * 客户端修改鉴证业务表6
 	 */
-	@RequestMapping(value = "/addjzywqktjb/{id}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/client/jzywqktjb/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateJzywqktjb(
 			@PathVariable("id") String id,
 			@RequestBody Map<String, Object> obj, HttpServletRequest request)
