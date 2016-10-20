@@ -143,18 +143,15 @@ public class ClientsdsbDao extends BaseJdbcDao{
 	
 	}
 	
-	public Map<String, Object> getOk(String jgid) {
-		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
-		int gid = (int)hashids.decode(jgid)[0];
-		String sql = "select b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_swsjbqk a,zs_jg b where jg_id=? and a.JG_ID=b.ID and nd=(select max(nd) from zs_sdsb_swsjbqk )";
-		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,gid);
-		Map<String,Object> ob = new HashMap<>();
-		ob.put("data", rs);
-		if(ob.size()>0){
-			return ob;
-		}else{
-			return null;
-		}
+	public List<Map<String, Object>> hyryqktjCheck(Integer jgid,int nd) {
+		String sql = "select id from zs_sdsb_hyryqktj a where jg_id=? and nd=?";
+		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,new Object[]{jgid,nd});
+		return rs;
+	}
+	public List<Map<String, Object>> hyryqktjIntit(Integer jgid,int nd) {
+		String sql = "select b.DWMC,b.fddbr as sz,a.nd,a.ryzs as ryzs_ry_zj,a.zyzcswsrs as zysws_ry_zj,a.ryzs-a.zyzcswsrs as qtcyry_ry_zj from zs_sdsb_swsjbqk a,zs_jg b where jg_id=? and a.JG_ID=b.ID and nd=?";
+		List<Map<String,Object>> rs = jdbcTemplate.queryForList(sql,new Object[]{jgid,nd});
+		return rs;
 	}
 	
 	public Map<String, Object> getJysrqkb(int page, int pageSize,int Jgid,
