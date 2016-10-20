@@ -90,8 +90,14 @@ public class ClientsdsbService {
 		clientsdsbDao.UpdateJysrqkb(obj);
 	}
 	
-	public Map<String, Object> getUpyear(String jgid){
-		Map<String, Object >obj=clientsdsbDao.getUpyear(jgid);				
+	public Map<String, Object> getJysrqkbUpyear(String jgid){
+		Map<String, Object >obj=clientsdsbDao.getJysrqkbUpyear(jgid);				
 		return obj;
+	}
+	
+	
+	public boolean checkAddJysrqkb(String jgid) {
+		boolean result=clientsdsbDao.checkAddJysrqkb(jgid);
+		return result;
 	}
  }
