@@ -246,16 +246,15 @@ public class ClientsdsbController {
 	 */
 	@RequestMapping(value = "/client/swsjbqkinit", method = RequestMethod.GET)
 	public ResponseEntity<?> getSwsjbqkInit(
-			@RequestParam(value = "id", required = false) String id ) {
+			@RequestParam(value = "id", required = false) String id) {
 		User user = accountService.getUserFromHeaderToken(request);
-		if (id == null && StringUtils.isEmpty(id)){
+		if (id == null && StringUtils.isEmpty(id)) {
 			Map<String, Object> obj = addsdsbService.getSwsjbqkInit(user);
 			return new ResponseEntity<>(obj, HttpStatus.OK);
 		}
-		Map<String,Object> obj = addsdsbService.getSwsjbqkInit(user,id);
+		Map<String, Object> obj = addsdsbService.getSwsjbqkInit(user, id);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
-		
-		
+
 	}
 
 	/*
@@ -364,16 +363,16 @@ public class ClientsdsbController {
 				user.getId(), user.getJgId(), where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
-	
+
 	/*
 	 * 获取表6填报初始数据
 	 */
 	@RequestMapping(value = "/client/jzywqktjbinit", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getJzywqktjbinit(
-			@RequestParam(value = "id", required = false) String id ) {
+			@RequestParam(value = "id", required = false) String id) {
 		User user = accountService.getUserFromHeaderToken(request);
-			Map<String, Object> obj = addsdsbService.getJzywqktjbinit(user);
-			return new ResponseEntity<>(obj, HttpStatus.OK);
+		Map<String, Object> obj = addsdsbService.getJzywqktjbinit(user);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
 	/*
@@ -392,15 +391,11 @@ public class ClientsdsbController {
 	 */
 	@RequestMapping(value = "/client/jzywqktjb", method = RequestMethod.POST)
 	public ResponseEntity<Map<String, Object>> addJzywqktjb(
-			@RequestBody Map<String, Object> obj, HttpServletRequest request)
-			throws Exception {
-		try {
-			User user = accountService.getUserFromHeaderToken(request);
-			obj.put("use_id", user.getId());
-			obj.put("jg_id", user.getJgId());
-		} catch (Exception e) {
-		}
-		Map<String, Object> rs = iaddsdsbService.AddJzywqktjb(obj);
+			@RequestBody Map<String, Object> obj) {
+		User user = accountService.getUserFromHeaderToken(request);
+		obj.put("use_id", user.getId());
+		obj.put("jg_id", user.getJgId());
+		Map<String, Object> rs = addsdsbService.AddJzywqktjb(obj);
 		return new ResponseEntity<>(rs, HttpStatus.CREATED);
 	}
 

@@ -194,7 +194,7 @@ public class AddsdsbService implements IAddsdsbService {
 	@Override
 	public Map<String, Object> AddJzywqktjb(Map<String, Object> obj) {
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
-		String rs = iaddsdsbDao.AddJzywqktjb(obj);
+		String rs = addsdsbDao.AddJzywqktjb(obj);
 		map.put("id", rs);
 		return map;
 
@@ -230,7 +230,7 @@ public class AddsdsbService implements IAddsdsbService {
 		int now_y = cal.get(Calendar.YEAR);
 		//判断是否有提交表1
 		if(!this.haveLastYearSwsjbqk(last_y,user.getJgId())){
-			throw new BbtbException("请先填报事务所基本情况统计表1");
+			throw new BbtbException("必须在事务所基本情况统计表1通过后才能填写该表");
 		}
 		// 获取事务所名称和法人
 		Map<String,Object> sws = swsDao.swsxx(user.getJgId());
