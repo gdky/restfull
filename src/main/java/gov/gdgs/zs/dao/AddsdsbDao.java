@@ -50,8 +50,8 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 	public void UpdateSwsjbqkb(Map <String,Object> obj) {
 		 StringBuffer sb = new StringBuffer("update "
 				+ Config.PROJECT_SCHEMA + "zs_sdsb_swsjbqk ");
-		sb.append(" set jg_id=:jg_id,use_id=:use_id,nd=:nd,jgxz_dm=:jgxz_dm,frdbxm=:frdbxm,czrs=:czrs,hhrs=:hhrs,ryzs=:ryzs,");	
-		sb.append(" zyzcswsrs=:zyzcswsrs,zczj=:zczj,yysr=:yysr,zcze=:zcze,srze=:srze,lrze=:lrze,cs_dm=:cs_dm,");
+		sb.append(" set use_id=:use_id,frdbxm=:frdbxm,czrs=:czrs,hhrs=:hhrs,ryzs=:ryzs,");	
+		sb.append(" zyzcswsrs=:zyzcswsrs,zczj=:zczj,yysr=:yysr,zcze=:zcze,lrze=:lrze,cs_dm=:cs_dm,");
 		sb.append(" wths=:wths,sbrq=sysdate(),ztbj=:ztbj,tianbiaoren=:tianbiaoren,suozhang=:suozhang where id=:id");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
@@ -68,7 +68,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,b.DWMC,a.nd,a.FRDBXM,a.CZRS,a.HHRS,a.ZYZCSWSRS,a.RYZS,a.ZCZJ,a.YYSR,");	
+		sb.append(" FROM   ( select a.id,b.DWMC,a.nd,a.FRDBXM,a.CZRS,a.HHRS,a.ZYZCSWSRS,a.RYZS,a.ZCZJ,a.YYSR,a.ztbj as ztdm, ");	
 		sb.append(" case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else null end as JGXZ,");	
 		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
 		sb.append(" FROM " + "zs_sdsb_swsjbqk a,zs_jg b,(SELECT @rownum:=?) temp");
@@ -102,7 +102,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 	}
 	
 	public Map<String, Object> getSwsjbqkbById(String id) {
-		String sql = "select b.DWMC,c.MC as cs,a.JGXZ_DM as jgxzdm,b.CS_DM as csdm,case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else null end as JGXZ,"
+		String sql = "select b.DWMC,c.MC as cs, case a.JGXZ_DM when 1 then '合伙事务所' when 2 then '有限公司' when 3 then '无'  else '无' end as JGXZ,"
 				+ "a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_swsjbqk a, zs_jg b,dm_cs c where a.jg_id = b.id and b.CS_DM=c.ID and a.id = ?";
 		Map<String,Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
@@ -125,7 +125,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_sdsb_jygmtjb ");	
 		sb.append("  ( id,jg_id,use_id,snsrze,bnsrze_hj,bnsrze_ssfw,bnsrze_ssjz,bnsrze_qtyw,nd,sbrq,ztbj,tbr,sz)");
-		sb.append("values ( :id,:jg_id,:use_id,:snsrze,:bnsrze_hj,:bnsrze_ssfw,:bnsrze_ssjz,:bnsrze_qtyw,:nd,sysdate(),:ztbj,:tbr,:sz)");	
+		sb.append("values (:id,:jg_id,:use_id,:snsrze,:bnsrze_hj,:bnsrze_ssfw,:bnsrze_ssjz,:bnsrze_qtyw,:nd,sysdate(),:ztbj,:tbr,:sz)");	
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		if(count==0){
@@ -150,12 +150,12 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 
 		Condition condition = new Condition();
 		condition.add("a.nd", "FUZZY", where.get("nd"));
-		condition.add("a.ZTBJ", "FUZZY", where.get("ZTBJ"));		
+		condition.add("a.ZTBJ", "FUZZY", where.get("ztbj"));		
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
-		sb.append(" FROM   ( select a.id,a.SNSRZE,a.nd,a.BNSRZE_HJ,a.BNSRZE_SSFW,a.BNSRZE_SSJZ,a.BNSRZE_QTYW,");	
-		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTBJ");		
+		sb.append(" FROM   ( select a.id,a.SNSRZE,a.TBR,a.SZ,date_format(a.SBRQ,'%Y-%m-%d') as SBRQ,a.nd,a.BNSRZE_HJ,a.BNSRZE_SSFW,a.BNSRZE_SSJZ,a.BNSRZE_QTYW,b.DWMC,a.ZTBJ,");	
+		sb.append(" case a.ZTBJ when 1 then '提交' when 2 then '通过' when 0 then '保存' when 3 then '退回' else null end as ZTDM");		
 		sb.append(" FROM " + Config.PROJECT_SCHEMA
 				+ "zs_sdsb_jygmtjb a,zs_jg b,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());// 相当元 where b.DWMC like '%%'
