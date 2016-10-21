@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.configuration.Constants;
@@ -75,5 +76,21 @@ public class CheckingController {
 	@RequestMapping(value = "/commont/checkisbh/{spid}", method = { RequestMethod.GET })
 	public ResponseEntity<?> checkIsBH(@PathVariable(value = "spid") String spid) {
 		return new ResponseEntity<>(chService.checkIsBH(spid),HttpStatus.OK);
+	}
+	/**
+	 * 检查是否可以提交报表
+	 * @param obj
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/commont/checiftjbb/{bblx}", method = RequestMethod.GET)
+	public ResponseEntity<?> addLrfpb(
+			@PathVariable(value = "bblx") String bblx,
+			@RequestParam(value = "checked", required = true) String checked,
+			HttpServletRequest request)
+			throws Exception {
+			User user = accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(chService.checkIfTJBB(bblx, user.getJgId(),checked), HttpStatus.OK);
 	}
 }

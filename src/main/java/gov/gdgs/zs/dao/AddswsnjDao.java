@@ -208,6 +208,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("        ifnull(a.GDBDQK,0) GDBDQK,");
 		//sql.append("       ifnull() ");
 		sql.append(" ifnull(a.ZCZJ,0) ZCZJ,");
+		sql.append("  a.ZJ,");
 		sql.append("  a.SZ,");
 		sql.append("  a.ND,");
 		sql.append("  a.FZR,");
@@ -297,7 +298,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		obj.put("xz", xz);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_jg_njb");
-		sb.append(" ( ZSJG_ID, ND,ZSJGXZ_ID,ZJWGDM, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,  ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ZJSJ,ztdm,GDBDQKZJ,GDBDQKJS,FZRSJ) "
+		sb.append(" ( ZSJG_ID, ND,ZSJGXZ_ID,ZJWGDM, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ZJSJ,ztdm,GDBDQKZJ,GDBDQKJS,FZRSJ) "
 				+ "VALUES (:jg_id,:nd,:xz,:wg,:NJZJ, :sz, :zczj, :zrs, :zyrs, :yjyrs, :sjjyrs, :wjyrs, :ZJ, :FZR, :ZCSWSBZJ,:ZCSWSBJS,:bndbafs,:FSS,now(),now(),:ztbj,:GDBDQKZJ,:GDBDQKJS,:qzrq ) ");
 		Number njid = this.insertAndGetKeyByNamedJdbc(sb.toString(), obj,
 				new String[] { "id" });
