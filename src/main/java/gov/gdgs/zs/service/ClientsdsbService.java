@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.entity.User;
+
 import com.gdky.restfull.exception.BbtbException;
+
 
 @Service
 public class ClientsdsbService {
@@ -57,11 +60,11 @@ public class ClientsdsbService {
 	
 	public Object hyryqktjCheck(int jgid) {
 		Calendar cal = Calendar.getInstance();
-		int last_y = cal.get(Calendar.YEAR) + 1;
-		if(clientsdsbDao.hyryqktjCheck(jgid,2016).size()>0){
+		int last_y = cal.get(Calendar.YEAR) - 1;
+		if(clientsdsbDao.hyryqktjCheck(jgid,last_y).size()>0){
 			throw new BbtbException("该年度报表已存在，请勿重复添加");
 		}else{
-			List<Map<String, Object>> obj = clientsdsbDao.hyryqktjIntit(jgid,2015);
+			List<Map<String, Object>> obj = clientsdsbDao.hyryqktjIntit(jgid,last_y);
 			if(obj.size()>0){
 				return obj.get(0);
 			}
@@ -106,7 +109,7 @@ public class ClientsdsbService {
 		Map<String, Object >obj=clientsdsbDao.getJysrqkbUpyear(jgid);				
 		return obj;
 	}
-	
+
 	
 	public boolean checkAddJysrqkb(String jgid) {
 		boolean result=clientsdsbDao.checkAddJysrqkb(jgid);

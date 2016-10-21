@@ -418,4 +418,9 @@ public class ClientsdsbDao extends BaseJdbcDao {
 				
 	}
 
+	public List<Map<String, Object>> getSwsjbqkByYear(int year, Integer jgId) {
+		String sql = " select id from zs_sdsb_swsjbqk where nd = ? and jg_id = ? and ztbj = 2 ";
+		return this.jdbcTemplate.queryForList(sql, new Object[]{year,jgId});
+	}
+
 }
