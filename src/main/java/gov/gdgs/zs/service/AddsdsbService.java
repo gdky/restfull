@@ -1,15 +1,16 @@
 package gov.gdgs.zs.service;
 
+import gov.gdgs.zs.dao.AddsdsbDao;
+import gov.gdgs.zs.dao.ClientsdsbDao;
+import gov.gdgs.zs.dao.IAddsdsbDao;
+import gov.gdgs.zs.dao.SWSDao;
+
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import gov.gdgs.zs.dao.AddsdsbDao;
-import gov.gdgs.zs.dao.ClientsdsbDao;
-import gov.gdgs.zs.dao.IAddsdsbDao;
 
 import javax.annotation.Resource;
 
@@ -31,6 +32,9 @@ public class AddsdsbService implements IAddsdsbService {
 
 	@Resource
 	private AddsdsbDao addsdsbDao;
+	
+	@Resource
+	private SWSDao swsDao;
 
 	@Override
 	public Map<String, Object> AddSwsjbqkb(Map<String, Object> obj) {
@@ -111,27 +115,29 @@ public class AddsdsbService implements IAddsdsbService {
 		obj.put("srze", srze);
 		return obj;
 	}
-	
+
 	/*
 	 * 修改基本情况表取初始数据
 	 */
 	public Map<String, Object> getSwsjbqkInit(User user, String id) {
-		//获取本记录的年度和执业人数
-		Map<String,Object> rs = clientSdsbDao.getJbqkNd(id);
-		//获取税务师数量
+		// 获取本记录的年度和执业人数
+		Map<String, Object> rs = clientSdsbDao.getJbqkNd(id);
+		// 获取税务师数量
 		List<Map<String, Object>> ls = clientSdsbDao.getSwsTj(user.getJgId(),
-				(Integer)rs.get("nd"));
-		Map<String, Object> swstj = new HashMap<String,Object>();
+				(Integer) rs.get("nd"));
+		Map<String, Object> swstj = new HashMap<String, Object>();
 		if (ls.size() == 0) {
-			swstj.put("zysws_sfnum",rs.get("zyzcswsrs"));
-		}else {
+			swstj.put("zysws_sfnum", rs.get("zyzcswsrs"));
+		} else {
 			swstj = ls.get(0);
 		}
-		
+
 		// 获取去年全年营业收入
-		BigDecimal srze = clientSdsbDao.getSrze((Integer)rs.get("nd"), user.getJgId());
+		BigDecimal srze = clientSdsbDao.getSrze((Integer) rs.get("nd"),
+				user.getJgId());
 		if (srze == null) {
-			throw new BbtbException("没法获取" + rs.get("nd").toString() + "年主营收入总额，请先提交该年度利润表");
+			throw new BbtbException("没法获取" + rs.get("nd").toString()
+					+ "年主营收入总额，请先提交该年度利润表");
 		}
 		BigDecimal b1 = new BigDecimal(10000);
 		srze = srze.divide(b1, 2, BigDecimal.ROUND_HALF_UP);
@@ -140,8 +146,6 @@ public class AddsdsbService implements IAddsdsbService {
 		obj.put("srze", srze);
 		return obj;
 	}
-	
-	
 
 	public Map<String, Object> AddJygmtjb(Map<String, Object> obj) {
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
@@ -186,11 +190,14 @@ public class AddsdsbService implements IAddsdsbService {
 	}
 
 	// 鉴证业务情况统计表
-
-	@Override
 	public Map<String, Object> AddJzywqktjb(Map<String, Object> obj) {
+		//检查是否已存在同年度
+		if (clientSdsbDao.isExists(obj.get("nd"), obj.get("jg_id"),
+				"zs_sdsb_jzywqktjb")) {
+			throw new BbtbException("该年度报表已存在，请勿重复添加");
+		}
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
-		String rs = iaddsdsbDao.AddJzywqktjb(obj);
+		String rs = addsdsbDao.AddJzywqktjb(obj);
 		map.put("id", rs);
 		return map;
 
@@ -198,24 +205,14 @@ public class AddsdsbService implements IAddsdsbService {
 
 	@Override
 	public void UpdateJzywqktjb(Map<String, Object> obj) {
-		iaddsdsbDao.UpdateJzywqktjb(obj);
+		addsdsbDao.UpdateJzywqktjb(obj);
 	}
 
 	public Map<String, Object> getJzywqktjb(int page, int pageSize, int Id,
-			int Jgid, String where) {
-		HashMap<String, Object> map = new HashMap<String, Object>();
-		if (where != null) {
-			try {
-				where = java.net.URLDecoder.decode(where, "UTF-8");
-				ObjectMapper mapper = new ObjectMapper();
-				map = mapper.readValue(where,
-						new TypeReference<Map<String, Object>>() {
-						});
-			} catch (Exception e) {
-			}
-		}
+			int Jgid, String whereParam) {
+		Map<String, Object> where = Common.decodeURItoMap(whereParam);
 		Map<String, Object> rs = addsdsbDao.getJzywqktjb(page, pageSize, Id,
-				Jgid, map);
+				Jgid, where);
 		return rs;
 	}
 
@@ -229,6 +226,38 @@ public class AddsdsbService implements IAddsdsbService {
 		return obj;
 	}
 
+
+	public Map<String, Object> getJzywqktjbinit(User user) {
+		// 获取去年年度
+		Calendar cal = Calendar.getInstance();
+		int last_y = cal.get(Calendar.YEAR) - 1;
+		int now_y = cal.get(Calendar.YEAR);
+		//判断是否有提交表1
+		if(!this.haveLastYearSwsjbqk(last_y,user.getJgId())){
+			throw new BbtbException("必须在事务所基本情况统计表1通过后才能填写该表");
+		}
+		// 获取事务所名称和法人
+		Map<String,Object> sws = swsDao.swsxx(user.getJgId());
+		
+		//获取前年报表6数据
+		Map<String,Object> preyear = addsdsbDao.getJzywqktjbByYear(last_y-1,user.getJgId());
+		Map<String, Object> obj = new HashMap<String, Object>();
+		if(preyear!=null){
+			obj = preyear;
+		}
+		obj.put("nd", last_y);
+		obj.put("dwmc", sws.get("dwmc"));
+		obj.put("suozhang", sws.get("fddbr"));
+		return obj;
+	}
+
+	private boolean haveLastYearSwsjbqk(int year, Integer jgId) {
+		List<Map<String,Object>> ls = clientSdsbDao.getSwsjbqkByYear(year,jgId);
+		if(ls.size() >0){
+			return true;
+		}
+		return false;
+	}
 	
 	
 	public Map<String, Object> getEditJygmtjInit(String jgid, String where) {

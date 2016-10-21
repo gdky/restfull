@@ -1,7 +1,9 @@
 package gov.gdgs.zs.service;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import gov.gdgs.zs.dao.ClientsdsbDao;
@@ -12,6 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.entity.User;
+
+import com.gdky.restfull.exception.BbtbException;
+
 
 @Service
 public class ClientsdsbService {
@@ -52,9 +58,18 @@ public class ClientsdsbService {
 		clientsdsbDao.UpdateHyryqktjb(obj);
 	}
 	
-	public Map<String, Object> getOK(String jgid) {
-		Map<String,Object> obj = clientsdsbDao.getOk(jgid);
-		return obj;
+	public Object hyryqktjCheck(int jgid) {
+		Calendar cal = Calendar.getInstance();
+		int last_y = cal.get(Calendar.YEAR) - 1;
+		if(clientsdsbDao.hyryqktjCheck(jgid,last_y).size()>0){
+			throw new BbtbException("该年度报表已存在，请勿重复添加");
+		}else{
+			List<Map<String, Object>> obj = clientsdsbDao.hyryqktjIntit(jgid,last_y);
+			if(obj.size()>0){
+				return obj.get(0);
+			}
+			return false;
+		}
 	}
 	/*
 	 * 经营收入统计表
@@ -94,7 +109,7 @@ public class ClientsdsbService {
 		Map<String, Object >obj=clientsdsbDao.getJysrqkbUpyear(jgid);				
 		return obj;
 	}
-	
+
 	
 	public boolean checkAddJysrqkb(String jgid) {
 		boolean result=clientsdsbDao.checkAddJysrqkb(jgid);
