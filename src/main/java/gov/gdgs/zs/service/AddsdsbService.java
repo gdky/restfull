@@ -190,9 +190,12 @@ public class AddsdsbService implements IAddsdsbService {
 	}
 
 	// 鉴证业务情况统计表
-
-	@Override
 	public Map<String, Object> AddJzywqktjb(Map<String, Object> obj) {
+		//检查是否已存在同年度
+		if (clientSdsbDao.isExists(obj.get("nd"), obj.get("jg_id"),
+				"zs_sdsb_jzywqktjb")) {
+			throw new BbtbException("该年度报表已存在，请勿重复添加");
+		}
 		Map<String, Object> map = new LinkedHashMap<String, Object>();
 		String rs = addsdsbDao.AddJzywqktjb(obj);
 		map.put("id", rs);
@@ -235,7 +238,12 @@ public class AddsdsbService implements IAddsdsbService {
 		// 获取事务所名称和法人
 		Map<String,Object> sws = swsDao.swsxx(user.getJgId());
 		
+		//获取前年报表6数据
+		Map<String,Object> preyear = addsdsbDao.getJzywqktjbByYear(last_y-1,user.getJgId());
 		Map<String, Object> obj = new HashMap<String, Object>();
+		if(preyear!=null){
+			obj = preyear;
+		}
 		obj.put("nd", last_y);
 		obj.put("dwmc", sws.get("dwmc"));
 		obj.put("suozhang", sws.get("fddbr"));

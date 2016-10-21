@@ -217,12 +217,12 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 		sb.append(" tzynsdse_hs,tzynsdse_je,tjynsdse_hs0,tjynsdse_je0,tjynsdse_hs,tjynsdse_je,mbksje_hs0,mbksje_je0,mbksje_hs,mbksje_je,");
 		sb.append("  ccsskc_hs0,ccsskc_je0,ccsskc_hs,ccsskc_je,tdzzsqsjz_hs0,tdzzsqsjz_je0,tdzzsqsjz_hs,tdzzsqsjz_je,");
 		sb.append(" qtjz_hs0,qtjz_je0,qtjz_hs,qtjz_je,gxjsqyrdqzyw_hs0,gxjsqyrdqzyw_je0,gxjsqyrdqzyw_hs,gxjsqyrdqzyw_je,qyzxswdeskjsjzyw_hs0,qyzxswdeskjsjzyw_je0,");
-		sb.append(" qyzxswdeskjsjzyw_hs,qyzxswdeskjsjzyw_je,yffjjkcjzyw_hs0,yffjjkcjzyw_je0,yffjjkcjzyw_hs,yffjjkcjzyw_je,qt_hs0,qt_je0,qt_hs,qt_je,tianbiaoren,suozhang)");
+		sb.append(" qyzxswdeskjsjzyw_hs,qyzxswdeskjsjzyw_je,yffjjkcjzyw_hs0,yffjjkcjzyw_je0,yffjjkcjzyw_hs,yffjjkcjzyw_je,qt_hs0,qt_je0,qt_hs,qt_je,tianbiaoren,suozhang,bz)");
 		sb.append("values ( :id,:jg_id,:use_id,:nd,sysdate(),:ztbj,:hsqjje_hs0,:hsqjje_je0,:hsqjje_hs,:hsqjje_je,:tzynsdse_hs0,:tzynsdse_je0,");
 		sb.append(" :tzynsdse_hs,:tzynsdse_je,:tjynsdse_hs0,:tjynsdse_je0,:tjynsdse_hs,:tjynsdse_je,:mbksje_hs0,:mbksje_je0,:mbksje_hs,:mbksje_je,");
 		sb.append(" :ccsskc_hs0,:ccsskc_je0,:ccsskc_hs,:ccsskc_je,:tdzzsqsjz_hs0,:tdzzsqsjz_je0,:tdzzsqsjz_hs,:tdzzsqsjz_je,:qtjz_hs0,:qtjz_je0,");
 		sb.append(" :qtjz_hs,:qtjz_je,:gxjsqyrdqzyw_hs0,:gxjsqyrdqzyw_je0,:gxjsqyrdqzyw_hs,:gxjsqyrdqzyw_je,:qyzxswdeskjsjzyw_hs0,:qyzxswdeskjsjzyw_je0,");
-		sb.append(" :qyzxswdeskjsjzyw_hs,:qyzxswdeskjsjzyw_je,:yffjjkcjzyw_hs0,:yffjjkcjzyw_je0,:yffjjkcjzyw_hs,:yffjjkcjzyw_je,:qt_hs0,:qt_je0,:qt_hs,:qt_je,:tianbiaoren,:suozhang)");
+		sb.append(" :qyzxswdeskjsjzyw_hs,:qyzxswdeskjsjzyw_je,:yffjjkcjzyw_hs0,:yffjjkcjzyw_je0,:yffjjkcjzyw_hs,:yffjjkcjzyw_je,:qt_hs0,:qt_je0,:qt_hs,:qt_je,:tianbiaoren,:suozhang,:bz)");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		if(count==0){
@@ -311,6 +311,22 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 //		}else{
 //			return null;
 //		}
+	}
+
+	public Map<String, Object> getJzywqktjbByYear(int nd,Integer jgId) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select hsqjje_hs as hsqjje_hs0,hsqjje_je as hsqjje_je0,tzynsdse_je as tzynsdse_je0,tzynsdse_hs as tzynsdse_hs0, ");
+		sb.append(" tjynsdse_je as tjynsdse_je0,tjynsdse_hs as tjynsdse_hs0,mbksje_je as mbksje_je0,mbksje_hs as mbksje_hs0, ");
+		sb.append(" ccsskc_je as ccsskc_je0,ccsskc_hs as ccsskc_hs0,tdzzsqsjz_je as tdzzsqsjz_je0,tdzzsqsjz_hs as tdzzsqsjz_hs0, ");
+		sb.append(" qtjz_je as qtjz_je0,qtjz_hs as qtjz_hs0,gxjsqyrdqzyw_je as gxjsqyrdqzyw_je0,gxjsqyrdqzyw_hs as gxjsqyrdqzyw_hs0, ");
+		sb.append(" qyzxswdeskjsjzyw_je as qyzxswdeskjsjzyw_je0,qyzxswdeskjsjzyw_hs as qyzxswdeskjsjzyw_hs0,yffjjkcjzyw_je as yffjjkcjzyw_je0,yffjjkcjzyw_hs as yffjjkcjzyw_hs0, ");
+		sb.append(" qt_je as qt_je0,qt_hs as qt_hs0 ");
+		sb.append(" from zs_sdsb_jzywqktjb where nd =? and jg_id =?  ");
+		List<Map<String,Object>> ls = jdbcTemplate.queryForList(sb.toString(), new Object[]{nd,jgId});
+		if (ls.size()>0){
+			return ls.get(0);
+		}
+		return null;
 	}
 
 }
