@@ -205,7 +205,7 @@ public class AddsdsbService implements IAddsdsbService {
 
 	@Override
 	public void UpdateJzywqktjb(Map<String, Object> obj) {
-		iaddsdsbDao.UpdateJzywqktjb(obj);
+		addsdsbDao.UpdateJzywqktjb(obj);
 	}
 
 	public Map<String, Object> getJzywqktjb(int page, int pageSize, int Id,

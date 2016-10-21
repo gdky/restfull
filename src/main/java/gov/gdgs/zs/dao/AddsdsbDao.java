@@ -245,7 +245,7 @@ public class AddsdsbDao extends BaseJdbcDao  implements IAddsdsbDao{
 		sb.append(" gxjsqyrdqzyw_je0=:gxjsqyrdqzyw_je0,gxjsqyrdqzyw_hs=:gxjsqyrdqzyw_hs,gxjsqyrdqzyw_je=:gxjsqyrdqzyw_je,");
 		sb.append(" qyzxswdeskjsjzyw_hs0=:qyzxswdeskjsjzyw_hs0,qyzxswdeskjsjzyw_je0=:qyzxswdeskjsjzyw_je0,qyzxswdeskjsjzyw_hs=:qyzxswdeskjsjzyw_hs,");
 		sb.append(" qyzxswdeskjsjzyw_je=:qyzxswdeskjsjzyw_je,yffjjkcjzyw_hs0=:yffjjkcjzyw_hs0,yffjjkcjzyw_je0=:yffjjkcjzyw_je0,yffjjkcjzyw_hs=:yffjjkcjzyw_hs,");
-		sb.append(" yffjjkcjzyw_je=:yffjjkcjzyw_je,qt_hs0=:qt_hs0,qt_je0=:qt_je0,qt_hs=:qt_hs,qt_je=:qt_je,tianbiaoren=:tianbiaoren,suozhang=:suozhang where id=:id");
+		sb.append(" yffjjkcjzyw_je=:yffjjkcjzyw_je,qt_hs0=:qt_hs0,qt_je0=:qt_je0,qt_hs=:qt_hs,qt_je=:qt_je,tianbiaoren=:tianbiaoren,suozhang=:suozhang,bz=:bz where id=:id");
 		NamedParameterJdbcTemplate named=new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
 		named.update(sb.toString(), obj);
 	}

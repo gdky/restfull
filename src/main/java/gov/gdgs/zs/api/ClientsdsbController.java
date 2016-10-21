@@ -405,14 +405,12 @@ public class ClientsdsbController {
 	@RequestMapping(value = "/client/jzywqktjb/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<ResponseMessage> updateJzywqktjb(
 			@PathVariable("id") String id,
-			@RequestBody Map<String, Object> obj, HttpServletRequest request)
-			throws Exception {
-		try {
+			@RequestBody Map<String, Object> obj) {
+		
 			User user = accountService.getUserFromHeaderToken(request);
 			obj.put("use_id", user.getId());
 			obj.put("jg_id", user.getJgId());
-		} catch (Exception e) {
-		}
+			obj.put("id", id);
 
 		addsdsbService.UpdateJzywqktjb(obj);
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),
