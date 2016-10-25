@@ -229,7 +229,7 @@ public class YwglService {
 			throw new YwbbException("协议文号已存在");
 		}
 		/* 判断是否存在同企业同年度同类型的撤销报告，是则不允许提交 */
-		// TODO
+		// TODO 判断是否存在同企业同年度同类型的撤销报告，是则不允许提交
 
 		// 生成随机验证码
 		String yzm = RandomStringUtils.randomNumeric(8);
