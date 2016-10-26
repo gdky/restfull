@@ -81,9 +81,9 @@ public class YwglService {
 		return obj;
 	}
 
-	public Map<String, Object> getYwbbByJg(String hashId, int page,
+	public Map<String, Object> getYwbbByJg(User user, int page,
 			int pagesize, String whereparam) {
-		Long jgId = HashIdUtil.decode(hashId);
+		Integer jgId = user.getJgId();
 		Condition condition = new Condition();
 		condition.add("jg_id", "EQUAL", jgId);
 		
@@ -111,12 +111,13 @@ public class YwglService {
 		return obj;
 	}
 
-	public Map<String, Object> getYwbbMiscByJg(String hashId) {
-		Long id = HashIdUtil.decode(hashId);
-		List<Map<String, Object>> zysws = ywglDao.getZyswsByJg(id);
-		Map<String, Object> jgxx = swsDao.swsxx(id.intValue());
-
+	public Map<String, Object> getYwbbMiscByJg(User user) {
+		//获取资质锁定记录
+		List<Map<String,Object>> locked = ywglDao.getJgLocked(user.getJgId());
+		List<Map<String, Object>> zysws = ywglDao.getZyswsByJg(user.getJgId());
+		Map<String, Object> jgxx = swsDao.swsxx(user.getJgId());
 		HashMap<String, Object> obj = new HashMap<String, Object>();
+		obj.put("locked", locked);
 		obj.put("zysws", zysws);
 		obj.put("jgxx", jgxx);
 		return obj;
@@ -229,7 +230,9 @@ public class YwglService {
 			throw new YwbbException("协议文号已存在");
 		}
 		/* 判断是否存在同企业同年度同类型的撤销报告，是则不允许提交 */
-		// TODO 判断是否存在同企业同年度同类型的撤销报告，是则不允许提交
+		if(isExistSameLx){
+			
+		}
 
 		// 生成随机验证码
 		String yzm = RandomStringUtils.randomNumeric(8);

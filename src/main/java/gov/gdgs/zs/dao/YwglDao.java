@@ -77,7 +77,7 @@ public class YwglDao extends BaseJdbcDao {
 		return rs;
 	}
 
-	public List<Map<String, Object>> getZyswsByJg(Long id) {
+	public List<Map<String, Object>> getZyswsByJg(Integer id) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select r.XMING,z.ID as ZYSWS_ID ");
 		sb.append(" from zs_jg j,zs_ryjbxx r,zs_zysws z ");
@@ -1711,5 +1711,10 @@ public class YwglDao extends BaseJdbcDao {
 		ob.put("data", ls);
 		ob.put("swsmc", swsmc);
 		return ob;
+	}
+
+	public List<Map<String, Object>> getJgLocked(Integer jgId) {
+		String sql = "select sdyy,DATE_FORMAT(sdtime,'%Y年%m月%d日') as sdtime,sdr_role from zs_sdjl_jg where yxbz = 1 and jg_id = ? ";
+		return this.jdbcTemplate.queryForList(sql, new Object[]{jgId});
 	}
 }

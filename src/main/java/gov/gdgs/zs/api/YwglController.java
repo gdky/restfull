@@ -39,6 +39,9 @@ public class YwglController {
 	
 	@Autowired
 	private AccountService accountService;
+	
+	@Autowired
+	private HttpServletRequest request;
 
 
 	/**
@@ -122,12 +125,13 @@ public class YwglController {
 	/*
 	 * 客户端用业务报备查询
 	 */
-	@RequestMapping(value = "/jgyw/{hashId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getYwbbByJg(@PathVariable("hashId") String hashId,
+	@RequestMapping(value = "/jgyw", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwbbByJg(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pageSize,
 			@RequestParam(value = "where", required = false) String where) {
-		Map<String, Object> obj = ywglService.getYwbbByJg(hashId, page,
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> obj = ywglService.getYwbbByJg(user, page,
 				pageSize, where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
@@ -135,10 +139,10 @@ public class YwglController {
 	/*
 	 * 客户端用机构关联执业税务师和机构信息
 	 */
-	@RequestMapping(value = "/ywbbmisc/{jgHashid}", method = RequestMethod.GET)
-	public ResponseEntity<?> getYwbbMiscByJg(
-			@PathVariable("jgHashid") String jgHashid) {
-		Map<String, Object> obj = ywglService.getYwbbMiscByJg(jgHashid);
+	@RequestMapping(value = "/ywbbmisc", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwbbMiscByJg() {
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> obj = ywglService.getYwbbMiscByJg(user);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
