@@ -1717,4 +1717,10 @@ public class YwglDao extends BaseJdbcDao {
 		String sql = "select sdyy,DATE_FORMAT(sdtime,'%Y年%m月%d日') as sdtime,sdr_role from zs_sdjl_jg where yxbz = 1 and jg_id = ? ";
 		return this.jdbcTemplate.queryForList(sql, new Object[]{jgId});
 	}
+
+	public List<Map<String, Object>> isExistSameLx(Object nd, Object ywlx,
+			Object customer) {
+		String sql = "select id from zs_ywbb where nd = ? and ywlx_dm = ? and customer_id = ? and zt = 5 ";
+		return this.jdbcTemplate.queryForList(sql, new Object[]{nd,ywlx,customer});
+	}
 }

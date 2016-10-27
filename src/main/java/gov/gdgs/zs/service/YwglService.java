@@ -133,7 +133,7 @@ public class YwglService {
 		
 		/* 判断是否有报备上报资质 */
 		if(zzglService.isJgLocked(user)){
-			throw new YwbbException("不具备业务上报资质或上报业务资质目前被锁，请联系中心解锁后再尝试");
+			throw new YwbbException("不具备业务上报资质或上报业务资质目前被锁，请联系中心解锁");
 		}
 
 		// 整理业务记录
@@ -230,8 +230,8 @@ public class YwglService {
 			throw new YwbbException("协议文号已存在");
 		}
 		/* 判断是否存在同企业同年度同类型的撤销报告，是则不允许提交 */
-		if(isExistSameLx){
-			
+		if(this.isExistSameLx(o.get("ND"),o.get("YWLX_DM"),o.get("CUSTOMER_ID"))){
+			throw new YwbbException("本年度已存在同委托企业同类型的撤销报告");
 		}
 
 		// 生成随机验证码
@@ -261,6 +261,15 @@ public class YwglService {
 		resp.put("yzm", yzm);
 		resp.put("bbhm", bbhm);
 		return resp;
+	}
+
+
+	private boolean isExistSameLx(Object nd, Object ywlx, Object customer) {
+		List<Map<String,Object>> ls = ywglDao.isExistSameLx(nd,ywlx,customer);
+		if(ls.size()>0){
+			return true;
+		}
+		return false;
 	}
 
 	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
