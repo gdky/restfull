@@ -137,6 +137,7 @@ public class YwglDao extends BaseJdbcDao {
 						map.put("nd", rs.getObject("nd"));
 						map.put("bbhm", rs.getObject("bbhm"));
 						map.put("bbrq", rs.getDate("bbrq"));
+						map.put("bgrq", rs.getDate("bgrq"));
 						map.put("bgwh", rs.getString("bgwh"));
 						map.put("zbrq", rs.getDate("zbrq"));
 						map.put("yzm", rs.getString("yzm"));
