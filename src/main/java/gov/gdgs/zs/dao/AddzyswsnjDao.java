@@ -87,6 +87,8 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		return obj;
 
 	}
+	
+	//执业税务师年度校验（校验选择年度是否已做校验）
 
 	// 前台点击"查看"时显示数据
 	public Map<String, Object> getzyswsnjbById(String id) {
@@ -224,4 +226,39 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 			spDao.swsSPqq(spsq);//生成审批表记录
 			}
 	}
+
+	
+
+	public Map<String, Object> checkzyswsnjnd(Integer jgId,
+			Map<String, Object> where) {
+		
+		Condition condition = new Condition();
+		condition.add("a.nd", "FUZZY", where.get("nd"));
+		condition.add("a.sws_id","FUZZY",where.get("sws_id"));
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT a.nd FROM zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d ");
+		sb.append(condition.getSql());
+		sb.append(" and a.ZSJG_ID=? ");
+		sb.append(" AND a.ZSJG_ID=b.ID AND a.SWS_ID=d.ID AND c.ID=d.RY_ID ");
+		sb.append("ORDER BY a.ND DESC");
+		
+		
+		// 装嵌传值数组
+
+		ArrayList<Object> params = condition.getParams();
+
+		params.add(jgId);
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+		
+
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+	    obj.put("jg_id", jgId);
+		return obj;
+
+	}
+	
 }
