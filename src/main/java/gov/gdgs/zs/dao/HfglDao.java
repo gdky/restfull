@@ -129,7 +129,7 @@ public class HfglDao extends BaseDao{
 		});
 	     int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		StringBuffer ub = new StringBuffer();
-		ub.append("		select  'dqytjkey' as 'jgid','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
+		ub.append("		select  null as 'key','dqytjkey' as 'jgid','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
 		ub.append("		sum(h.yftt) as yftt,sum(h.qjtt) as qjtt,sum(h.yjgr) as yjgr,sum(h.yfgr) as yfgr,");
 		ub.append("		sum(h.qjgr) as qjgr,'1' as issd from (select g.* from (select   b.dwmc,'"+lyear+"' as nd,");
 		ub.append("			(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
