@@ -1,5 +1,6 @@
 package gov.gdgs.zs.api;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -155,7 +156,14 @@ public class YwglController {
 			HttpServletRequest request){ 
 		
 		User user =  accountService.getUserFromHeaderToken(request);
-		Map<String,Object> obj = ywglService.addYwbb(values,user);
+		String type = (String) values.get("type");
+		
+		Map<String,Object> obj = new HashMap<String, Object>();
+		if ("save".equals(type)){
+			 obj = ywglService.saveYwbb(values,user);
+		}else if ("commit".equals(type)){
+			 obj = ywglService.addYwbb(values,user);
+		}
 		return new ResponseEntity<>(obj,HttpStatus.CREATED);
 	}
 	
