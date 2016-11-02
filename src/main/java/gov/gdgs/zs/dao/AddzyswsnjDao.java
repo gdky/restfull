@@ -33,7 +33,14 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
 		sb.append(" from  ( select a.id,a.ND,c.XMING,b.dwmc,");
-		sb.append(" CASE a.ZTDM WHEN 0 THEN '退回' WHEN 1 THEN '保存' WHEN 2 THEN '自检' WHEN 3 THEN '年检' ELSE NULL END AS ZTDM");
+		sb.append(" CASE a.ZTDM WHEN 0 THEN '退回' WHEN 1 THEN '保存' WHEN 2 THEN '自检' WHEN 3 THEN '年检' ELSE NULL END AS ZTDM,");
+		sb.append(" CASE a.WGCL_DM WHEN a.ZTDM=0 THEN NULL WHEN a.ZTDM=1 THEN '年检报告待提交' WHEN a.ZTDM=2 THEN '等待年检' WHEN 1 THEN  '年检予以通过' WHEN 2 THEN '年检不予通过，责令2个月整改，整改期间不得对外行使注册税务师签字权，如整改期满仍达不到要求，注销执业证书'  ");
+		sb.append(" WHEN 3 THEN '年检不予通过，不得继续执业，注销执业证书' ");
+		sb.append(" WHEN 4 THEN '违反《注册税务师管理暂行办法》第二十五条、第二十六条所列行为2次以上处罚记录的，年检不予通过，注销执业证书'");
+		sb.append(" WHEN 5 THEN '违反《注册税务师管理暂行办法》第四十二条、第四十四条所列行政处罚记录的，在年检公告时向社会公告'");
+		sb.append(" WHEN 6 THEN '违反《注册税务师管理暂行办法》第四十五条所列行政处罚情节严重，注销执业证书并向社会公告'");
+		sb.append(" WHEN 7 THEN '年检不予通过'");
+		sb.append(" WHEN 8 THEN '资料填写有误，请重新填写' END AS NJCL");
 		sb.append(" from " + Config.PROJECT_SCHEMA
 				+ "zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d ");
 		sb.append("  " + condition.getSql() + " "); // 相当元 where x.xx like '%%'
@@ -87,6 +94,8 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		return obj;
 
 	}
+	
+	//执业税务师年度校验（校验选择年度是否已做校验）
 
 	// 前台点击"查看"时显示数据
 	public Map<String, Object> getzyswsnjbById(String id) {
@@ -167,7 +176,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_zcswsnj");
 		sb.append(" (ZSJG_ID,ID,ND,SWS_ID,ZJWGDM,NJZJ,SWSFZRYJ,SWSFZRSJ,SWSFZR,ZDSJ,ZTDM,CZBL,BAFS) "
-				+ "VALUES (:jg_id,:id1,:ND,:sws_id,:wg,:ZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),:ztbj,:czbl,:bndbafs) ");
+				+ "VALUES (:jg_id,:id1,:ND,:sws_id,:wg,:ZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),:ztdm,:czbl,:bndbafs) ");
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());
 		int count = named.update(sb.toString(), obj);
@@ -206,7 +215,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		StringBuffer sb = new StringBuffer("update " + Config.PROJECT_SCHEMA
 				+ "zs_zcswsnj ");
 
-		sb.append(" set ZSJG_ID=:jg_id,ND=:nd,SWS_ID=:sws_id,ZJWGDM=:wg,NJZJ=:ZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM=:ztbj where id=:id ");
+		sb.append(" set ZSJG_ID=:jg_id,ND=:ND,SWS_ID=:sws_id,ZJWGDM=:wg,NJZJ=:ZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM=:ztdm where id=:id ");
 
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());
@@ -224,4 +233,39 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 			spDao.swsSPqq(spsq);//生成审批表记录
 			}
 	}
+
+	
+
+	public Map<String, Object> checkzyswsnjnd(Integer jgId,
+			Map<String, Object> where) {
+		
+		Condition condition = new Condition();
+		condition.add("a.nd", "FUZZY", where.get("nd"));
+		condition.add("a.sws_id","FUZZY",where.get("sws_id"));
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT a.nd FROM zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d ");
+		sb.append(condition.getSql());
+		sb.append(" and a.ZSJG_ID=? ");
+		sb.append(" AND a.ZSJG_ID=b.ID AND a.SWS_ID=d.ID AND c.ID=d.RY_ID ");
+		sb.append("ORDER BY a.ND DESC");
+		
+		
+		// 装嵌传值数组
+
+		ArrayList<Object> params = condition.getParams();
+
+		params.add(jgId);
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+		
+
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+	    obj.put("jg_id", jgId);
+		return obj;
+
+	}
+	
 }

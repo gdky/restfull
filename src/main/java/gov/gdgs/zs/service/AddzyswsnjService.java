@@ -2,6 +2,7 @@ package gov.gdgs.zs.service;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -88,6 +89,24 @@ public class AddzyswsnjService implements IAddzyswsnjService {
 			public Map<String, Object> getzyswsnjBafs(String nd, String sws_id) {
 				// TODO Auto-generated method stub
 				Map<String, Object> rs =addzyswsnjdao.getzyswsnjBafs(nd, sws_id);
+				return rs;
+			}
+			
+			//执业税务师年度年检
+			public Map<String, Object> checkzyswsnjnd(Integer jgId, String where) {
+				// TODO Auto-generated method stub
+				HashMap<String, Object> map = new HashMap<String, Object>();
+				if (where != null) {
+					try {
+						where = java.net.URLDecoder.decode(where, "UTF-8");
+						ObjectMapper mapper = new ObjectMapper();
+						map = mapper.readValue(where,
+								new TypeReference<Map<String, Object>>() {
+								});
+					} catch (Exception e) {
+					}
+				}		
+				Map<String, Object> rs =addzyswsnjdao.checkzyswsnjnd(jgId, map);
 				return rs;
 			}
 			
