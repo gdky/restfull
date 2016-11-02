@@ -49,6 +49,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("                   '已年检' ");
 		sql.append("                  WHEN 2 THEN ");
 		sql.append("                   '已自检' ");
+		
 		sql.append("                  else ");
 		sql.append("                   null ");
 		sql.append("                end as njzt, ");
@@ -299,7 +300,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_jg_njb");
 		sb.append(" ( ZSJG_ID, ND,ZSJGXZ_ID,ZJWGDM, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ZJSJ,ztdm,GDBDQKZJ,GDBDQKJS,FZRSJ) "
-				+ "VALUES (:jg_id,:nd,:xz,:wg,:NJZJ, :sz, :zczj, :zrs, :zyrs, :yjyrs, :sjjyrs, :wjyrs, :ZJ, :FZR, :ZCSWSBZJ,:ZCSWSBJS,:bndbafs,:FSS,now(),now(),:ztbj,:GDBDQKZJ,:GDBDQKJS,:qzrq ) ");
+				+ "VALUES (:jg_id,:nd,:xz,:wg,:NJZJ, :sz, :zczj, :zrs, :zyrs, :yjyrs, :sjjyrs, :wjyrs, :ZJ, :FZR, :ZCSWSBZJ,:ZCSWSBJS,:bndbafs,:FSS,now(),now(),:ztdm,:GDBDQKZJ,:GDBDQKJS,:qzrq ) ");
 		Number njid = this.insertAndGetKeyByNamedJdbc(sb.toString(), obj,
 				new String[] { "id" });
 		if (null == njid) {
@@ -337,7 +338,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sb.append(" set ZSJG_ID=:jg_id,ZSJGXZ_ID=:xz,ND =:nd,ZJWGDM=:wg,NJZJ=:NJZJ,GDBDQKZJ=:GDBDQKZJ,"
 				+ "GDBDQKJS=:GDBDQKJS,ZRS=:ZRS,ZYRS=:zyrs,YJYRS=:yjyrs,SJJYRS=:sjjyrs, "
 				+ "WJYRS=:wjyrs,ZJ=:ZJ,FZR=:FZR,ZCSWSBZJ=:ZCSWSBZJ, "
-				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS," + "ztdm=:ztbj where id=:id ");
+				+ "ZCSWSBJS=:ZCSWSBJS,FSS=:FSS," + "ztdm=:ztdm where id=:id ");
 
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());

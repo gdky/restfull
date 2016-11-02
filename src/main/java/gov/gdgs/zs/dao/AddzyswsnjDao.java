@@ -34,7 +34,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
 		sb.append(" from  ( select a.id,a.ND,c.XMING,b.dwmc,");
 		sb.append(" CASE a.ZTDM WHEN 0 THEN '退回' WHEN 1 THEN '保存' WHEN 2 THEN '自检' WHEN 3 THEN '年检' ELSE NULL END AS ZTDM,");
-		sb.append(" CASE a.WGCL_DM WHEN a.ZTDM=0 OR a.ZTDM=1 THEN NULL WHEN 1 THEN  '年检予以通过' WHEN 2 THEN '年检不予通过，责令2个月整改，整改期间不得对外行使注册税务师签字权，如整改期满仍达不到要求，注销执业证书'  ");
+		sb.append(" CASE a.WGCL_DM WHEN a.ZTDM=0 THEN NULL WHEN a.ZTDM=1 THEN '年检报告待提交' WHEN a.ZTDM=2 THEN '等待年检' WHEN 1 THEN  '年检予以通过' WHEN 2 THEN '年检不予通过，责令2个月整改，整改期间不得对外行使注册税务师签字权，如整改期满仍达不到要求，注销执业证书'  ");
 		sb.append(" WHEN 3 THEN '年检不予通过，不得继续执业，注销执业证书' ");
 		sb.append(" WHEN 4 THEN '违反《注册税务师管理暂行办法》第二十五条、第二十六条所列行为2次以上处罚记录的，年检不予通过，注销执业证书'");
 		sb.append(" WHEN 5 THEN '违反《注册税务师管理暂行办法》第四十二条、第四十四条所列行政处罚记录的，在年检公告时向社会公告'");
@@ -176,7 +176,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_zcswsnj");
 		sb.append(" (ZSJG_ID,ID,ND,SWS_ID,ZJWGDM,NJZJ,SWSFZRYJ,SWSFZRSJ,SWSFZR,ZDSJ,ZTDM,CZBL,BAFS) "
-				+ "VALUES (:jg_id,:id1,:ND,:sws_id,:wg,:ZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),:ztbj,:czbl,:bndbafs) ");
+				+ "VALUES (:jg_id,:id1,:ND,:sws_id,:wg,:ZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),:ztdm,:czbl,:bndbafs) ");
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());
 		int count = named.update(sb.toString(), obj);
@@ -215,7 +215,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		StringBuffer sb = new StringBuffer("update " + Config.PROJECT_SCHEMA
 				+ "zs_zcswsnj ");
 
-		sb.append(" set ZSJG_ID=:jg_id,ND=:nd,SWS_ID=:sws_id,ZJWGDM=:wg,NJZJ=:ZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM=:ztbj where id=:id ");
+		sb.append(" set ZSJG_ID=:jg_id,ND=:ND,SWS_ID=:sws_id,ZJWGDM=:wg,NJZJ=:ZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM=:ztdm where id=:id ");
 
 		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
 				jdbcTemplate.getDataSource());
