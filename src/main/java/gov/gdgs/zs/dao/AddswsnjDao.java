@@ -49,6 +49,8 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("                   '已年检' ");
 		sql.append("                  WHEN 2 THEN ");
 		sql.append("                   '已自检' ");
+		sql.append("                  WHEN 1 THEN");
+		sql.append("                      '保存'");
 		sql.append("                  else null");
 		sql.append("                end as njzt, ");
 		sql.append("                CASE a.WGCL_DM ");
