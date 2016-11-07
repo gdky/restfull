@@ -26,7 +26,7 @@ public class YwglDao extends BaseJdbcDao {
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
-		sb.append(" FROM (zs_ywbb y,dm_ywbb_zt z,dm_ywlx l,  ");
+		sb.append(" FROM (zs_ywbb y,dm_ywbb_zt z,  ");
 
 		// <=== 查询条件集合
 		sb.append(" ( "
@@ -40,9 +40,10 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" on y.cs_dm = cs.id ");
 		sb.append(" left join dm_cs AS qx ");
 		sb.append(" on y.qx_dm = qx.id ");
+		sb.append(" left join dm_ywlx as l ");
+		sb.append(" on y.ywlx_dm = l.id ");
 
 		sb.append(" WHERE y.zt = z.id  ");
-		sb.append(" AND y.ywlx_dm = l.id  ");
 		sb.append(" AND sub.id = y.id ");
 		sb.append(" ORDER BY y.bbrq desc ");
 
@@ -99,12 +100,12 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" QZSWS,QMSWSID,TXDZ,SWSDZYJ,SWSWZ,YWLX_DM,JTXM,ZBRQ,ZGSWJG, ");
 		sb.append(" SENDTIME,SSTARTTIME,MEMO,NSRXZ,HY_ID,ZSFS_DM,ISWS,SB_DM,CS_DM,QX_DM,CITY, ");
 		sb.append(" WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ,XYJE,CUSTOMER_ID,TZVALUE1,TJVALUE2, ");
-		sb.append(" YZM,BBHM,IS_YD,ZT) ");
+		sb.append(" YZM,BBHM,IS_YD,ZT,XYZT_DM) ");
 		sb.append(" values(:ND,:BBRQ,:BGWH,:BGRQ,:SFJE,:JG_ID,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWNSRSBH,:XYH,:YJFH,:RJFH,:SJFH, ");
 		sb.append(" :QZSWS,:QMSWSID,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX_DM,:JTXM,:ZBRQ,:ZGSWJG, ");
 		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
-		sb.append(" :YZM,:BBHM,:IS_YD,:ZT) ");
+		sb.append(" :YZM,:BBHM,:IS_YD,:ZT,:XYZT_DM) ");
 		this.namedParameterJdbcTemplate.update(sb.toString(), o);
 	}
 
@@ -1723,5 +1724,21 @@ public class YwglDao extends BaseJdbcDao {
 			Object customer) {
 		String sql = "select id from zs_ywbb where nd = ? and ywlx_dm = ? and customer_id = ? and zt = 5 ";
 		return this.jdbcTemplate.queryForList(sql, new Object[]{nd,ywlx,customer});
+	}
+
+	public void addSaveYwbb(HashMap<String, Object> o) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into zs_ywbb ");
+		sb.append(" (ND,BBRQ,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
+		sb.append(" QZSWS,QMSWSID,TXDZ,SWSDZYJ,SWSWZ,YWLX_DM,JTXM,ZBRQ,ZGSWJG, ");
+		sb.append(" SENDTIME,SSTARTTIME,MEMO,NSRXZ,HY_ID,ZSFS_DM,ISWS,SB_DM,CS_DM,QX_DM,CITY, ");
+		sb.append(" WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ,XYJE,CUSTOMER_ID,TZVALUE1,TJVALUE2, ");
+		sb.append(" ZT,XYZT_DM) ");
+		sb.append(" values(:ND,:BBRQ,:BGWH,:BGRQ,:SFJE,:JG_ID,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWNSRSBH,:XYH,:YJFH,:RJFH,:SJFH, ");
+		sb.append(" :QZSWS,:QMSWSID,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX_DM,:JTXM,:ZBRQ,:ZGSWJG, ");
+		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
+		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
+		sb.append(" :ZT,:XYZT_DM) ");
+		this.namedParameterJdbcTemplate.update(sb.toString(), o);
 	}
 }

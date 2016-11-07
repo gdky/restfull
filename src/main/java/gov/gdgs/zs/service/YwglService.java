@@ -786,12 +786,9 @@ public class YwglService {
 		return ywglDao.getSwsywtjMx(ywlx, bbnd, jgid, map);
 	}
 
-	public Map<String, Object> addSaveYwbb(Map<String, Object> values, User user) {
-		Map<String, Object> xy = (Map<String, Object>) values.get("dataXY");
-		Map<String, Object> yw = (Map<String, Object>) values.get("dataYW");
-		Map<String, Object> jg = (Map<String, Object>) values.get("dataJG");
-		Map<String, Object> customer = (Map<String, Object>) values
-				.get("customer");
+	public Map<String, Object> addSaveYwbb(Map<String, Object> value, User user) {
+		Map<String, Object> formValue = (Map<String, Object>) value.get("formValue");
+		Map<String, Object> jg = (Map<String, Object>) value.get("dataJG");
 		
 		// 整理业务记录
 		HashMap<String, Object> o = new HashMap<String, Object>();
@@ -805,67 +802,93 @@ public class YwglService {
 
 		String currentTime = Common.getCurrentTime2MysqlDateTime();
 		o.put("BBRQ", currentTime);
-		o.put("BGWH", values.get("BGWH"));
-		o.put("BGRQ", Common.getTime2MysqlDateTime((String) values.get("BGRQ")));
-		o.put("SFJE", values.get("SFJE"));
-		o.put("JG_ID", customer.get("JG_ID"));
+		o.put("BGWH", formValue.get("BGWH"));
+		if(formValue.get("BGRQ")!=null){
+			o.put("BGRQ", Common.getTime2MysqlDateTime((String) formValue.get("BGRQ")));
+		}else{
+			o.put("BGRQ",null);
+		}
+		o.put("SFJE", formValue.get("SFJE"));
+		o.put("JG_ID", user.getJgId());
 		o.put("SWSMC", jg.get("dwmc"));
 		o.put("SWSSWDJZH", jg.get("swdjhm"));
-		o.put("WTDW", customer.get("DWMC"));
-		o.put("WTDWNSRSBH", customer.get("NSRSBH"));
-		o.put("XYH", values.get("XYH"));
-		o.put("YJFH", values.get("YJFH"));
-		o.put("RJFH", values.get("RJFH"));
-		o.put("SJFH", values.get("SJFH"));
-		List<Map<String, Object>> qmswsList = (List<Map<String, Object>>) values
-				.get("QMSWS");
-		String QMSWSID = (String) qmswsList.get(0).get("key") + ","
-				+ (String) qmswsList.get(1).get("key");
-		String QZSWS = (String) qmswsList.get(0).get("label") + ","
-				+ (String) qmswsList.get(1).get("label");
-		o.put("QZSWS", QZSWS);
-		o.put("QMSWSID", QMSWSID);
+		o.put("WTDW", formValue.get("DWMC"));
+		o.put("WTDWNSRSBH", formValue.get("NSRSBH"));
+		o.put("XYH", formValue.get("XYH"));
+		o.put("YJFH", formValue.get("YJFH"));
+		o.put("RJFH", formValue.get("RJFH"));
+		o.put("SJFH", formValue.get("SJFH"));
+		if(formValue.get("QMSWS") != null){
+			List<Map<String, Object>> qmswsList = (List<Map<String, Object>>) formValue
+					.get("QMSWS");
+			String QMSWSID = (String) qmswsList.get(0).get("key") + ","
+					+ (String) qmswsList.get(1).get("key");
+			String QZSWS = (String) qmswsList.get(0).get("label") + ","
+					+ (String) qmswsList.get(1).get("label");
+			o.put("QZSWS", QZSWS);
+			o.put("QMSWSID", QMSWSID);
+		}else {
+			o.put("QZSWS", null);
+			o.put("QMSWSID", null);
+		}
 		o.put("TXDZ", jg.get("dzhi"));
 		o.put("SWSDZYJ", jg.get("dzyj"));
 		o.put("SWSWZ", jg.get("wangzhi"));
-		o.put("YWLX_DM", values.get("YWLX_DM"));
-		Integer ywlx = Integer.parseInt((String) o.get("YWLX_DM"));
-		o.put("JTXM", values.get("JTXM"));
-		o.put("ZBRQ", currentTime);
-		List<String> sssq = (List<String>) values.get("SSSQ");
-		o.put("SENDTIME", Common.getTime2MysqlDateTime(sssq.get(1)));
-		o.put("SSTARTTIME", Common.getTime2MysqlDateTime(sssq.get(0)));
-		o.put("ND",null);
-		o.put("MEMO", values.get("MEMO"));
-		o.put("NSRXZ", values.get("NSRXZ"));
-		o.put("HY_ID", values.get("HY_ID"));
-		o.put("ZSFS_DM", values.get("ZSFS_DM"));
-		o.put("ISWS", values.get("ISWS"));
-		o.put("SB_DM", values.get("SB_DM"));
-		o.put("CITY", values.get("CITY"));
-		o.put("CS_DM", values.get("CS_DM"));
-		o.put("QX_DM", values.get("QX_DM"));
-		o.put("ZGSWJG", values.get("ZGSWJG"));
-		o.put("WTDWXZ_DM", values.get("WTDWXZ_DM"));
-		o.put("WTDWNSRSBHDF", customer.get("NSRSBH"));
-		o.put("WTDWLXR", customer.get("LXR"));
-		o.put("WTDWLXDH", customer.get("LXDH"));
-		o.put("WTDXLXDZ", customer.get("LXDZ"));
-		o.put("XYJE", values.get("XYJE"));
-		o.put("CUSTOMER_ID", customer.get("ID"));
-		if (values.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
-			o.put("TZVALUE1", values.get("TZVALUE1"));
+		o.put("YWLX_DM", formValue.get("YWLX_DM"));
+		Integer ywlx = null;
+		if (formValue.get("YWLX_DM")!=null){
+			ywlx = Integer.parseInt((String) o.get("YWLX_DM"));
+		}
+		if (formValue.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
+			o.put("TZVALUE1", formValue.get("TZVALUE1"));
 		} else {
 			o.put("TZVALUE1", null);
 		}
-		if (values.get("TJVALUE2") != null && ywlx != 1 && ywlx != 2 && ywlx != 7) {
-			o.put("TJVALUE2", values.get("TJVALUE2"));
+		if (formValue.get("TJVALUE2") != null && ywlx != 1 && ywlx != 2 && ywlx != 7) {
+			o.put("TJVALUE2", formValue.get("TJVALUE2"));
 		} else {
 			o.put("TJVALUE2", null);
 		}
+		o.put("JTXM", formValue.get("JTXM"));
+		o.put("ZBRQ", currentTime);
+		if(formValue.get("SSSQ")!=null){
+			List<String> sssq = (List<String>) formValue.get("SSSQ");
+			o.put("SENDTIME", Common.getTime2MysqlDateTime(sssq.get(1)));
+			o.put("SSTARTTIME", Common.getTime2MysqlDateTime(sssq.get(0)));
+		}else{
+			o.put("SENDTIME",null);
+			o.put("SSTARTTIME",null);
+		}
+		o.put("ND",null);
+		o.put("MEMO", formValue.get("MEMO"));
+		o.put("NSRXZ", formValue.get("NSRXZ"));
+		o.put("HY_ID", formValue.get("HY_ID"));
+		o.put("ZSFS_DM", formValue.get("ZSFS_DM"));
+		o.put("ISWS", formValue.get("ISWS"));
+		o.put("SB_DM", formValue.get("SB_DM"));
+		o.put("CITY", formValue.get("CITY"));
+		if(formValue.get("ISWS").equals("Y")){
+			o.put("CS_DM", -2);
+			o.put("QX_DM", null);
+		}else if (formValue.get("DQ")!=null){
+			List<Integer> dq = (List<Integer>) formValue.get("DQ");
+			o.put("CS_DM", dq.get(0));
+			o.put("QX_DM", dq.get(1));			
+		}else {
+			o.put("CS_DM",null);
+			o.put("QX_DM",null);
+		}
+		o.put("ZGSWJG", formValue.get("ZGSWJG"));
+		o.put("WTDWXZ_DM", formValue.get("WTDWXZ_DM"));
+		o.put("WTDWNSRSBHDF", formValue.get("NSRSBH"));
+		o.put("WTDWLXR", formValue.get("LXR"));
+		o.put("WTDWLXDH", formValue.get("LXDH"));
+		o.put("WTDXLXDZ", formValue.get("LXDZ"));
+		o.put("XYJE", formValue.get("XYJE"));
+		o.put("CUSTOMER_ID", formValue.get("ID"));
 		o.put("ZT", 0);
-		o.put("XYZT_DM", 2);
-		ywglDao.addYwbb(o);
+		o.put("XYZT_DM", 1);
+		ywglDao.addSaveYwbb(o);
 
 		Map<String,Object> resp = new HashMap<String,Object>();
 		return resp;
