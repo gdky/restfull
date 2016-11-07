@@ -786,7 +786,7 @@ public class YwglService {
 		return ywglDao.getSwsywtjMx(ywlx, bbnd, jgid, map);
 	}
 
-	public Map<String, Object> saveYwbb(Map<String, Object> values, User user) {
+	public Map<String, Object> addSaveYwbb(Map<String, Object> values, User user) {
 		Map<String, Object> xy = (Map<String, Object>) values.get("dataXY");
 		Map<String, Object> yw = (Map<String, Object>) values.get("dataYW");
 		Map<String, Object> jg = (Map<String, Object>) values.get("dataJG");
@@ -805,19 +805,19 @@ public class YwglService {
 
 		String currentTime = Common.getCurrentTime2MysqlDateTime();
 		o.put("BBRQ", currentTime);
-		o.put("BGWH", yw.get("BGWH"));
-		o.put("BGRQ", Common.getTime2MysqlDateTime((String) yw.get("BGRQ")));
-		o.put("SFJE", yw.get("SFJE"));
+		o.put("BGWH", values.get("BGWH"));
+		o.put("BGRQ", Common.getTime2MysqlDateTime((String) values.get("BGRQ")));
+		o.put("SFJE", values.get("SFJE"));
 		o.put("JG_ID", customer.get("JG_ID"));
 		o.put("SWSMC", jg.get("dwmc"));
 		o.put("SWSSWDJZH", jg.get("swdjhm"));
 		o.put("WTDW", customer.get("DWMC"));
 		o.put("WTDWNSRSBH", customer.get("NSRSBH"));
-		o.put("XYH", xy.get("XYH"));
-		o.put("YJFH", yw.get("YJFH"));
-		o.put("RJFH", yw.get("RJFH"));
-		o.put("SJFH", yw.get("SJFH"));
-		List<Map<String, Object>> qmswsList = (List<Map<String, Object>>) yw
+		o.put("XYH", values.get("XYH"));
+		o.put("YJFH", values.get("YJFH"));
+		o.put("RJFH", values.get("RJFH"));
+		o.put("SJFH", values.get("SJFH"));
+		List<Map<String, Object>> qmswsList = (List<Map<String, Object>>) values
 				.get("QMSWS");
 		String QMSWSID = (String) qmswsList.get(0).get("key") + ","
 				+ (String) qmswsList.get(1).get("key");
@@ -828,50 +828,41 @@ public class YwglService {
 		o.put("TXDZ", jg.get("dzhi"));
 		o.put("SWSDZYJ", jg.get("dzyj"));
 		o.put("SWSWZ", jg.get("wangzhi"));
-		o.put("YWLX_DM", xy.get("YWLX_DM"));
+		o.put("YWLX_DM", values.get("YWLX_DM"));
 		Integer ywlx = Integer.parseInt((String) o.get("YWLX_DM"));
-		o.put("JTXM", yw.get("JTXM"));
+		o.put("JTXM", values.get("JTXM"));
 		o.put("ZBRQ", currentTime);
-		List<String> sssq = (List<String>) xy.get("SSSQ");
+		List<String> sssq = (List<String>) values.get("SSSQ");
 		o.put("SENDTIME", Common.getTime2MysqlDateTime(sssq.get(1)));
 		o.put("SSTARTTIME", Common.getTime2MysqlDateTime(sssq.get(0)));
 		o.put("ND",null);
-		o.put("MEMO", xy.get("MEMO"));
-		o.put("NSRXZ", yw.get("NSRXZ"));
-		o.put("HY_ID", yw.get("HY_ID"));
-		o.put("ZSFS_DM", yw.get("ZSFS_DM"));
-		o.put("ISWS", yw.get("ISWS"));
-		o.put("SB_DM", yw.get("SB_DM"));
-		o.put("CITY", yw.get("CITY"));
-		o.put("CS_DM", yw.get("CS_DM"));
-		o.put("QX_DM", yw.get("QX_DM"));
-		o.put("ZGSWJG", yw.get("ZGSWJG"));
-		o.put("WTDWXZ_DM", yw.get("WTDWXZ_DM"));
+		o.put("MEMO", values.get("MEMO"));
+		o.put("NSRXZ", values.get("NSRXZ"));
+		o.put("HY_ID", values.get("HY_ID"));
+		o.put("ZSFS_DM", values.get("ZSFS_DM"));
+		o.put("ISWS", values.get("ISWS"));
+		o.put("SB_DM", values.get("SB_DM"));
+		o.put("CITY", values.get("CITY"));
+		o.put("CS_DM", values.get("CS_DM"));
+		o.put("QX_DM", values.get("QX_DM"));
+		o.put("ZGSWJG", values.get("ZGSWJG"));
+		o.put("WTDWXZ_DM", values.get("WTDWXZ_DM"));
 		o.put("WTDWNSRSBHDF", customer.get("NSRSBH"));
 		o.put("WTDWLXR", customer.get("LXR"));
 		o.put("WTDWLXDH", customer.get("LXDH"));
 		o.put("WTDXLXDZ", customer.get("LXDZ"));
-		o.put("XYJE", xy.get("XYJE"));
+		o.put("XYJE", values.get("XYJE"));
 		o.put("CUSTOMER_ID", customer.get("ID"));
-		if (yw.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
-			o.put("TZVALUE1", yw.get("TZVALUE1"));
+		if (values.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
+			o.put("TZVALUE1", values.get("TZVALUE1"));
 		} else {
 			o.put("TZVALUE1", null);
 		}
-		if (yw.get("TJVALUE2") != null && ywlx != 1 && ywlx != 2 && ywlx != 7) {
-			o.put("TJVALUE2", yw.get("TJVALUE2"));
+		if (values.get("TJVALUE2") != null && ywlx != 1 && ywlx != 2 && ywlx != 7) {
+			o.put("TJVALUE2", values.get("TJVALUE2"));
 		} else {
 			o.put("TJVALUE2", null);
 		}
-		// 判断是否异地
-		if ((Integer)o.get("CS_DM")!= -2 && ((Integer) jg.get("csdm") != (Integer) o.get("CS_DM"))) {
-			o.put("IS_YD", "Y");
-		} else {
-			o.put("IS_YD", "N");
-		}
-		
-		o.put("YZM", null);
-		o.put("BBHM", null);
 		o.put("ZT", 0);
 		o.put("XYZT_DM", 2);
 		ywglDao.addYwbb(o);

@@ -160,7 +160,7 @@ public class YwglController {
 		
 		Map<String,Object> obj = new HashMap<String, Object>();
 		if ("save".equals(type)){
-			 obj = ywglService.saveYwbb(values,user);
+			 obj = ywglService.addSaveYwbb(values,user);
 		}else if ("commit".equals(type)){
 			 obj = ywglService.addYwbb(values,user);
 		}
