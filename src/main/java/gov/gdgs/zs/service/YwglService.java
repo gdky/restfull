@@ -15,11 +15,13 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.exception.YwbbException;
 import com.gdky.restfull.utils.Common;
@@ -86,7 +88,6 @@ public class YwglService {
 		Integer jgId = user.getJgId();
 		Condition condition = new Condition();
 		condition.add("jg_id", "EQUAL", jgId);
-		
 		if(!StringUtils.isEmpty(whereparam)){
 			Map<String,Object> where = Common.decodeURItoMap(whereparam);
 			condition.add("wtdw", "FUZZY", where.get("wtdw"));
@@ -104,8 +105,8 @@ public class YwglService {
 			condition.add("zsfs_dm", "EQUAL", where.get("zsfs_dm"));
 			condition.add("is_yd", "EQUAL", where.get("is_yd"));
 			condition.add("swbz", "EQUAL", where.get("swbz"));
-			condition.add(" AND yxbz = 1 ");
 		}
+		condition.add(" AND yxbz = 1 ");		
 		
 		Map<String, Object> obj = ywglDao.getYwbb(page, pagesize,condition);
 		return obj;
@@ -892,6 +893,11 @@ public class YwglService {
 
 		Map<String,Object> resp = new HashMap<String,Object>();
 		return resp;
+	}
+
+	public Integer delYwbb(String hash, User user) {
+		Long id = HashIdUtil.decode(hash);
+		return ywglDao.delYwbb(id,user);
 	}
 
 }

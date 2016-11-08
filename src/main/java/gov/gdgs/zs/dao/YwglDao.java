@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
+import com.gdky.restfull.entity.User;
 import com.gdky.restfull.utils.HashIdUtil;
 
 @Repository
@@ -73,7 +74,7 @@ public class YwglDao extends BaseJdbcDao {
 
 	public Map<String, Object> getYwbbById(long id) {
 		String sql = "select * from " + Config.PROJECT_SCHEMA
-				+ "zs_ywbb_old where id = ?";
+				+ "zs_ywbb where id = ?";
 		Map<String, Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
@@ -1740,5 +1741,11 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
 		sb.append(" :ZT,:XYZT_DM) ");
 		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+	}
+
+	public Integer delYwbb(Long id, User user) {
+		String sql = " update  zs_ywbb set yxbz = 0 where id = ? and jg_id = ? ";
+		return this.jdbcTemplate.update(sql, new Object[]{id,user.getJgId()});
+		 
 	}
 }

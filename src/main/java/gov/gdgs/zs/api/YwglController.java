@@ -103,10 +103,10 @@ public class YwglController {
 	/*
 	 * 修改业务报备信息
 	 */
-	@RequestMapping(value = "/ywbb/{id}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/ywbb/{hash}", method = RequestMethod.PUT)
 	public ResponseEntity<?> getYwbb(@RequestBody Map<String, Object> map,
-			@PathVariable String id) {
-		ywglService.updateYwbb(id, map);
+			@PathVariable String hash) {
+		ywglService.updateYwbb(hash, map);
 		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
 				"200", "更新成功");
 		return new ResponseEntity<>(rm, HttpStatus.OK);
@@ -152,8 +152,7 @@ public class YwglController {
 	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.POST)
 	public  ResponseEntity<Map<String,Object>> addYwbb(
-			@RequestBody Map<String,Object> values,
-			HttpServletRequest request){ 
+			@RequestBody Map<String,Object> values){ 
 		
 		User user =  accountService.getUserFromHeaderToken(request);
 		String type = (String) values.get("type");
@@ -165,6 +164,18 @@ public class YwglController {
 			 obj = ywglService.addYwbb(values,user);
 		}
 		return new ResponseEntity<>(obj,HttpStatus.CREATED);
+	}
+	/*
+	 * 客户端删除业务报备
+	 */
+	@RequestMapping(value="/ywbb/{hash}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> delYwbb(@PathVariable String hash){
+		
+		User user = accountService.getUserFromHeaderToken(request);
+		Integer rs = ywglService.delYwbb(hash,user);
+		return new ResponseEntity<>(new ResponseMessage(
+				ResponseMessage.Type.success, rs.toString()),
+				HttpStatus.OK);
 	}
 	
 	/**
