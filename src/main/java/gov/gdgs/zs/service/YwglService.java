@@ -125,12 +125,8 @@ public class YwglService {
 	}
 
 	public Map<String, Object> addYwbb(Map<String, Object> values, User user) {
-		Map<String, Object> xy = (Map<String, Object>) values.get("dataXY");
-		Map<String, Object> yw = (Map<String, Object>) values.get("dataYW");
+		Map<String, Object> formValue = (Map<String, Object>) values.get("formValue");
 		Map<String, Object> jg = (Map<String, Object>) values.get("dataJG");
-		Map<String, Object> customer = (Map<String, Object>) values
-				.get("customer");
-		String type = (String) values.get("type");
 		
 		/* 判断是否有报备上报资质 */
 		if(zzglService.isJgLocked(user)){
@@ -149,19 +145,19 @@ public class YwglService {
 
 		String currentTime = Common.getCurrentTime2MysqlDateTime();
 		o.put("BBRQ", currentTime);
-		o.put("BGWH", yw.get("BGWH"));
-		o.put("BGRQ", Common.getTime2MysqlDateTime((String) yw.get("BGRQ")));
-		o.put("SFJE", yw.get("SFJE"));
-		o.put("JG_ID", customer.get("JG_ID"));
+		o.put("BGWH", formValue.get("BGWH"));
+		o.put("BGRQ", Common.getTime2MysqlDateTime((String) formValue.get("BGRQ")));
+		o.put("SFJE", formValue.get("SFJE"));
+		o.put("JG_ID", user.getJgId());
 		o.put("SWSMC", jg.get("dwmc"));
 		o.put("SWSSWDJZH", jg.get("swdjhm"));
-		o.put("WTDW", customer.get("DWMC"));
-		o.put("WTDWNSRSBH", customer.get("NSRSBH"));
-		o.put("XYH", xy.get("XYH"));
-		o.put("YJFH", yw.get("YJFH"));
-		o.put("RJFH", yw.get("RJFH"));
-		o.put("SJFH", yw.get("SJFH"));
-		List<Map<String, Object>> qmswsList = (List<Map<String, Object>>) yw
+		o.put("WTDW", formValue.get("DWMC"));
+		o.put("WTDWNSRSBH", formValue.get("NSRSBH"));
+		o.put("XYH", formValue.get("XYH"));
+		o.put("YJFH", formValue.get("YJFH"));
+		o.put("RJFH", formValue.get("RJFH"));
+		o.put("SJFH", formValue.get("SJFH"));
+		List<Map<String, Object>> qmswsList = (List<Map<String, Object>>) formValue
 				.get("QMSWS");
 		String QMSWSID = (String) qmswsList.get(0).get("key") + ","
 				+ (String) qmswsList.get(1).get("key");
@@ -172,49 +168,53 @@ public class YwglService {
 		o.put("TXDZ", jg.get("dzhi"));
 		o.put("SWSDZYJ", jg.get("dzyj"));
 		o.put("SWSWZ", jg.get("wangzhi"));
-		o.put("YWLX_DM", xy.get("YWLX_DM"));
+		o.put("YWLX_DM", formValue.get("YWLX_DM"));
 		Integer ywlx = Integer.parseInt((String) o.get("YWLX_DM"));
-		o.put("JTXM", yw.get("JTXM"));
+		o.put("JTXM", formValue.get("JTXM"));
 		o.put("ZBRQ", currentTime);
-		List<String> sssq = (List<String>) xy.get("SSSQ");
+		List<String> sssq = (List<String>) formValue.get("SSSQ");
 		o.put("SENDTIME", Common.getTime2MysqlDateTime(sssq.get(1)));
 		o.put("SSTARTTIME", Common.getTime2MysqlDateTime(sssq.get(0)));
 		Calendar calND = Calendar.getInstance();
 		calND.setTime(Common.getTimeFromJsToJava(sssq.get(1))); // 暂按项目所属期止
 		o.put("ND", calND.get(Calendar.YEAR));
-		o.put("MEMO", xy.get("MEMO"));
-		o.put("NSRXZ", yw.get("NSRXZ"));
-		o.put("HY_ID", yw.get("HY_ID"));
-		o.put("ZSFS_DM", yw.get("ZSFS_DM"));
-		o.put("ISWS", yw.get("ISWS"));
-		o.put("SB_DM", yw.get("SB_DM"));
+		o.put("MEMO", formValue.get("MEMO"));
+		o.put("NSRXZ", formValue.get("NSRXZ"));
+		o.put("HY_ID", formValue.get("HY_ID"));
+		o.put("ZSFS_DM", formValue.get("ZSFS_DM"));
+		o.put("ISWS", formValue.get("ISWS"));
+		o.put("SB_DM", formValue.get("SB_DM"));
+		o.put("CITY", formValue.get("CITY"));
 		// 处理城市和地区
-		if(yw.get("ISWS").equals("Y")){
-			o.put("CITY", yw.get("CITY"));
+		if(formValue.get("ISWS").equals("Y")){
 			o.put("CS_DM", -2);
 			o.put("QX_DM", null);
-			o.put("ZGSWJG", null);
-		}else{
-			List<Integer> dq = (List<Integer>) yw.get("DQ");
+		}else if (formValue.get("DQ")!=null){
+			List<Integer> dq = (List<Integer>) formValue.get("DQ");
 			o.put("CS_DM", dq.get(0));
-			o.put("QX_DM", dq.get(1));
-			o.put("CITY", ywglDao.getCITY(dq.get(0)));
-			o.put("ZGSWJG", yw.get("ZGSWJG"));
+			o.put("QX_DM", null);
+			if(dq.size()>1){
+				o.put("QX_DM", dq.get(1));
+			}
+		}else {
+			o.put("CS_DM",null);
+			o.put("QX_DM",null);
 		}
-		o.put("WTDWXZ_DM", yw.get("WTDWXZ_DM"));
-		o.put("WTDWNSRSBHDF", customer.get("NSRSBH"));
-		o.put("WTDWLXR", customer.get("LXR"));
-		o.put("WTDWLXDH", customer.get("LXDH"));
-		o.put("WTDXLXDZ", customer.get("LXDZ"));
-		o.put("XYJE", xy.get("XYJE"));
-		o.put("CUSTOMER_ID", customer.get("ID"));
-		if (yw.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
-			o.put("TZVALUE1", yw.get("TZVALUE1"));
+		o.put("ZGSWJG", formValue.get("ZGSWJG"));
+		o.put("WTDWXZ_DM", formValue.get("WTDWXZ_DM"));
+		o.put("WTDWNSRSBHDF", formValue.get("NSRSBH"));
+		o.put("WTDWLXR", formValue.get("LXR"));
+		o.put("WTDWLXDH", formValue.get("LXDH"));
+		o.put("WTDXLXDZ", formValue.get("LXDZ"));
+		o.put("XYJE", formValue.get("XYJE"));
+		o.put("CUSTOMER_ID", formValue.get("CUSTOMER_ID"));
+		if (formValue.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
+			o.put("TZVALUE1", formValue.get("TZVALUE1"));
 		} else {
 			o.put("TZVALUE1", null);
 		}
-		if (yw.get("TJVALUE2") != null && ywlx != 1 && ywlx != 2 && ywlx != 7) {
-			o.put("TJVALUE2", yw.get("TJVALUE2"));
+		if (formValue.get("TJVALUE2") != null && ywlx != 1 && ywlx != 2 && ywlx != 7) {
+			o.put("TJVALUE2", formValue.get("TJVALUE2"));
 		} else {
 			o.put("TJVALUE2", null);
 		}
@@ -244,20 +244,16 @@ public class YwglService {
 		bbhm.append(cal.getTimeInMillis());
 		bbhm.delete(21, 23);
 		bbhm.delete(10, 17);
-		/* 判断直接提交还是保存 */
-		if (type.equals("save")) { // 保存
-			o.put("YZM", yzm);
-			o.put("BBHM", bbhm);
-			o.put("ZT", 0);
-			o.put("XYZT_DM", 2);
-			ywglDao.addYwbb(o);
-		} else if (type.equals("commit")) { // 直接报备
-			o.put("BBHM", bbhm);
-			o.put("YZM", yzm);
-			o.put("ZT", 1);
-			o.put("XYZT_DM", 3);
-			ywglDao.addYwbb(o);
-		}
+		
+		//TODO 生成条形码
+		
+		/* 提交报备 */
+		o.put("BBHM", bbhm);
+		o.put("YZM", yzm);
+		o.put("ZT", 1);
+		o.put("XYZT_DM", 3);
+		ywglDao.addYwbb(o);
+
 		Map<String,Object> resp = new HashMap<String,Object>();
 		resp.put("yzm", yzm);
 		resp.put("bbhm", bbhm);
@@ -874,7 +870,10 @@ public class YwglService {
 		}else if (formValue.get("DQ")!=null){
 			List<Integer> dq = (List<Integer>) formValue.get("DQ");
 			o.put("CS_DM", dq.get(0));
-			o.put("QX_DM", dq.get(1));			
+			o.put("QX_DM", null);
+			if(dq.size()>1){
+				o.put("QX_DM", dq.get(1));
+			}
 		}else {
 			o.put("CS_DM",null);
 			o.put("QX_DM",null);
@@ -886,7 +885,7 @@ public class YwglService {
 		o.put("WTDWLXDH", formValue.get("LXDH"));
 		o.put("WTDXLXDZ", formValue.get("LXDZ"));
 		o.put("XYJE", formValue.get("XYJE"));
-		o.put("CUSTOMER_ID", formValue.get("ID"));
+		o.put("CUSTOMER_ID", formValue.get("CUSTOMER_ID"));
 		o.put("ZT", 0);
 		o.put("XYZT_DM", 1);
 		ywglDao.addSaveYwbb(o);
