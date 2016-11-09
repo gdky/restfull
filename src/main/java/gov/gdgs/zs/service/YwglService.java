@@ -151,8 +151,14 @@ public class YwglService {
 		o.put("JG_ID", user.getJgId());
 		o.put("SWSMC", jg.get("dwmc"));
 		o.put("SWSSWDJZH", jg.get("swdjhm"));
-		o.put("WTDW", formValue.get("DWMC"));
+		o.put("WTDW", formValue.get("WTDW"));
 		o.put("WTDWNSRSBH", formValue.get("NSRSBH"));
+		o.put("WTDWXZ_DM", formValue.get("WTDWXZ_DM"));
+		o.put("WTDWNSRSBHDF", formValue.get("NSRSBHDF"));
+		o.put("WTDWLXR", formValue.get("LXR"));
+		o.put("WTDWLXDH", formValue.get("LXDH"));
+		o.put("WTDXLXDZ", formValue.get("LXDZ"));
+		o.put("CUSTOMER_ID", formValue.get("CUSTOMER_ID"));
 		o.put("XYH", formValue.get("XYH"));
 		o.put("YJFH", formValue.get("YJFH"));
 		o.put("RJFH", formValue.get("RJFH"));
@@ -201,13 +207,8 @@ public class YwglService {
 			o.put("QX_DM",null);
 		}
 		o.put("ZGSWJG", formValue.get("ZGSWJG"));
-		o.put("WTDWXZ_DM", formValue.get("WTDWXZ_DM"));
-		o.put("WTDWNSRSBHDF", formValue.get("NSRSBH"));
-		o.put("WTDWLXR", formValue.get("LXR"));
-		o.put("WTDWLXDH", formValue.get("LXDH"));
-		o.put("WTDXLXDZ", formValue.get("LXDZ"));
 		o.put("XYJE", formValue.get("XYJE"));
-		o.put("CUSTOMER_ID", formValue.get("CUSTOMER_ID"));
+		
 		if (formValue.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
 			o.put("TZVALUE1", formValue.get("TZVALUE1"));
 		} else {
@@ -816,8 +817,14 @@ public class YwglService {
 		o.put("JG_ID", user.getJgId());
 		o.put("SWSMC", jg.get("dwmc"));
 		o.put("SWSSWDJZH", jg.get("swdjhm"));
-		o.put("WTDW", formValue.get("DWMC"));
+		o.put("WTDW", formValue.get("WTDW"));
 		o.put("WTDWNSRSBH", formValue.get("NSRSBH"));
+		o.put("WTDWXZ_DM", formValue.get("WTDWXZ_DM"));
+		o.put("WTDWNSRSBHDF", formValue.get("NSRSBHDF"));
+		o.put("WTDWLXR", formValue.get("LXR"));
+		o.put("WTDWLXDH", formValue.get("LXDH"));
+		o.put("WTDXLXDZ", formValue.get("LXDZ"));
+		o.put("CUSTOMER_ID", formValue.get("CUSTOMER_ID"));
 		o.put("XYH", formValue.get("XYH"));
 		o.put("YJFH", formValue.get("YJFH"));
 		o.put("RJFH", formValue.get("RJFH"));
@@ -886,13 +893,7 @@ public class YwglService {
 			o.put("QX_DM",null);
 		}
 		o.put("ZGSWJG", formValue.get("ZGSWJG"));
-		o.put("WTDWXZ_DM", formValue.get("WTDWXZ_DM"));
-		o.put("WTDWNSRSBHDF", formValue.get("NSRSBH"));
-		o.put("WTDWLXR", formValue.get("LXR"));
-		o.put("WTDWLXDH", formValue.get("LXDH"));
-		o.put("WTDXLXDZ", formValue.get("LXDZ"));
 		o.put("XYJE", formValue.get("XYJE"));
-		o.put("CUSTOMER_ID", formValue.get("CUSTOMER_ID"));
 		o.put("ZT", 0);
 		o.put("XYZT_DM", 1);
 		ywglDao.addSaveYwbb(o);
