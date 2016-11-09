@@ -325,9 +325,16 @@ public class YwglService {
 			this.ywglDao.updateYwbbZT(id, 7);
 		} else if (lx != null && lx == 10 ){
 			this.handleYwQY(id,data);
+		} else if (lx != null && lx == 1){
+			this.updateYwbbMx(id,data);
 		}
 	}
 	
+	private void updateYwbbMx(Long id, Map<String, Object> data) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	private void handleYwBB(Long id, Map<String,Object> data){
 		//TODO 首先要检测报备资质
 		ywglDao.updateYwbbZT(id, 1, 3);
