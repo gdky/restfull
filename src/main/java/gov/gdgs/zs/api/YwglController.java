@@ -104,9 +104,10 @@ public class YwglController {
 	 * 修改业务报备信息
 	 */
 	@RequestMapping(value = "/ywbb/{hash}", method = RequestMethod.PUT)
-	public ResponseEntity<?> getYwbb(@RequestBody Map<String, Object> map,
+	public ResponseEntity<?> getYwbb(@RequestBody Map<String, Object> values,
 			@PathVariable String hash) {
-		ywglService.updateYwbb(hash, map);
+		User user = accountService.getUserFromHeaderToken(request); 
+		ywglService.updateYwbb(hash, values, user);
 		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
 				"200", "更新成功");
 		return new ResponseEntity<>(rm, HttpStatus.OK);

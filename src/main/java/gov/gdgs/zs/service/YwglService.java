@@ -300,7 +300,7 @@ public class YwglService {
 	 *     同时建立一条新记录，保留原记录信息，使用新的报备号码，业务状态置为0，协议状态置为1（保存） 
 	 * 12- 拒绝启用操作，将业务状态置为5，协议状态置为0（撤销）
 	 */
-	public void updateYwbb(String hashid, Map<String, Object> map) {
+	public void updateYwbb(String hashid, Map<String, Object> map, User user) {
 		Long id = HashIdUtil.decode(hashid);
 		Integer lx = (Integer) map.get("lx");
 		Map<String, Object> data = (Map<String, Object>) map.get("data");
@@ -327,13 +327,111 @@ public class YwglService {
 		} else if (lx != null && lx == 10 ){
 			this.handleYwQY(id,data);
 		} else if (lx != null && lx == 1){
-			this.updateYwbbMx(id,data);
+			this.updateYwbbMx(id,data,user);
 		}
 	}
 	
-	private void updateYwbbMx(Long id, Map<String, Object> data) {
-		// TODO Auto-generated method stub
+	private void updateYwbbMx(Long id, Map<String, Object> value, User user) {
+		Map<String, Object> formValue = (Map<String, Object>) value.get("formValue");
+		Map<String, Object> jg = (Map<String, Object>) value.get("dataJG");
 		
+		// 整理业务记录
+		HashMap<String, Object> o = new HashMap<String, Object>();
+		String currentTime = Common.getCurrentTime2MysqlDateTime();
+		o.put("BBRQ", currentTime);
+		o.put("BGWH", formValue.get("BGWH"));
+		if(formValue.get("BGRQ")!=null){
+			o.put("BGRQ", Common.getTime2MysqlDateTime((String) formValue.get("BGRQ")));
+		}else{
+			o.put("BGRQ",null);
+		}
+		o.put("SFJE", formValue.get("SFJE"));
+		o.put("JG_ID", user.getJgId());
+		o.put("SWSMC", jg.get("dwmc"));
+		o.put("SWSSWDJZH", jg.get("swdjhm"));
+		o.put("WTDW", formValue.get("WTDW"));
+		o.put("WTDWNSRSBH", formValue.get("NSRSBH"));
+		o.put("WTDWXZ_DM", formValue.get("WTDWXZ_DM"));
+		o.put("WTDWNSRSBHDF", formValue.get("NSRSBHDF"));
+		o.put("WTDWLXR", formValue.get("LXR"));
+		o.put("WTDWLXDH", formValue.get("LXDH"));
+		o.put("WTDXLXDZ", formValue.get("LXDZ"));
+		o.put("CUSTOMER_ID", formValue.get("CUSTOMER_ID"));
+		o.put("XYH", formValue.get("XYH"));
+		o.put("YJFH", formValue.get("YJFH"));
+		o.put("RJFH", formValue.get("RJFH"));
+		o.put("SJFH", formValue.get("SJFH"));
+		if(formValue.get("QMSWS") != null && ((List)formValue.get("QMSWS")).size()>0){
+			List<Map<String, Object>> qmswsList = (List<Map<String, Object>>) formValue
+					.get("QMSWS");
+			StringBuffer QMSWSID = new StringBuffer();
+			StringBuffer QZSWS = new StringBuffer();
+			for (Map<String,Object> item : qmswsList){
+				QMSWSID.append(item.get("key")+",");
+				QZSWS.append(item.get("label")+",");
+			}
+			QMSWSID.deleteCharAt(QMSWSID.length() -1);  
+			QZSWS.deleteCharAt(QZSWS.length() -1);  
+			o.put("QZSWS", QZSWS);
+			o.put("QMSWSID", QMSWSID);
+		}else {
+			o.put("QZSWS", null);
+			o.put("QMSWSID", null);
+		}
+		o.put("TXDZ", jg.get("dzhi"));
+		o.put("SWSDZYJ", jg.get("dzyj"));
+		o.put("SWSWZ", jg.get("wangzhi"));
+		o.put("YWLX_DM", formValue.get("YWLX_DM"));
+		Integer ywlx = null;
+		if (formValue.get("YWLX_DM")!=null){
+			ywlx = Integer.parseInt((String) o.get("YWLX_DM"));
+		}
+		if (formValue.get("TZVALUE1") != null && ywlx != 1 && ywlx != 7) {
+			o.put("TZVALUE1", formValue.get("TZVALUE1"));
+		} else {
+			o.put("TZVALUE1", null);
+		}
+		if (formValue.get("TJVALUE2") != null && ywlx != 1 && ywlx != 2 && ywlx != 7) {
+			o.put("TJVALUE2", formValue.get("TJVALUE2"));
+		} else {
+			o.put("TJVALUE2", null);
+		}
+		o.put("JTXM", formValue.get("JTXM"));
+		if(formValue.get("SSSQ")!=null){
+			List<String> sssq = (List<String>) formValue.get("SSSQ");
+			o.put("SENDTIME", Common.getTime2MysqlDateTime(sssq.get(1)));
+			o.put("SSTARTTIME", Common.getTime2MysqlDateTime(sssq.get(0)));
+		}else{
+			o.put("SENDTIME",null);
+			o.put("SSTARTTIME",null);
+		}
+		o.put("MEMO", formValue.get("MEMO"));
+		o.put("NSRXZ", formValue.get("NSRXZ"));
+		o.put("HY_ID", formValue.get("HY_ID"));
+		o.put("ZSFS_DM", formValue.get("ZSFS_DM"));
+		o.put("ISWS", formValue.get("ISWS"));
+		o.put("SB_DM", formValue.get("SB_DM"));
+		o.put("CITY", formValue.get("CITY"));
+		if(formValue.get("ISWS").equals("Y")){
+			o.put("CS_DM", -2);
+			o.put("QX_DM", null);
+		}else if (formValue.get("DQ")!=null){
+			List<Integer> dq = (List<Integer>) formValue.get("DQ");
+			o.put("CS_DM", dq.get(0));
+			o.put("QX_DM", null);
+			if(dq.size()>1){
+				o.put("QX_DM", dq.get(1));
+			}
+		}else {
+			o.put("CS_DM",null);
+			o.put("QX_DM",null);
+		}
+		o.put("ZGSWJG", formValue.get("ZGSWJG"));
+		o.put("XYJE", formValue.get("XYJE"));
+		o.put("ZT", 0);
+		o.put("XYZT_DM", 1);
+		o.put("ID", id);
+		ywglDao.updateYwbbMx(o);
 	}
 
 	private void handleYwBB(Long id, Map<String,Object> data){
@@ -829,13 +927,17 @@ public class YwglService {
 		o.put("YJFH", formValue.get("YJFH"));
 		o.put("RJFH", formValue.get("RJFH"));
 		o.put("SJFH", formValue.get("SJFH"));
-		if(formValue.get("QMSWS") != null){
+		if(formValue.get("QMSWS") != null && ((List)formValue.get("QMSWS")).size()>0){
 			List<Map<String, Object>> qmswsList = (List<Map<String, Object>>) formValue
 					.get("QMSWS");
-			String QMSWSID = (String) qmswsList.get(0).get("key") + ","
-					+ (String) qmswsList.get(1).get("key");
-			String QZSWS = (String) qmswsList.get(0).get("label") + ","
-					+ (String) qmswsList.get(1).get("label");
+			StringBuffer QMSWSID = new StringBuffer();
+			StringBuffer QZSWS = new StringBuffer();
+			for (Map<String,Object> item : qmswsList){
+				QMSWSID.append(item.get("key")+",");
+				QZSWS.append(item.get("label")+",");
+			}
+			QMSWSID.deleteCharAt(QMSWSID.length() -1);  
+			QZSWS.deleteCharAt(QZSWS.length() -1);  
 			o.put("QZSWS", QZSWS);
 			o.put("QMSWSID", QMSWSID);
 		}else {

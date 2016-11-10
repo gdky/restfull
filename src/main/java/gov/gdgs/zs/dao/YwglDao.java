@@ -1748,4 +1748,16 @@ public class YwglDao extends BaseJdbcDao {
 		return this.jdbcTemplate.update(sql, new Object[]{id,user.getJgId()});
 		 
 	}
+
+	public void updateYwbbMx(HashMap<String, Object> o) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_ywbb set ");
+		
+		for (String key : o.keySet() ) {
+			sb.append(key + "=:" + key + ",");
+		}
+		sb.setLength(sb.length()-1);
+		sb.append(" where ID = :ID ");
+		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+	}
 }
