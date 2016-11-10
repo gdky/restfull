@@ -111,7 +111,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	public int getXyhNum(String xyh, Integer jgId) {
-		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1 and jg_id = ?";
+		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1 and jg_id = ? and zt != 0 ";
 		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
 				new Object[] { xyh,jgId });
 		return ls.size();
@@ -1750,6 +1750,18 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	public void updateYwbbMx(HashMap<String, Object> o) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_ywbb set ");
+		
+		for (String key : o.keySet() ) {
+			sb.append(key + "=:" + key + ",");
+		}
+		sb.setLength(sb.length()-1);
+		sb.append(" where ID = :ID ");
+		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+	}
+
+	public void handleYwBB(HashMap<String, Object> o) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" update zs_ywbb set ");
 		
