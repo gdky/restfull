@@ -77,6 +77,18 @@ public class RyglController {
 		
 	}
 	/**
+	 * 人员入所类型信息
+	 * @param xqTab
+	 * @param gid
+	 * @return
+	 */
+	@RequestMapping(value="/swsba/rslx/{zyryId}", method = RequestMethod.GET )
+	public ResponseEntity<Map<String, Object>> swsrslx(
+			@PathVariable(value = "zyryId") String gid) {
+		return new ResponseEntity<>(ryglService.swsbarslx(gid),HttpStatus.OK);
+		
+	}
+	/**
 	 * 税务师转籍统计
 	 * @param pn
 	 * @param ps

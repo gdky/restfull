@@ -22,6 +22,7 @@ import java.util.Map;
 
 
 
+
 import javax.management.Query;
 
 import org.hashids.Hashids;
@@ -65,11 +66,49 @@ public class RyglDao extends BaseDao{
 		sb.append("				from zs_ryjbxx a,dm_cs b,dm_mz c,dm_xb d,dm_rysf e,dm_xl f,(select @rownum:=?) zs_ry");
 		sb.append("		"+condition.getSql()+" ");
 		if(qury.containsKey("dwmc")){
-			if (!Objects.equal(qury.get("dwmc"), "") && !Objects.equal(qury.get("dwmc"), null)) {
+			Object obj=qury.get("dwmc");
+			if (!Objects.equal(obj, "") && !Objects.equal(obj, null)) {
 				sb.append("		and a.ID in (");
-				sb.append("		select j.RY_ID from zs_cyry j,zs_jg h where j.JG_ID=h.id and h.id='"+qury.get("dwmc")+"' union");
-				sb.append("		select g.RY_ID from zs_zysws g,zs_jg h where g.jg_id=h.ID and h.id='"+qury.get("dwmc")+"' union");
-				sb.append("		select i.RY_ID from zs_fzysws i,zs_jg h where i.ZZDW=h.dwmc and h.id='"+qury.get("dwmc")+"') ");
+				sb.append("		select j.RY_ID from zs_cyry j,zs_jg h where j.JG_ID=h.id and h.id='"+obj+"' union");
+				sb.append("		select g.RY_ID from zs_zysws g,zs_jg h where g.jg_id=h.ID and h.id='"+obj+"' union");
+				sb.append("		select i.RY_ID from zs_fzysws i,zs_jg h where i.ZZDW=h.dwmc and h.id='"+obj+"') ");
+			}
+		}
+		if(qury.containsKey("ZW")){
+			Object obj=qury.get("ZW");
+			if (!Objects.equal(obj, "") && !Objects.equal(obj, null)) {
+				sb.append("		and a.ID in (");
+				sb.append("		select j.RY_ID from zs_cyry j where j.ZW_DM='"+obj+"' union");
+				sb.append("		select g.RY_ID from zs_zysws g where g.ZW_DM='"+obj+"' union");
+				sb.append("		select i.RY_ID from zs_fzysws i where i.ZW_DM='"+obj+"') ");
+			}
+		}
+		if(qury.containsKey("ZYZGZSBH")){
+			Object obj=qury.get("ZYZGZSBH");
+			if (!Objects.equal(obj, "") && !Objects.equal(obj, null)) {
+				sb.append("		and a.ID in (");
+				sb.append("		select g.RY_ID from zs_zysws g where g.ZYZGZSBH like'"+obj+"%')");
+			}
+		}
+		if(qury.containsKey("ZYZSBH")){
+			Object obj=qury.get("ZYZSBH");
+			if (!Objects.equal(obj, "") && !Objects.equal(obj, null)) {
+				sb.append("		and a.ID in (");
+				sb.append("		select g.RY_ID from zs_zysws g where g.ZYZSBH like'"+obj+"%')");
+			}
+		}
+		if(qury.containsKey("CZE")){
+			Object obj=qury.get("CZE");
+			if (!Objects.equal(obj, "") && !Objects.equal(obj, null)) {
+				sb.append("		and a.ID in (");
+				sb.append("		select g.RY_ID from zs_zysws g where g.CZE like'"+obj+"%')");
+			}
+		}
+		if(qury.containsKey("YDDH")){
+			Object obj=qury.get("YDDH");
+			if (!Objects.equal(obj, "") && !Objects.equal(obj, null)) {
+				sb.append("		and a.ID in (");
+				sb.append("		select k.id from zs_ryjbxx k where k.YDDH like'"+obj+"%')");
 			}
 		}
 		sb.append("				and a.xb_dm= d.id");
@@ -187,9 +226,13 @@ public class RyglDao extends BaseDao{
 		sb.append("	d.mc as xb, ");	
 		sb.append("	g.mc as mz,");	
 		sb.append("	date_format(c.sri,'%Y-%m-%d') as csny,");	
-		sb.append("		e.mc as xl,");	
+		sb.append("		(select e.mc from dm_xl e where e.id=c.xl_dm) as xl,");	
 		sb.append("	c.sfzh,");	
-		sb.append("	h.mc as zzmm,");	
+		sb.append("	(select j.ZYRYBALB_DM from zs_zyrybayyb j where j.ZYSWS_ID=a.id) as rslb,");	
+		sb.append("	(select j.DCS from zs_zyrybayyb j where j.ZYSWS_ID=a.id) as DCS,");	
+		sb.append("	(select j.YJGMC from zs_zyrybayyb j where j.ZYSWS_ID=a.id) as YJGMC,");	
+		sb.append("	(select j.YJGDH from zs_zyrybayyb j where j.ZYSWS_ID=a.id) as YJGDH,");	
+		sb.append("	(select k.YJIAN from zs_zyswsbasp k where k.ZYSWS_ID=a.id) as bhyy,");	
 		sb.append("	c.txdz,");	
 		sb.append("	c.yddh,");	
 		sb.append("		c.yzbm,");	
@@ -211,15 +254,13 @@ public class RyglDao extends BaseDao{
 		sb.append("	c.xpian,c.XB_DM,c.XL_DM,c.CS_DM,c.MZ_DM,c.ZZMM_DM,a.ZW_DM,a.czr_dm,a.fqr_dm");	
 		sb.append("	from ");	
 		sb.append("	zs_zysws a,zs_jg b ,zs_ryjbxx c ,");	
-		sb.append("	dm_xb d,dm_xl e,dm_cs f,dm_mz g,dm_zzmm h,dm_zw i,(select @rownum:=0) zs_sws");	
+		sb.append("	dm_xb d,dm_cs f,dm_mz g,dm_zw i,(select @rownum:=0) zs_sws");	
 		sb.append("	where");	
 		sb.append("		b.id=a.jg_id");	
 		sb.append("		 and a.ry_id = c.ID ");	
 		sb.append("		and d.ID = c.XB_DM");	
-		sb.append("	and e.ID = c.XL_DM");	
 		sb.append("		and f.ID = c.CS_DM");	
 		sb.append("		and g.ID = c.MZ_DM");	
-		sb.append("	and h.ID = c.ZZMM_DM");	
 		sb.append("	and i.ID = a.ZW_DM");	
 		sb.append("	and c.ID = ?");	
 		String sql = "SELECT @rownum:=@rownum+1 as 'key',a.qzny,a.xxxx,a.zmr FROM zs_jl a,zs_ryjbxx c,(select @rownum:=0) zs_sws WHERE a.ry_id = c.id  and a.xxxx is not null and c.ID = ? order by a.ID";
@@ -534,11 +575,12 @@ public class RyglDao extends BaseDao{
 		condition.add("b.xb_DM", Condition.EQUAL, qury.get("xb"));
 		condition.add("b.xl_dm", Condition.EQUAL, qury.get("xl"));
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.id as zyswsid, b.id,b.xming,d.mc as xb,b.sfzh,a.zyzsbh,e.mc as cs,f.mc as xl,g.mc as zw,c.mc as ryzt, ");
-		sb.append("		a.ryspgczt_dm from zs_zysws a,zs_ryjbxx b,dm_ryspgczt c,dm_xb d,dm_cs e,dm_xl f,dm_zw g,(select @rownum:=?) zs_ry  ");
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.id as zyswsid, b.id,b.xming,d.mc as xb,b.sfzh,a.zyzsbh,e.mc as cs,g.mc as zw,c.mc as ryzt, ");
+		sb.append("		(select f.mc from dm_xl f where f.id=b.xl_dm) as xl,  ");
+		sb.append("		a.ryspgczt_dm from zs_zysws a,zs_ryjbxx b,dm_ryspgczt c,dm_xb d,dm_cs e,dm_zw g,(select @rownum:=?) zs_ry  ");
 		sb.append(condition.getSql());
 		sb.append("		and  a.JG_ID=? and b.ID=a.ry_id and c.ID=a.RYSPGCZT_DM and ZYZT_DM in (1,3)");
-		sb.append("		and b.XB_DM=d.ID and b.CS_DM=e.ID and f.ID=b.XL_DM and a.ZW_DM=g.ID");
+		sb.append("		and b.XB_DM=d.ID and b.CS_DM=e.ID  and a.ZW_DM=g.ID");
 		if(qury.containsKey("sorder")){
 			Boolean asc = qury.get("sorder").toString().equals("ascend");
 			switch (qury.get("sfield").toString()) {
@@ -631,11 +673,12 @@ public class RyglDao extends BaseDao{
 		condition.add("b.CS_DM", Condition.EQUAL, qury.get("cs"));
 		condition.add("b.xb_DM", Condition.EQUAL, qury.get("xb"));
 		condition.add("b.xl_dm", Condition.EQUAL, qury.get("xl"));
+		condition.add("a.zw_dm", Condition.EQUAL, qury.get("zw"));
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', b.id,b.xming,d.mc as xb,b.sfzh,e.mc as cs,f.mc as xl,g.mc as zw");
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', b.id,a.id as cyid,b.xming,d.mc as xb,b.sfzh,e.mc as cs,f.mc as xl,g.mc as zw,a.CYRYZT_DM as ztdm");
 		sb.append("		 from zs_cyry a,zs_ryjbxx b,dm_xb d,dm_cs e,dm_xl f,dm_zw g,(select @rownum:=?) zs_ry ");
 		sb.append(condition.getSql());
-		sb.append("		and  a.JG_ID=? and b.ID=a.ry_id and CYRYZT_DM in (1,3)");
+		sb.append("		and  a.JG_ID=? and b.ID=a.ry_id and a.CYRYZT_DM in (1,3,14)");
 		sb.append("		and b.XB_DM=d.ID and b.CS_DM=e.ID and f.ID=b.XL_DM and a.ZW_DM=g.ID");
 		if(qury.containsKey("sorder")){
 			Boolean asc = qury.get("sorder").toString().equals("ascend");
@@ -676,6 +719,7 @@ public class RyglDao extends BaseDao{
 				Map<String,Object> map = new HashMap<String,Object>();
 				Map<String,Object> link = new HashMap<>();
 				String id = hashids.encode(rs.getLong("id"));
+				String cyid = hashids.encode(rs.getLong("cyid"));
 				link.put("herf_xxzl", url+"/ryxx/cyryxx/"+id);
 				link.put("herf_bgjl", url+"/ryxx/cyrybgjl/"+id);
 				map.put("key", rs.getObject("key"));
@@ -687,7 +731,7 @@ public class RyglDao extends BaseDao{
 				map.put("sfzh", rs.getObject("sfzh"));
 				map.put("zw", rs.getObject("zw"));
 				map.put("xl", rs.getObject("xl"));
-				map.put("ryid", id);
+				map.put("ryid", cyid);
 				return map;
 			}
 		});
@@ -1100,6 +1144,14 @@ public class RyglDao extends BaseDao{
 	 */
 	public void ryxpgx(int ryid,String path) {
 		this.jdbcTemplate.update("update zs_ryjbxx a set a.xpian=? where id=?",new Object[]{path,ryid});
+	}
+	/**
+	 * 人员入所类别
+	 * @param ryid
+	 * @param path
+	 */
+	public Map<String, Object> swsbarslx(int ryid) {
+		return this.jdbcTemplate.queryForMap("select ZYRYBALB_DM as rslb,DCS,YJGMC,YJGDH from zs_zyrybayyb where ZYSWS_ID=? limit 1",new Object[]{ryid});
 	}
 	
 }

@@ -109,6 +109,10 @@ public class SPservice {
 			this.spDao.swszxsq(sqxm);break;
 		case"jghbsq"://机构合并申请
 			this.spDao.swshbsq(sqxm);break;
+		case "zyswsba"://执业备案申请
+			this.spDao.zyswsba(sqxm);break;
+		case "zyswscxba"://执业重新备案申请
+			this.spDao.zyswscxba(sqxm);break;
 		case "zyswsbgsq"://执业变更申请
 			this.spDao.zyswsbgsq(sqxm);break;
 		case"zyzjsq"://执业转籍申请
@@ -129,6 +133,8 @@ public class SPservice {
 			this.spDao.fzyzjsq(sqxm);break;
 		case"fzyzzysq"://非执业转执业申请
 			this.spDao.fzyzzysq(sqxm);break;
+		case"cyzzy"://从业转执业申请
+			this.spDao.cyzzy(sqxm);break;
 		}
 	}
 	/**
@@ -143,7 +149,9 @@ public class SPservice {
 				this.spDao.updatePTXM(ptxm);break;
 			case "zyzrfs"://执业转入分所
 				this.spDao.zyzrfssq(ptxm);break;
-			case "cydrsq"://从业转入分所
+			case "zyswsqxba"://执业取消备案申请
+				this.spDao.zyswsqxba(ptxm);break;
+			case "cydrsq"://从业调入
 				this.spDao.cydrsq(ptxm);break;
 			case "zydrzssq"://执业调入主所
 				this.spDao.zydrzssq(ptxm);break;
