@@ -416,11 +416,13 @@ public class HfglDao extends BaseDao{
 	            		}
                 	}
             	}else{
-            		if(yftt.equals("")){
+            		if(yftt.equals("")||yftt.equals("0.0")||yftt.equals("0")){
             			yftt="0";
             			int zys = (int)new BigDecimal(yfgr).divide(new BigDecimal("800"),1,BigDecimal.ROUND_HALF_EVEN).doubleValue();
-            			for(Map<String, Object> k:this.jdbcTemplate.queryForList("select ry_id from zs_zysws a where a.jg_id=? and a.yxbz=1 and a.ry_id not in(select b.ry_id from zs_hyhfjfryls b where b.nd=? and b.JG_ID=? and b.yxbz=1) limit ?",
-            					new Object[]{jgs.get("id"),nd,jgs.get("id"),zys})){
+            			List<Map<String, Object>> rys = this.jdbcTemplate.queryForList("select ry_id from zs_zysws a where a.jg_id=? and a.yxbz=1 and a.ry_id not in(select b.ry_id from zs_hyhfjfryls b where b.nd=? and b.JG_ID=? and b.yxbz=1) limit ?",
+            					new Object[]{jgs.get("id"),nd,jgs.get("id"),zys});
+            			jfrs=rys.size();
+            			for(Map<String, Object> k:rys){
             				this.jdbcTemplate.update("insert into zs_hyhfjfryls (ID,ND,RY_ID,JG_ID,JF_ID,SCJLID,LRRQ,YXBZ) values(replace(uuid(),'-',''),?,?,?,?,?,sysdate(),1)",new Object[]{nd,k.get("ry_id"),jgs.get("id"),uuid,uuid2});
             			}
             		}

@@ -207,4 +207,9 @@ public class RyglService {
 		int ryid = (int)hashids.decode(gid)[0];
 		ryglDao.ryxpgx(ryid, path);
 	}
+	public Map<String, Object> swsbarslx(String gid) {
+		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+		int ryid = (int)hashids.decode(gid)[0];
+		return ryglDao.swsbarslx(ryid);
+	}
 }

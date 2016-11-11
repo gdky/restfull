@@ -359,12 +359,12 @@ public class SWSDao extends BaseDao{
 		return this.insertAndGetKeyByJdbc(sql,new Object[]{jgtj.get("dwmc"),jgtj.get("cs")},new String[] {"ID"});
 	}
 	/**
-	 * 当前用户分所
+	 * 当前用户分所/判断是否主所
 	 * @param pid
 	 * @return
 	 */
-	public List<Map<String, Object>> chilchenJG(Object pid){
-		return this.jdbcTemplate.query("select ID,DWMC from zs_jg where PARENTJGID=? and jgzt_dm=11",new Object[]{pid},
+	public Object chilchenJG(Object pid){
+		List<Map<String, Object>> fs = this.jdbcTemplate.query("select ID,DWMC from zs_jg where PARENTJGID=? and jgzt_dm=11",new Object[]{pid},
 				new RowMapper<Map<String,Object>>() {
 					public Map<String,Object> mapRow(ResultSet rs, int arg1) throws SQLException{
 						Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
@@ -375,6 +375,16 @@ public class SWSDao extends BaseDao{
 						return map;
 					}
 				});
+		if(fs.size()>0){
+			return fs;
+		}else{
+			List<Map<String, Object>> isfs = this.jdbcTemplate.queryForList("select id from zs_jg a where (a.PARENTJGID >0) and a.YXBZ=1 and a.id=?",new Object[]{pid});
+			if(isfs.size()>0){
+				return 1;
+			}
+		};
+		return false;
+		
 	}
 
 	public List<Map<String, Object>> getCzrxx(Long jgId) {
