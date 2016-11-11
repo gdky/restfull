@@ -107,10 +107,8 @@ public class YwglController {
 	public ResponseEntity<?> getYwbb(@RequestBody Map<String, Object> values,
 			@PathVariable String hash) {
 		User user = accountService.getUserFromHeaderToken(request); 
-		ywglService.updateYwbb(hash, values, user);
-		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
-				"200", "更新成功");
-		return new ResponseEntity<>(rm, HttpStatus.OK);
+		Map<String,Object> rs = ywglService.updateYwbb(hash, values, user);
+		return new ResponseEntity<>(rs, HttpStatus.OK);
 	}
 
 	/*

@@ -286,7 +286,7 @@ public class YwglService {
 	/*
 	 * 按类型处理业务报备修改操作 修改请求json结构为{lx:int number, data:{}}
 	 * data为修改的业务具体属性信息，lx为修改操作类型 
-	 * 1 - 业务信息修改 
+	 * 1 - 业务信息修改，将业务状态置为0(保存)，协议状态置为1
 	 * 2 - 退回操作，将业务状态置为0(保存)，协议状态置为1
 	 * 3 - 报备操作，将业务状态置为1（报备），协议状态置为3  客户端
 	 * 4 - 收费操作，将业务状态置为3（已收费），协议状态置为4 客户端
@@ -305,6 +305,8 @@ public class YwglService {
 		Integer lx = (Integer) map.get("lx");
 		Map<String, Object> data = (Map<String, Object>) map.get("data");
 		Map<String,Object> resp = new HashMap<String,Object>();
+		resp.put("data", "success");
+		resp.put("code", 200);
 		if (lx != null && lx == 2) {
 			this.sentBackYw(id, data);
 		} else if (lx != null && lx == 6) {
@@ -318,7 +320,7 @@ public class YwglService {
 		} else if (lx != null && lx == 12) {
 			this.ywglDao.updateYwbbZT(id, 5, 0);
 		} else if (lx != null && lx == 3) {
-			resp = this.handleYwBB(id, data,user);
+			resp.put("data", this.handleYwBB(id, data,user)) ;
 		} else if (lx != null && lx == 4) {
 			this.handleYwSF(id,data);
 		} else if (lx != null && lx == 8) {
@@ -340,7 +342,6 @@ public class YwglService {
 		// 整理业务记录
 		HashMap<String, Object> o = new HashMap<String, Object>();
 		String currentTime = Common.getCurrentTime2MysqlDateTime();
-		o.put("BBRQ", currentTime);
 		o.put("BGWH", formValue.get("BGWH"));
 		if(formValue.get("BGRQ")!=null){
 			o.put("BGRQ", Common.getTime2MysqlDateTime((String) formValue.get("BGRQ")));
@@ -430,6 +431,7 @@ public class YwglService {
 		}
 		o.put("ZGSWJG", formValue.get("ZGSWJG"));
 		o.put("XYJE", formValue.get("XYJE"));
+		o.put("ZBRQ", currentTime);
 		o.put("ZT", 0);
 		o.put("XYZT_DM", 1);
 		o.put("ID", id);
@@ -1039,7 +1041,6 @@ public class YwglService {
 		int now_s = cal.get(Calendar.SECOND);// 得到秒数
 
 		String currentTime = Common.getCurrentTime2MysqlDateTime();
-		o.put("BBRQ", currentTime);
 		o.put("BGWH", formValue.get("BGWH"));
 		if(formValue.get("BGRQ")!=null){
 			o.put("BGRQ", Common.getTime2MysqlDateTime((String) formValue.get("BGRQ")));

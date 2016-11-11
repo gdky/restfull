@@ -26,7 +26,8 @@ public class YwglDao extends BaseJdbcDao {
 			Condition condition) {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
+		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx, ");
+		sb.append(" (CASE WHEN DATEDIFF(now(),bbrq)>30 THEN 1 ELSE 0 END) as overtime ");
 		sb.append(" FROM (zs_ywbb y,dm_ywbb_zt z,  ");
 
 		// <=== 查询条件集合
@@ -46,7 +47,7 @@ public class YwglDao extends BaseJdbcDao {
 
 		sb.append(" WHERE y.zt = z.id  ");
 		sb.append(" AND sub.id = y.id ");
-		sb.append(" ORDER BY y.bbrq desc ");
+		sb.append(" ORDER BY y.zbrq desc ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
@@ -428,6 +429,9 @@ public class YwglDao extends BaseJdbcDao {
 			map.put("ywzt_dm", rs.getInt("zt"));
 			map.put("sqthyy", rs.getString("sqthyy"));
 			map.put("sqqyly", rs.getString("sqqyly"));
+			if(rs.getObject("overtime") != null){
+				map.put("overtime",rs.getInt("overtime"));
+			}
 
 			return map;
 		}
@@ -1730,12 +1734,12 @@ public class YwglDao extends BaseJdbcDao {
 	public void addSaveYwbb(HashMap<String, Object> o) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" insert into zs_ywbb ");
-		sb.append(" (ND,BBRQ,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
+		sb.append(" (ND,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
 		sb.append(" QZSWS,QMSWSID,TXDZ,SWSDZYJ,SWSWZ,YWLX_DM,JTXM,ZBRQ,ZGSWJG, ");
 		sb.append(" SENDTIME,SSTARTTIME,MEMO,NSRXZ,HY_ID,ZSFS_DM,ISWS,SB_DM,CS_DM,QX_DM,CITY, ");
 		sb.append(" WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ,XYJE,CUSTOMER_ID,TZVALUE1,TJVALUE2, ");
 		sb.append(" ZT,XYZT_DM) ");
-		sb.append(" values(:ND,:BBRQ,:BGWH,:BGRQ,:SFJE,:JG_ID,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWNSRSBH,:XYH,:YJFH,:RJFH,:SJFH, ");
+		sb.append(" values(:ND,:BGWH,:BGRQ,:SFJE,:JG_ID,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWNSRSBH,:XYH,:YJFH,:RJFH,:SJFH, ");
 		sb.append(" :QZSWS,:QMSWSID,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX_DM,:JTXM,:ZBRQ,:ZGSWJG, ");
 		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
