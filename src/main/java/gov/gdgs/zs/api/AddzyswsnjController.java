@@ -8,6 +8,7 @@ import gov.gdgs.zs.service.AddzyswsnjService;
 import gov.gdgs.zs.service.IAddswsnjService;
 import gov.gdgs.zs.service.IAddzyswsnjService;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -90,7 +91,17 @@ Map<String, Object> obj = addzyswsnjService.getzyswsnjBafs(nd, sws_id);
 return new ResponseEntity<>(obj, HttpStatus.OK);
 
 }
-
+//执业税务师年检年度校验
+@RequestMapping(value="checkzyswsnjnd",method = RequestMethod.GET)
+public ResponseEntity<Map<String, Object>> checkzyswsnjnd(
+		@RequestParam(value="where", required=false) String where,
+		HttpServletRequest request)
+		{
+		
+    User user =  accountService.getUserFromHeaderToken(request);
+Map<String, Object> obj = addzyswsnjService.checkzyswsnjnd(user.getJgId(), where);
+				return new ResponseEntity<>(obj,HttpStatus.OK); 
+}
 
 
 
