@@ -380,7 +380,6 @@ public class ClientsdsbDao extends BaseJdbcDao {
 
 	
 	public boolean checkAddJysrqkb(String jgid) {
-		// TODO Auto-generated method stub
 		int nd=(Calendar.getInstance().get(Calendar.YEAR))-1;
 		String swsqkSql="select b.ID from zs_sdsb_swsjbqk b where b.JG_ID=? and b.ZTBJ='2' and b.ND=year(sysdate())-1 ";
 		List<String> ls=this.jdbcTemplate.queryForList(swsqkSql, new Object[]{jgid}, String.class);
@@ -397,7 +396,6 @@ public class ClientsdsbDao extends BaseJdbcDao {
 
 	public Map<String, Object> getEditJygmtjInit(String jgid,
 			HashMap<String, Object> map) {
-		// TODO Auto-generated method stub
 		StringBuffer sb=new StringBuffer();
 		sb.append("select a.nd,b.DWMC,a.* from "+Config.PROJECT_SCHEMA+"zs_sdsb_jygmtjb a,zs_jg b where a.jg_id=b.id and a.jg_id=? and a.ND=( date_format(sysdate(),'%Y')-1)");
 		// 装嵌传值数组

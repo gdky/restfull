@@ -15,7 +15,6 @@ import com.gdky.restfull.dao.BaseJdbcDao;
 public class XttjbbDao extends BaseJdbcDao {
 
 	public Map<String, Object> getXttjbb(int page, int pageSize, HashMap<String, Object> where) {
-		// TODO Auto-generated method stub
 		Condition condition = new Condition();
 		condition.add("jg.DWMC", Condition.EQUAL, where.get("dwmc")); 
 		StringBuffer sql=new StringBuffer(" SELECT SQL_CALC_FOUND_ROWS @rownum := @rownum + 1 AS 'KEY', xj.* ");
@@ -97,7 +96,6 @@ public class XttjbbDao extends BaseJdbcDao {
 
 	public Map<String, Object> getHyryqktj(int page, int pageSize,
 			HashMap<String, Object> map) {
-		// TODO Auto-generated method stub
 		StringBuffer sql = new StringBuffer();
 		sql.append(" select '1:执业税务师' as xmmc, count(distinct zy.id) zrs, ")
 			.append(" sum(case when jb.xb_dm = '1' then 1 else 0 end) n_zrs, ")
@@ -196,7 +194,6 @@ public class XttjbbDao extends BaseJdbcDao {
 		obj.put("current", page);
 		return obj;
 		
-//		// TODO Auto-generated method stub
 //		StringBuffer sb = new StringBuffer();
 //		sb.append(" select cs.ID, ");
 //		sb.append("        cs.PARENT_ID, ");
@@ -536,7 +533,6 @@ public class XttjbbDao extends BaseJdbcDao {
 
 	public Map<String, Object> getRyztsjfx(int page, int pageSize,
 			HashMap<String, Object> map) {
-		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select cs.ID, ");
 		sb.append("        cs.PARENT_ID, ");

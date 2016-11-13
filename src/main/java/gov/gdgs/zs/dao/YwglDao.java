@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
+import com.gdky.restfull.entity.User;
 import com.gdky.restfull.utils.HashIdUtil;
 
 @Repository
@@ -25,8 +26,9 @@ public class YwglDao extends BaseJdbcDao {
 			Condition condition) {
 
 		StringBuffer sb = new StringBuffer();
-		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx ");
-		sb.append(" FROM (zs_ywbb y,dm_ywbb_zt z,dm_ywlx l,  ");
+		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx, ");
+		sb.append(" (CASE WHEN DATEDIFF(now(),bbrq)>30 THEN 1 ELSE 0 END) as overtime ");
+		sb.append(" FROM (zs_ywbb y,dm_ywbb_zt z,  ");
 
 		// <=== 查询条件集合
 		sb.append(" ( "
@@ -40,11 +42,12 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" on y.cs_dm = cs.id ");
 		sb.append(" left join dm_cs AS qx ");
 		sb.append(" on y.qx_dm = qx.id ");
+		sb.append(" left join dm_ywlx as l ");
+		sb.append(" on y.ywlx_dm = l.id ");
 
 		sb.append(" WHERE y.zt = z.id  ");
-		sb.append(" AND y.ywlx_dm = l.id  ");
 		sb.append(" AND sub.id = y.id ");
-		sb.append(" ORDER BY y.bbrq desc ");
+		sb.append(" ORDER BY y.zbrq desc ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
@@ -72,12 +75,12 @@ public class YwglDao extends BaseJdbcDao {
 
 	public Map<String, Object> getYwbbById(long id) {
 		String sql = "select * from " + Config.PROJECT_SCHEMA
-				+ "zs_ywbb_old where id = ?";
+				+ "zs_ywbb where id = ?";
 		Map<String, Object> rs = jdbcTemplate.queryForMap(sql, id);
 		return rs;
 	}
 
-	public List<Map<String, Object>> getZyswsByJg(Long id) {
+	public List<Map<String, Object>> getZyswsByJg(Integer id) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select r.XMING,z.ID as ZYSWS_ID ");
 		sb.append(" from zs_jg j,zs_ryjbxx r,zs_zysws z ");
@@ -99,19 +102,25 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" QZSWS,QMSWSID,TXDZ,SWSDZYJ,SWSWZ,YWLX_DM,JTXM,ZBRQ,ZGSWJG, ");
 		sb.append(" SENDTIME,SSTARTTIME,MEMO,NSRXZ,HY_ID,ZSFS_DM,ISWS,SB_DM,CS_DM,QX_DM,CITY, ");
 		sb.append(" WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ,XYJE,CUSTOMER_ID,TZVALUE1,TJVALUE2, ");
-		sb.append(" YZM,BBHM,IS_YD,ZT) ");
+		sb.append(" YZM,BBHM,IS_YD,ZT,XYZT_DM) ");
 		sb.append(" values(:ND,:BBRQ,:BGWH,:BGRQ,:SFJE,:JG_ID,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWNSRSBH,:XYH,:YJFH,:RJFH,:SJFH, ");
 		sb.append(" :QZSWS,:QMSWSID,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX_DM,:JTXM,:ZBRQ,:ZGSWJG, ");
 		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
-		sb.append(" :YZM,:BBHM,:IS_YD,:ZT) ");
+		sb.append(" :YZM,:BBHM,:IS_YD,:ZT,:XYZT_DM) ");
 		this.namedParameterJdbcTemplate.update(sb.toString(), o);
 	}
 
 	public int getXyhNum(String xyh, Integer jgId) {
-		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1 and jg_id = ?";
+		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1 and jg_id = ? and zt != 0 ";
 		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
 				new Object[] { xyh,jgId });
+		return ls.size();
+	}
+	public int getXyhNum(String xyh, Integer jgId,Long id) {
+		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1 and jg_id = ? and id != ? and zt != 0 ";
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
+				new Object[] { xyh,jgId,id });
 		return ls.size();
 	}
 
@@ -137,6 +146,7 @@ public class YwglDao extends BaseJdbcDao {
 						map.put("nd", rs.getObject("nd"));
 						map.put("bbhm", rs.getObject("bbhm"));
 						map.put("bbrq", rs.getDate("bbrq"));
+						map.put("bgrq", rs.getDate("bgrq"));
 						map.put("bgwh", rs.getString("bgwh"));
 						map.put("zbrq", rs.getDate("zbrq"));
 						map.put("yzm", rs.getString("yzm"));
@@ -198,6 +208,7 @@ public class YwglDao extends BaseJdbcDao {
 						map.put("fphm", rs.getString("FPHM"));
 						map.put("xyje", rs.getBigDecimal("XYJE"));
 						map.put("sjsqje", rs.getBigDecimal("SJSQJE"));
+						map.put("fpje", rs.getBigDecimal("FPJE"));
 						map.put("memo", rs.getString("MEMO"));
 						map.put("zgswjg", rs.getString("ZGSWJG"));
 						map.put("swsdh", rs.getString("SWSDH"));
@@ -417,6 +428,7 @@ public class YwglDao extends BaseJdbcDao {
 			map.put("fphm", rs.getString("FPHM"));
 			map.put("xyje", rs.getBigDecimal("XYJE"));
 			map.put("sjsqje", rs.getBigDecimal("SJSQJE"));
+			map.put("fpje", rs.getBigDecimal("FPJE"));
 			map.put("memo", rs.getString("MEMO"));
 			map.put("zgswjg", rs.getString("ZGSWJG"));
 			map.put("swsdh", rs.getString("SWSDH"));
@@ -425,6 +437,9 @@ public class YwglDao extends BaseJdbcDao {
 			map.put("ywzt_dm", rs.getInt("zt"));
 			map.put("sqthyy", rs.getString("sqthyy"));
 			map.put("sqqyly", rs.getString("sqqyly"));
+			if(rs.getObject("overtime") != null){
+				map.put("overtime",rs.getInt("overtime"));
+			}
 
 			return map;
 		}
@@ -1567,7 +1582,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 	
 	public void handleYwSF (Long id,Map<String,Object> data ){
-		String sql  = "update zs_ywbb set sjsqje=:sjsqje, fphm=:fphm, zt=:zt, xyzt_dm=:xyzt_dm where id = :id";
+		String sql  = "update zs_ywbb set sjsqje=:sjsqje, fphm=:fphm, zt=:zt, xyzt_dm=:xyzt_dm, fpje=:fpje where id = :id";
 		this.namedParameterJdbcTemplate.update(sql, data);
 	}
 	
@@ -1711,5 +1726,62 @@ public class YwglDao extends BaseJdbcDao {
 		ob.put("data", ls);
 		ob.put("swsmc", swsmc);
 		return ob;
+	}
+
+	public List<Map<String, Object>> getJgLocked(Integer jgId) {
+		String sql = "select sdyy,DATE_FORMAT(sdtime,'%Y年%m月%d日') as sdtime,sdr_role from zs_sdjl_jg where yxbz = 1 and jg_id = ? ";
+		return this.jdbcTemplate.queryForList(sql, new Object[]{jgId});
+	}
+
+	public List<Map<String, Object>> isExistSameLx(Object nd, Object ywlx,
+			Object customer) {
+		String sql = "select id from zs_ywbb where nd = ? and ywlx_dm = ? and customer_id = ? and zt = 5 ";
+		return this.jdbcTemplate.queryForList(sql, new Object[]{nd,ywlx,customer});
+	}
+
+	public void addSaveYwbb(HashMap<String, Object> o) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into zs_ywbb ");
+		sb.append(" (ND,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
+		sb.append(" QZSWS,QMSWSID,TXDZ,SWSDZYJ,SWSWZ,YWLX_DM,JTXM,ZBRQ,ZGSWJG, ");
+		sb.append(" SENDTIME,SSTARTTIME,MEMO,NSRXZ,HY_ID,ZSFS_DM,ISWS,SB_DM,CS_DM,QX_DM,CITY, ");
+		sb.append(" WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ,XYJE,CUSTOMER_ID,TZVALUE1,TJVALUE2, ");
+		sb.append(" ZT,XYZT_DM) ");
+		sb.append(" values(:ND,:BGWH,:BGRQ,:SFJE,:JG_ID,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWNSRSBH,:XYH,:YJFH,:RJFH,:SJFH, ");
+		sb.append(" :QZSWS,:QMSWSID,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX_DM,:JTXM,:ZBRQ,:ZGSWJG, ");
+		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
+		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
+		sb.append(" :ZT,:XYZT_DM) ");
+		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+	}
+
+	public Integer delYwbb(Long id, User user) {
+		String sql = " update  zs_ywbb set yxbz = 0 where id = ? and jg_id = ? ";
+		return this.jdbcTemplate.update(sql, new Object[]{id,user.getJgId()});
+		 
+	}
+
+	public void updateYwbbMx(HashMap<String, Object> o) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_ywbb set ");
+		
+		for (String key : o.keySet() ) {
+			sb.append(key + "=:" + key + ",");
+		}
+		sb.setLength(sb.length()-1);
+		sb.append(" where ID = :ID ");
+		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+	}
+
+	public void handleYwBB(HashMap<String, Object> o) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_ywbb set ");
+		
+		for (String key : o.keySet() ) {
+			sb.append(key + "=:" + key + ",");
+		}
+		sb.setLength(sb.length()-1);
+		sb.append(" where ID = :ID ");
+		this.namedParameterJdbcTemplate.update(sb.toString(), o);
 	}
 }

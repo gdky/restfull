@@ -23,8 +23,6 @@ public class XttjbbService {
 
 	public Map<String, Object> getXttjbb(int page, int pageSize,
 			String where) {
-		// TODO Auto-generated method stub
-		//Long jid = HashIdUtil.decode(jgid);
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		if(where != null){
 			try{
@@ -41,7 +39,6 @@ public class XttjbbService {
 	}
 
 	public Map<String, Object> getHyryqktj(int page, int pageSize, String where) {
-		// TODO Auto-generated method stub
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		if(where != null){
 			try{
@@ -58,7 +55,6 @@ public class XttjbbService {
 	}
 
 	public Map<String, Object> getHynlsjfx(int page, int pageSize, String where) {
-		// TODO Auto-generated method stub
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		if(where != null){
 			try{

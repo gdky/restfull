@@ -87,7 +87,6 @@ public class AddzyswsnjService implements IAddzyswsnjService {
 			}
 			
 			public Map<String, Object> getzyswsnjBafs(String nd, String sws_id) {
-				// TODO Auto-generated method stub
 				Map<String, Object> rs =addzyswsnjdao.getzyswsnjBafs(nd, sws_id);
 				return rs;
 			}

@@ -1,5 +1,6 @@
 package gov.gdgs.zs.api;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,9 @@ public class YwglController {
 	
 	@Autowired
 	private AccountService accountService;
+	
+	@Autowired
+	private HttpServletRequest request;
 
 
 	/**
@@ -99,13 +103,12 @@ public class YwglController {
 	/*
 	 * 修改业务报备信息
 	 */
-	@RequestMapping(value = "/ywbb/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<?> getYwbb(@RequestBody Map<String, Object> map,
-			@PathVariable String id) {
-		ywglService.updateYwbb(id, map);
-		ResponseMessage rm = new ResponseMessage(ResponseMessage.Type.success,
-				"200", "更新成功");
-		return new ResponseEntity<>(rm, HttpStatus.OK);
+	@RequestMapping(value = "/ywbb/{hash}", method = RequestMethod.PUT)
+	public ResponseEntity<?> getYwbb(@RequestBody Map<String, Object> values,
+			@PathVariable String hash) {
+		User user = accountService.getUserFromHeaderToken(request); 
+		Map<String,Object> rs = ywglService.updateYwbb(hash, values, user);
+		return new ResponseEntity<>(rs, HttpStatus.OK);
 	}
 
 	/*
@@ -122,12 +125,13 @@ public class YwglController {
 	/*
 	 * 客户端用业务报备查询
 	 */
-	@RequestMapping(value = "/jgyw/{hashId}", method = RequestMethod.GET)
-	public ResponseEntity<?> getYwbbByJg(@PathVariable("hashId") String hashId,
+	@RequestMapping(value = "/jgyw", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwbbByJg(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pageSize,
 			@RequestParam(value = "where", required = false) String where) {
-		Map<String, Object> obj = ywglService.getYwbbByJg(hashId, page,
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> obj = ywglService.getYwbbByJg(user, page,
 				pageSize, where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
@@ -135,10 +139,10 @@ public class YwglController {
 	/*
 	 * 客户端用机构关联执业税务师和机构信息
 	 */
-	@RequestMapping(value = "/ywbbmisc/{jgHashid}", method = RequestMethod.GET)
-	public ResponseEntity<?> getYwbbMiscByJg(
-			@PathVariable("jgHashid") String jgHashid) {
-		Map<String, Object> obj = ywglService.getYwbbMiscByJg(jgHashid);
+	@RequestMapping(value = "/ywbbmisc", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwbbMiscByJg() {
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> obj = ywglService.getYwbbMiscByJg(user);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
@@ -147,12 +151,30 @@ public class YwglController {
 	 */
 	@RequestMapping(value = "/ywbb", method = RequestMethod.POST)
 	public  ResponseEntity<Map<String,Object>> addYwbb(
-			@RequestBody Map<String,Object> values,
-			HttpServletRequest request){ 
+			@RequestBody Map<String,Object> values){ 
 		
 		User user =  accountService.getUserFromHeaderToken(request);
-		Map<String,Object> obj = ywglService.addYwbb(values,user);
+		String type = (String) values.get("type");
+		
+		Map<String,Object> obj = new HashMap<String, Object>();
+		if ("save".equals(type)){
+			 obj = ywglService.addSaveYwbb(values,user);
+		}else if ("commit".equals(type)){
+			 obj = ywglService.addYwbb(values,user);
+		}
 		return new ResponseEntity<>(obj,HttpStatus.CREATED);
+	}
+	/*
+	 * 客户端删除业务报备
+	 */
+	@RequestMapping(value="/ywbb/{hash}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> delYwbb(@PathVariable String hash){
+		
+		User user = accountService.getUserFromHeaderToken(request);
+		Integer rs = ywglService.delYwbb(hash,user);
+		return new ResponseEntity<>(new ResponseMessage(
+				ResponseMessage.Type.success, rs.toString()),
+				HttpStatus.OK);
 	}
 	
 	/**
@@ -355,6 +377,24 @@ public class YwglController {
 			@RequestParam(value = "pagesize", required = true) int pagesize,
 			@RequestParam(value = "where", required = false) String where) {
 		Map<String, Object> map = ywglService.getYwbbsjhzJe(page, pagesize,
+				where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	
+	/**
+	 * 客户端 - 业务汇总统计
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/ywhztj", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwbbhztj(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where) {
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> map = ywglService.getYwbbhztj(user,page, pagesize,
 				where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
