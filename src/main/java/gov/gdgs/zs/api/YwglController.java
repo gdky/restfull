@@ -380,4 +380,22 @@ public class YwglController {
 				where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
+	
+	/**
+	 * 客户端 - 业务汇总统计
+	 * @param page
+	 * @param pagesize
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/ywhztj", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwbbhztj(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where) {
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> map = ywglService.getYwbbhztj(user,page, pagesize,
+				where);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
 }

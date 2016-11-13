@@ -117,6 +117,12 @@ public class YwglDao extends BaseJdbcDao {
 				new Object[] { xyh,jgId });
 		return ls.size();
 	}
+	public int getXyhNum(String xyh, Integer jgId,Long id) {
+		String sql = "select id from zs_ywbb where xyh = ? and yxbz = 1 and jg_id = ? and id != ? and zt != 0 ";
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(sql,
+				new Object[] { xyh,jgId,id });
+		return ls.size();
+	}
 
 	public Map<String, Object> getYwbbByYzmAndBbhm(String bbhm, String yzm) {
 		StringBuffer sb = new StringBuffer();
@@ -202,6 +208,7 @@ public class YwglDao extends BaseJdbcDao {
 						map.put("fphm", rs.getString("FPHM"));
 						map.put("xyje", rs.getBigDecimal("XYJE"));
 						map.put("sjsqje", rs.getBigDecimal("SJSQJE"));
+						map.put("fpje", rs.getBigDecimal("FPJE"));
 						map.put("memo", rs.getString("MEMO"));
 						map.put("zgswjg", rs.getString("ZGSWJG"));
 						map.put("swsdh", rs.getString("SWSDH"));
@@ -421,6 +428,7 @@ public class YwglDao extends BaseJdbcDao {
 			map.put("fphm", rs.getString("FPHM"));
 			map.put("xyje", rs.getBigDecimal("XYJE"));
 			map.put("sjsqje", rs.getBigDecimal("SJSQJE"));
+			map.put("fpje", rs.getBigDecimal("FPJE"));
 			map.put("memo", rs.getString("MEMO"));
 			map.put("zgswjg", rs.getString("ZGSWJG"));
 			map.put("swsdh", rs.getString("SWSDH"));
@@ -1574,7 +1582,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 	
 	public void handleYwSF (Long id,Map<String,Object> data ){
-		String sql  = "update zs_ywbb set sjsqje=:sjsqje, fphm=:fphm, zt=:zt, xyzt_dm=:xyzt_dm where id = :id";
+		String sql  = "update zs_ywbb set sjsqje=:sjsqje, fphm=:fphm, zt=:zt, xyzt_dm=:xyzt_dm, fpje=:fpje where id = :id";
 		this.namedParameterJdbcTemplate.update(sql, data);
 	}
 	
