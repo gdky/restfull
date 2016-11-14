@@ -26,9 +26,10 @@ public class YwglDao extends BaseJdbcDao {
 			Condition condition) {
 
 		StringBuffer sb = new StringBuffer();
+		sb.append(" select t.*,@rownum := @rownum + 1 as xh from ( ");
 		sb.append(" SELECT y.*,z.mc AS ywzt,l.mc AS ywlx,hy.mc AS hy,cs.mc AS cs,qx.mc AS qx, ");
 		sb.append(" (CASE WHEN DATEDIFF(now(),bbrq)>30 THEN 1 ELSE 0 END) as overtime ");
-		sb.append(" FROM (zs_ywbb y,dm_ywbb_zt z,  ");
+		sb.append(" FROM (zs_ywbb y,dm_ywbb_zt z, ");
 
 		// <=== 查询条件集合
 		sb.append(" ( "
@@ -47,13 +48,14 @@ public class YwglDao extends BaseJdbcDao {
 
 		sb.append(" WHERE y.zt = z.id  ");
 		sb.append(" AND sub.id = y.id ");
-		sb.append(" ORDER BY y.zbrq desc ");
+		sb.append(" ORDER BY y.zbrq DESC) t,(SELECT @rownum:=?) temp ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
 		params.add(startIndex);
 		params.add(pagesize);
+		params.add(startIndex);
 
 		// 获取符合条件的记录
 		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),
@@ -356,6 +358,7 @@ public class YwglDao extends BaseJdbcDao {
 				throws SQLException {
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("id", HashIdUtil.encode(rs.getLong("id")));
+			map.put("xh",rs.getString("xh"));
 			map.put("nd", rs.getObject("nd"));
 			map.put("bbhm", rs.getObject("bbhm"));
 			map.put("bbrq", rs.getDate("bbrq"));
