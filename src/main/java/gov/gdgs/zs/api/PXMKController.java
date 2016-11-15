@@ -63,7 +63,14 @@ public class PXMKController {
 		
 		User user = accountService.getUserFromHeaderToken(request);
 		return new ResponseEntity<>(pxmkService.getPxxx(user,page, pagesize, whereparam),HttpStatus.OK);
-
+	}
+	/*
+	 * 培训内容
+	 */
+	@RequestMapping(value = "/pxnr/{id}", method = { RequestMethod.GET })
+	public ResponseEntity<?> getPxnr(
+			@PathVariable String id)  {
+		return new ResponseEntity<>(pxmkService.getPxnr(id),HttpStatus.OK);
 	}
 
 }

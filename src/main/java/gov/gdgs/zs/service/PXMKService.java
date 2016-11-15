@@ -56,4 +56,8 @@ public class PXMKService {
 		Map<String, Object> obj = pxmkDao.getPxxx(page, pagesize,condition);
 		return obj;
 	}
+	public Map<String,Object> getPxnr(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
