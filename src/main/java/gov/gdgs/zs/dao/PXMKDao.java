@@ -60,4 +60,10 @@ public class PXMKDao extends BaseDao{
 				sqxx.get("SRJ"),sqxx.get("DRJ"),sqxx.get("ZAOC"),sqxx.get("WUC"),
 				sqxx.get("WANC"),sqxx.get("BGZJ"),sqxx.get("HWZDHHM")});
 	}
+
+	public Map<String, Object> getPxxx(int page, int pagesize,
+			Condition condition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
