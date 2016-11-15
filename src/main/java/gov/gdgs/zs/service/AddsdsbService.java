@@ -261,7 +261,6 @@ public class AddsdsbService implements IAddsdsbService {
 	
 	
 	public Map<String, Object> getEditJygmtjInit(String jgid, String where) {
-		// TODO Auto-generated method stub
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		if (where != null) {
 			try {

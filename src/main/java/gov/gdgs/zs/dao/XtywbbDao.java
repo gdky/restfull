@@ -12,7 +12,6 @@ public class XtywbbDao extends BaseJdbcDao {
 
 	public Map<String, Object> getNdjysrtj(int page, int pageSize,
 			HashMap<String, Object> map) {
-		// TODO Auto-generated method stub
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select '一、收入总额' xmlx, ");
 		sb.append("        hs_qn, ");
@@ -831,7 +830,6 @@ public class XtywbbDao extends BaseJdbcDao {
 
 	public Map<String, Object> getHyjygmqktj(int page, int pageSize,
 			HashMap<String, Object> map) {
-		// TODO Auto-generated method stub
 		StringBuffer where = new StringBuffer();
 			where.append(" from (select jg.dwmc,jb.bz, ")
 				.append(" ifnull(sum(BNSRZE_HJ), 0) bnhj, ")

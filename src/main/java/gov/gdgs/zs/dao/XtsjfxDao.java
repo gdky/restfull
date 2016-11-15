@@ -84,7 +84,6 @@ public class XtsjfxDao extends BaseJdbcDao{
 
 	public Map<String, Object> getRynjsjfxb(int page, int pageSize,
 			HashMap<String, Object> map) {
-		// TODO Auto-generated method stub
 		StringBuffer sql = new StringBuffer(" select ")
 			.append(" t1.id,t1.parent_id,date_format(now(),'%Y') as nd,t1.mc,t1.zrs ycjzy_zrs,t3.scjzy_rs, ")
 			.append(" round(t3.scjzy_rs * 100 / t1.zrs, 2) scjzy_bl, ")

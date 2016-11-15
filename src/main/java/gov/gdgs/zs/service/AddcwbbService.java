@@ -136,7 +136,6 @@ public class AddcwbbService implements IAddcwbbService {
 		}
 
 		public boolean checkZcfz(Integer jgId, String where) {
-			// TODO Auto-generated method stub
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			if (where != null) {
 				try {
