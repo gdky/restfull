@@ -1158,21 +1158,12 @@ public class YwglService {
 			Map<String,Object> where = Common.decodeURItoMap(whereparam);
 			condition.add("wtdw", "FUZZY", where.get("wtdw"));
 			condition.add("ywlx_dm", "EQUAL", where.get("ywlx_dm"));
-			condition.add("xyje", "BETWEEN", where.get("xyje"));
-			condition.add("sjsqje", "BETWEEN", where.get("sjsqje"));
-			condition.add("xyh", "FUZZY", where.get("xyh"));
-			condition.add("bgwh", "FUZZY", where.get("bgwh"));
-			condition.add("bbhm", "FUZZY", where.get("bbhm"));
 			condition.add("bbrq", "DATE_BETWEEN", where.get("bbrq"));
 			condition.add("bgrq", "DATE_BETWEEN", where.get("bgrq"));
-			condition.add("cs_dm", "EQUAL", where.get("cs_dm"));
-			condition.add("zt", "EQUAL", where.get("zt"));
+			condition.add("sb_dm", "EQUAL", where.get("sb_dm"));
 			condition.add("nd", "EQUAL", where.get("nd"));
-			condition.add("zsfs_dm", "EQUAL", where.get("zsfs_dm"));
-			condition.add("is_yd", "EQUAL", where.get("is_yd"));
-			condition.add("swbz", "EQUAL", where.get("swbz"));
 		}
-		condition.add(" AND yxbz = 1 ");		
+		condition.add(" AND yxbz = 1 AND (zt =1 or zt = 3) ");		
 		
 		Map<String, Object> obj = ywglDao.getYwbb(page, pagesize,condition);
 		return obj;
