@@ -34,7 +34,7 @@ public class YwglDao extends BaseJdbcDao {
 		// <=== 查询条件集合
 		sb.append(" ( "
 				+ condition.getSelectSql("zs_ywbb", "id"));
-		sb.append("    ORDER BY bbrq desc  ");
+		sb.append("    ORDER BY zbrq desc  ");
 		sb.append("    LIMIT ? , ?) sub) ");
 		// ===> 插入查询条件集合结束
 		sb.append(" left join dm_hy AS hy ");

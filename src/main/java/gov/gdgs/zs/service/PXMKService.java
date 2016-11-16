@@ -53,11 +53,20 @@ public class PXMKService {
 			Map<String,Object> where = Common.decodeURItoMap(whereparam);
 		}
 		condition.add(" AND yxbz = 1 ");		
+		Map<String, Object> obj = pxmkDao.getPxxxForUser(page, pagesize,condition);
+		return obj;
+	}
+	public Map<String,Object> getPxxx(int page, int pagesize, String whereparam) {
+		Condition condition = new Condition();
+		if(!StringUtils.isEmpty(whereparam)){
+			Map<String,Object> where = Common.decodeURItoMap(whereparam);
+		}
+		condition.add(" AND yxbz = 1 ");		
 		Map<String, Object> obj = pxmkDao.getPxxx(page, pagesize,condition);
 		return obj;
 	}
 	public Map<String,Object> getPxnr(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		return pxmkDao.getPxnr(id);
 	}
+	
 }
