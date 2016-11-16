@@ -1,5 +1,6 @@
 package gov.gdgs.zs.dao;
 
+import gov.gdgs.zs.dao.YwglDao.YwbbRowMapper;
 import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
@@ -59,5 +60,59 @@ public class PXMKDao extends BaseDao{
 				sqxx.get("PXDDDH"),sqxx.get("PXLXR"),sqxx.get("PXNR"),sqxx.get("ZYSX"),
 				sqxx.get("SRJ"),sqxx.get("DRJ"),sqxx.get("ZAOC"),sqxx.get("WUC"),
 				sqxx.get("WANC"),sqxx.get("BGZJ"),sqxx.get("HWZDHHM")});
+	}
+
+	public Map<String, Object> getPxxx(int page, int pagesize,
+			Condition condition) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select t.bt,t.pxkssj,t.pxjssj,t.pxlxr,t.bmjzsj,t.fbzt,@rownum := @rownum + 1 AS xh ");
+		sb.append(" FROM zs_pxqkb t, ");
+		// <=== 查询条件集合
+		sb.append(" ( "
+				+ condition.getSelectSql("zs_pxqkb", "id"));
+		sb.append("    ORDER BY lrrq desc  ");
+		sb.append("    LIMIT ? , ?) sub, ");
+		// ===> 插入查询条件集合结束
+		sb.append(" (SELECT @rownum:=?) temp ");
+		sb.append(" where t.id = sub.id ");
+
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		ArrayList<Object> params = condition.getParams();
+		params.add(startIndex);
+		params.add(pagesize);
+		params.add(startIndex);
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+
+		// 获取符合条件的记录数
+		String countSql = condition.getCountSql("id", "zs_pxqkb");
+		int total = jdbcTemplate.queryForObject(countSql, condition.getParams()
+				.toArray(), Integer.class);
+
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+
+		return obj;
+	}
+
+	public Map<String, Object> getPxnr(String id) {
+		String sql = " select bt,pxkssj,pxjssj,pxlxr,pxnr,zysx from zs_pxqkb where id = ? ";
+		List<Map<String,Object>> ls =  this.jdbcTemplate.queryForList(sql);
+		if (ls.size()>0){
+			return ls.get(0);
+		}
+		return null;
+	}
+
+	public Map<String, Object> getPxxxForUser(int page, int pagesize,
+			Condition condition) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

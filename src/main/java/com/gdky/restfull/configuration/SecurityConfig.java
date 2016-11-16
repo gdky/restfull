@@ -65,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST,"/api/auth/**").permitAll()            
             
             // authenticate REST api 
-            .antMatchers("/api/**").permitAll()
+            .antMatchers("/api/**").authenticated()
             
             //对外公开api允许匿名访问
             .antMatchers("/pub/api/**").permitAll()
