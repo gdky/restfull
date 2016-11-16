@@ -105,7 +105,7 @@ public class PXMKDao extends BaseDao{
 
 	public Map<String, Object> getPxnr(String id) {
 		String sql = " select bt,pxkssj,pxjssj,pxlxr,pxnr,zysx from zs_pxqkb where id = ? ";
-		List<Map<String,Object>> ls =  this.jdbcTemplate.queryForList(sql);
+		List<Map<String,Object>> ls =  this.jdbcTemplate.queryForList(sql,new Object[]{id});
 		if (ls.size()>0){
 			return ls.get(0);
 		}
