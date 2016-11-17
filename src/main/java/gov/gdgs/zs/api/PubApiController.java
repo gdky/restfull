@@ -1,6 +1,7 @@
 package gov.gdgs.zs.api;
 
 import gov.gdgs.zs.service.CheckingService;
+import gov.gdgs.zs.service.PXMKService;
 import gov.gdgs.zs.service.RyglService;
 import gov.gdgs.zs.service.SPservice;
 import gov.gdgs.zs.service.SwsService;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gdky.restfull.entity.ResponseMessage;
+import com.gdky.restfull.entity.User;
 import com.gdky.restfull.exception.InvalidRequestException;
 import com.gdky.restfull.exception.ResourceAlreadyExistsExcepiton;
 import com.gdky.restfull.service.AuthService;
@@ -43,6 +45,8 @@ public class PubApiController {
 	private RyglService ryglService;
 	@Autowired
 	private YwglService ywglService;
+	@Autowired
+	private PXMKService pxmkService;
 	
 
 	//机构查询
@@ -115,6 +119,18 @@ public class PubApiController {
 		Map<String,Object> rs = ywglService.getYwbbByYzmAndBbhm(bbhm,yzm);
 		
 		return  ResponseEntity.ok(rs);
+	}
+	
+	/*
+	 * 门户网站用培训信息列表
+	 */
+	@RequestMapping(value = "/pxxx", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> getPxxx(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value="where", required=false) String whereparam)  {
+		
+		return new ResponseEntity<>(pxmkService.getPxxx(page, pagesize, whereparam),HttpStatus.OK);
 	}
 	
 	
