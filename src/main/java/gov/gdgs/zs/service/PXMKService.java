@@ -48,12 +48,11 @@ public class PXMKService {
 	public Map<String,Object> getPxxx(User user, int page, int pagesize, String whereparam) {
 		Integer jgId = user.getJgId();
 		Condition condition = new Condition();
-		condition.add("jg_id", "EQUAL", jgId);
 		if(!StringUtils.isEmpty(whereparam)){
 			Map<String,Object> where = Common.decodeURItoMap(whereparam);
 		}
 		condition.add(" AND yxbz = 1 ");		
-		Map<String, Object> obj = pxmkDao.getPxxxForUser(page, pagesize,condition);
+		Map<String, Object> obj = pxmkDao.getPxxxForUser(user,page, pagesize,condition);
 		return obj;
 	}
 	public Map<String,Object> getPxxx(int page, int pagesize, String whereparam) {
@@ -67,6 +66,9 @@ public class PXMKService {
 	}
 	public Map<String,Object> getPxnr(String id) {
 		return pxmkDao.getPxnr(id);
+	}
+	public Map<String, Object> getPxbmInit(User user,String id) {
+		return null;
 	}
 	
 }
