@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.service.PXMKService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,12 +23,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gdky.restfull.configuration.Constants;
 import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.entity.User;
+import com.gdky.restfull.service.AccountService;
 
 @RestController
 @RequestMapping(value = Constants.URI_API_PREFIX + Config.URI_API_ZS)
 public class PXMKController {
 	@Resource
 	private PXMKService pxmkService;
+	@Autowired
+	private HttpServletRequest request;
+	
+	@Autowired	
+	private AccountService accountService;
 	/**
 	 * 中心端发布列表
 	 * @param pn
@@ -99,6 +107,27 @@ public class PXMKController {
 		ptxm.put("pxid", pxid);
 		pxmkService.fspsq(ptxm,"pxxxtz");
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
+	}
+	
+	/*
+	 * 客户端用培训信息列表
+	 */
+	@RequestMapping(value = "/pxxx", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> getPxxx(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value="where", required=false) String whereparam)  {
+		
+		User user = accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(pxmkService.getPxxx(user,page, pagesize, whereparam),HttpStatus.OK);
+	}
+	/*
+	 * 培训内容
+	 */
+	@RequestMapping(value = "/pxnr/{id}", method = { RequestMethod.GET })
+	public ResponseEntity<?> getPxnr(
+			@PathVariable String id)  {
+		return new ResponseEntity<>(pxmkService.getPxnr(id),HttpStatus.OK);
 	}
 
 }
