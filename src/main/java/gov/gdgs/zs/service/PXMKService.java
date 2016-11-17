@@ -67,5 +67,8 @@ public class PXMKService {
 	public Map<String,Object> getPxnr(String id) {
 		return pxmkDao.getPxnr(id);
 	}
+	public Map<String, Object> getPxbmInit(User user,String id) {
+		return null;
+	}
 	
 }
