@@ -39,6 +39,12 @@ public class PXMKService {
 		 switch (splx) {
 			case "pxxxfb"://培训信息发布
 				this.pxmkDao.pxxxfb(ptxm);break;
+			case "pxxxxg"://培训信息修改
+				this.pxmkDao.pxxxxg(ptxm);break;
+			case "pxxxsc"://培训信息删除
+				this.pxmkDao.pxxxsc(ptxm);break;
+			case "pxxxtz"://培训信息停止报名
+				this.pxmkDao.pxxxtz(ptxm);break;
 		 }
 	}
 }
