@@ -153,4 +153,21 @@ public class PXMKDao extends BaseDao{
 		obj.put("current", page);
 		return obj;
 	}
+
+	public List<Map<String, Object>> getPxbmRy(String id) {
+		String sql = " select xming,xb,zw,yddh,dhhm,nl,email,fjlx,zaoc,wuc,wanc,rzsj,lksj "
+				+ "from zs_pxqkbmb where pxid = ?";
+		return   this.jdbcTemplate.queryForList(sql,new Object[]{id});
+	}
+
+	public Map<String, Object> getPxxxMx(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select fbzt,bt,pxdz,qs,pxkssj,pxjssj,bmjzsj,pxdddh,pxlxr,pxnr,zysx,");
+		sb.append(" srj,drj,zaoc,wuc,wanc,bgdh,hwwzfjh from zs_pxqkb where id = ? ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
+		if(ls.size()>0){
+			return ls.get(0);
+		}
+		return null;
+	}
 }

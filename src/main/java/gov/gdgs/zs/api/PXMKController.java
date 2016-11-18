@@ -80,7 +80,7 @@ public class PXMKController {
 	public ResponseEntity<?> getPxbmInit(@PathVariable String id){
 		User user = accountService.getUserFromHeaderToken(request);
 		Map<String,Object> rs = pxmkService.getPxbmInit(user,id);
-		return null;
+		return new ResponseEntity<>(rs,HttpStatus.OK);
 	}
 	
 	/*
