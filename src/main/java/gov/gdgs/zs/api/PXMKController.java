@@ -129,5 +129,24 @@ public class PXMKController {
 			@PathVariable String id)  {
 		return new ResponseEntity<>(pxmkService.getPxnr(id),HttpStatus.OK);
 	}
+	
+	/*
+	 * 培训报名初始化信息
+	 */
+	@RequestMapping(value = "/pxbminit/{id}", method = { RequestMethod.GET })
+	public ResponseEntity<?> getPxbmInit(@PathVariable String id){
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String,Object> rs = pxmkService.getPxbmInit(user,id);
+		return null;
+	}
+	
+	/*
+	 * 新增培训报名
+	 */
+	@RequestMapping(value = "/pxbm/", method = { RequestMethod.POST })
+	public ResponseEntity<?> addPxbm(
+			@RequestBody Map<String,Object> values){
+				return null;
+	}
 
 }

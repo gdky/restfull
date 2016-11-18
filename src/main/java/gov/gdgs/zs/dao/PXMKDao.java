@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.gdky.restfull.entity.User;
+
 @Repository
 public class PXMKDao extends BaseDao{
 
@@ -122,16 +124,52 @@ public class PXMKDao extends BaseDao{
 
 	public Map<String, Object> getPxnr(String id) {
 		String sql = " select bt,pxkssj,pxjssj,pxlxr,pxnr,zysx from zs_pxqkb where id = ? ";
-		List<Map<String,Object>> ls =  this.jdbcTemplate.queryForList(sql);
+		List<Map<String,Object>> ls =  this.jdbcTemplate.queryForList(sql,new Object[]{id});
 		if (ls.size()>0){
 			return ls.get(0);
 		}
 		return null;
 	}
 
-	public Map<String, Object> getPxxxForUser(int page, int pagesize,
+	public Map<String, Object> getPxxxForUser(User user , int page, int pagesize,
 			Condition condition) {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT t.id,t.bt,t.pxkssj,t.pxjssj,t.pxlxr,t.bmjzsj,t.fbzt,t.lrrq, ");
+		sb.append(" @rownum := @rownum + 1 as xh, ");
+		sb.append(" if(b.jg_id is not null,1,0) as isbm ");
+		sb.append(" FROM (zs_pxqkb t, ");
+		// <=== 查询条件集合
+		sb.append(" ( "
+				+ condition.getSelectSql("zs_pxqkb", "id"));
+		sb.append("    ORDER BY lrrq desc  ");
+		sb.append("    LIMIT ? , ?) sub, ");
+		// ===> 插入查询条件集合结束
+		sb.append(" (SELECT @rownum:=?) temp) ");
+		sb.append(" left join zs_pxqkbmb b ");
+		sb.append(" on (b.PXID = t.id and jg_id = ?) ");
+		sb.append(" where sub.id = t.id ");
+
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		ArrayList<Object> params = condition.getParams();
+		params.add(startIndex);
+		params.add(pagesize);
+		params.add(startIndex);
+		params.add(user.getJgId());
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+
+		// 获取符合条件的记录数
+		String countSql = condition.getCountSql("id", "zs_pxqkb");
+		int total = jdbcTemplate.queryForObject(countSql, condition.getParams()
+				.toArray(), Integer.class);
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+		return obj;
 	}
 }
