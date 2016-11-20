@@ -1,5 +1,6 @@
 package gov.gdgs.zs.api;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -88,7 +89,7 @@ public class PXMKController {
 	 */
 	@RequestMapping(value = "/pxbm/{pxid}", method = { RequestMethod.POST })
 	public ResponseEntity<?> addPxbm(
-			@RequestBody Map<String,Object> values,
+			@RequestBody List<Map<String,Object>> values,
 			@PathVariable String pxid){
 		User user = accountService.getUserFromHeaderToken(request);
 		pxmkService.addPxbm(user,pxid,values);

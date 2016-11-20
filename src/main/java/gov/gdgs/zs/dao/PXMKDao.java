@@ -171,4 +171,11 @@ public class PXMKDao extends BaseDao{
 		}
 		return null;
 	}
+	
+	public int[] addPxbm (Map<String, Object>[] values){
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into zs_pxqkbmb (ID,PXID,JG_ID,XMING,XB,ZW,YDDH,DHHM,NL,EMAIL,FJLX,ZAOC,WUC,WANC,RZSJ,LKSJ,BMSJ,BZ,YXBZ) ");
+		sb.append(" values(:id,:pxid,:jg_id,:xming,:xb,:zw,:yddh,:dhhm,:nl,:email,:fjlx,:zaoc,:wuc,:wanc,:rzsj,:lksj,:bmsj,:bz,1) ");
+		return this.namedParameterJdbcTemplate.batchUpdate(sb.toString(), values);
+	}
 }

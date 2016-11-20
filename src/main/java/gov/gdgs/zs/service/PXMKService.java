@@ -91,8 +91,14 @@ public class PXMKService {
 		rs.put("ry",ry);
 		return rs;
 	}
-	public void addPxbm(User user, String pxid, Map<String, Object> values) {
-	
+	public void addPxbm(User user, String pxid, List<Map<String, Object>> values) {
+		for (Map<String,Object> item : values){
+			item.put("id", Common.newUUID());
+			item.put("pxid", pxid);
+			item.put("jg_id", user.getJgId());
+			item.put("bmsj", Common.getCurrentTime2MysqlDateTime());
+		}
+		pxmkDao.addPxbm(values.toArray(new HashMap[values.size()]));
 		
 	}
 	
