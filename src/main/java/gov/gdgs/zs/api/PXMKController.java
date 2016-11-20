@@ -86,9 +86,12 @@ public class PXMKController {
 	/*
 	 * 新增培训报名
 	 */
-	@RequestMapping(value = "/pxbm/", method = { RequestMethod.POST })
+	@RequestMapping(value = "/pxbm/{pxid}", method = { RequestMethod.POST })
 	public ResponseEntity<?> addPxbm(
-			@RequestBody Map<String,Object> values){
+			@RequestBody Map<String,Object> values,
+			@PathVariable String pxid){
+		User user = accountService.getUserFromHeaderToken(request);
+		pxmkService.addPxbm(user,pxid,values);
 				return null;
 	}
 

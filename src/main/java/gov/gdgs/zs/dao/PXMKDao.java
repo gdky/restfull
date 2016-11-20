@@ -116,6 +116,7 @@ public class PXMKDao extends BaseDao{
 			Condition condition) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT t.id,t.bt,t.pxkssj,t.pxjssj,t.pxlxr,t.bmjzsj,t.fbzt,t.lrrq, ");
+		sb.append(" t.srj,t.drj,t.zaoc,t.wuc,t.wanc,t.bgdh,t.hwwzfjh,t.pxdz,t.pxdddh, ");
 		sb.append(" @rownum := @rownum + 1 as xh, ");
 		sb.append(" if(b.jg_id is not null,1,0) as isbm ");
 		sb.append(" FROM (zs_pxqkb t, ");

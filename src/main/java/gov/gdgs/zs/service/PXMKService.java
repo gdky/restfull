@@ -91,5 +91,9 @@ public class PXMKService {
 		rs.put("ry",ry);
 		return rs;
 	}
+	public void addPxbm(User user, String pxid, Map<String, Object> values) {
+	
+		
+	}
 	
 }
