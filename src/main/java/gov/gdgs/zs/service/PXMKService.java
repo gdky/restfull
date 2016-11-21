@@ -4,6 +4,7 @@ import gov.gdgs.zs.dao.PXMKDao;
 import gov.gdgs.zs.untils.Condition;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -72,6 +73,9 @@ public class PXMKService {
 	}
 	public Map<String,Object> getPxnr(String id) {
 		return pxmkDao.getPxnr(id);
+	}
+	public List<Map<String,Object>> pxtjbmList(String id) {
+		return pxmkDao.pxtjbmList(id);
 	}
 	public Map<String, Object> getPxbmInit(User user,String id) {
 		return null;

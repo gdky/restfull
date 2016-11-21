@@ -108,6 +108,16 @@ public class PXMKController {
 		pxmkService.fspsq(ptxm,"pxxxtz");
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
 	}
+	/**
+	 * 获取报名列表
+	 * @param pxid
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pxxxtjlist/{pxid}", method = RequestMethod.GET)
+	public ResponseEntity<?> pxtjbmList(@PathVariable(value = "pxid") String pxid)throws Exception {
+		return new ResponseEntity<>(pxmkService.pxtjbmList(pxid),HttpStatus.OK);
+	}
 	
 	/*
 	 * 客户端用培训信息列表

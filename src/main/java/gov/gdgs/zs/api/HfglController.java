@@ -48,6 +48,19 @@ public class HfglController {
 
 	}
 	/**
+	 * 费用统计
+	 * @param where
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/fytj", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> fytj(
+			@RequestParam(value="where", required=false) String where) throws Exception  {
+		
+		return new ResponseEntity<>(hfglService.fytj(where),HttpStatus.OK);
+		
+	}
+	/**
 	 * 发票打印查询
 	 * @param pn
 	 * @param ps
@@ -94,19 +107,7 @@ public class HfglController {
 		return new ResponseEntity<>(hfglService.fpjexg(jlid, fptj, user.getNames()),HttpStatus.OK);
 	}
 	
-	/**
-	 * 费用统计
-	 * @param where
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping(value = "/fytj", method = { RequestMethod.GET })
-	public ResponseEntity<Map<String, Object>> fytj(
-			@RequestParam(value="where", required=false) String where) throws Exception  {
-		
-		return new ResponseEntity<>(hfglService.fytj(where),HttpStatus.OK);
-		
-	}
+	
 	/**
 	 * 会费缴纳单据提交
 	 * @param file

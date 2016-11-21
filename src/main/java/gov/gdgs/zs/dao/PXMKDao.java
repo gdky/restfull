@@ -36,7 +36,15 @@ public class PXMKDao extends BaseDao{
 		sb.append("		SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.id as pxid,a.BT,a.PXDZ as PXDD,a.QS,a.PXDDDH,a.PXNR,a.PXKSSJ,a.PXJSSJ,a.BMJZSJ,a.PXLXR,"); 
 		sb.append("	a.ZYSX,a.ZAOC,a.WUC,a.WANC,a.DRJ,a.SRJ,a.BGDH as BGZJ,a.HWWZFJH as HWZDHHM,"); 
 		sb.append("	 a.FBZT as fbzt,"); 
-		sb.append("	 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.YXBZ=1 )as bmrs,"); 
+		sb.append("	 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.YXBZ=1 )as bmrs,");
+		sb.append("		(select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX in (1,2) and b.YXBZ=1 )as zszrs,"); 
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=1 and b.YXBZ=1 )as drzs,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=2 and b.XB='男' and b.YXBZ=1 )as srnan,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=2 and b.XB='女' and b.YXBZ=1 )as srnv, ");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and (b.ZAOC=1 or b.WUC=1 or b.WANC=1) and b.YXBZ=1 )as bczrs,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.ZAOC=1 and b.YXBZ=1 )as zcrs,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.WUC=1 and b.YXBZ=1 )as wucrs,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.WANC=1 and b.YXBZ=1 )as wcrs,");
 		sb.append("	   concat((select cast(count(b.id) as char) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=1 and b.YXBZ=1 ),'/',"); 
 		sb.append("	  (select cast(ceil (count(b.id) / 2 ) as char) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=2 and b.YXBZ=1 ))as dfs,");
 		sb.append("	CONCAT((SELECT cast(COUNT(b.id) as char) FROM zs_pxqkbmb b");
@@ -82,6 +90,23 @@ public class PXMKDao extends BaseDao{
 	public void pxxxtz(Map<String, Object> sqxx) throws Exception {
 		String sql ="update zs_pxqkb set FBZT='1' where ID=?";
 		this.jdbcTemplate.update(sql, new Object[]{sqxx.get("pxid")});
+	}
+	public List<Map<String,Object>> pxtjbmList(String pxid){
+		StringBuffer sb = new StringBuffer();
+		sb.append("	select b.DWMC,a.XMING,a.XB,");
+		sb.append("	a.ZW,a.YDDH,");
+		sb.append("	case a.FJLX when 1 then '单' when 2 then '双' else null end as DF,");
+		sb.append("	a.RZSJ,a.LKSJ,");
+		sb.append("	concat((case a.ZAOC when 1 then '早餐' else '' end),");
+		sb.append("	(case a.WUC when a.ZAOC=1 and a.WUC=1 and a.WANC=1 then '，午餐，' ");
+		sb.append("	when a.ZAOC=0 and a.WUC=1 and a.WANC=1 then '午餐，'");
+		sb.append("	when a.ZAOC=0 and a.WUC=1 and a.WANC=0 then '午餐' ");
+		sb.append("	when a.ZAOC=1 and a.WUC=1 and a.WANC=0 then '，午餐' ");
+		sb.append("	when a.ZAOC=1 and a.WUC=0 and a.WANC=1 then '，'");
+		sb.append("	 else '' end),");
+		sb.append("	(case a.WANC when 1 then '晚餐' else ''end)) as DCQK,a.BZ");
+		sb.append("	 from zs_pxqkbmb a,zs_jg b where a.JG_ID=b.ID and a.pxid=?");
+		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{pxid});
 	}
 	public Map<String, Object> getPxxx(int page, int pagesize,
 			Condition condition) {
