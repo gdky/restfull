@@ -20,7 +20,7 @@ import com.gdky.restfull.entity.User;
 import com.gdky.restfull.utils.Common;
 
 @Service
-@Transactional(rollbackFor=Exception.class)
+@Transactional
 public class PXMKService {
 	@Resource
 	private PXMKDao pxmkDao;
@@ -78,7 +78,7 @@ public class PXMKService {
 	public Map<String, Object> getPxbmInit(User user,String id ) {
 		Map<String,Object> px = this.getPxxxMx(id);
 		Map<String,Object> jg = swsDao.swsxx(user.getJgId());
-		List<Map<String,Object>> ry = this.pxmkDao.getPxbmRy(id);
+		List<Map<String,Object>> ry = this.pxmkDao.getPxbmRy(user , id);
 		Map<String,Object> rs = new HashMap<String,Object>();
 		px.put("swsmc", jg.get("dwmc"));
 		px.put("swsdh", jg.get("dhua"));
@@ -100,6 +100,17 @@ public class PXMKService {
 		}
 		pxmkDao.addPxbm(values.toArray(new HashMap[values.size()]));
 		
+	}
+	public void updatePxbm(User user, String pxid,
+			List<Map<String, Object>> values) {
+		for (Map<String,Object> item : values){
+			item.put("id", Common.newUUID());
+			item.put("pxid", pxid);
+			item.put("jg_id", user.getJgId());
+			item.put("bmsj", Common.getCurrentTime2MysqlDateTime());
+		}
+		pxmkDao.delRyByPxidAndUser(user, pxid);
+		pxmkDao.addPxbm(values.toArray(new HashMap[values.size()]));
 	}
 	
 }

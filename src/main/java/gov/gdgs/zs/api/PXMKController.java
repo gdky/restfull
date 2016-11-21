@@ -95,5 +95,17 @@ public class PXMKController {
 		pxmkService.addPxbm(user,pxid,values);
 				return null;
 	}
+	
+	/*
+	 * 修改培训报名
+	 */
+	@RequestMapping(value = "/pxbm/{pxid}", method = { RequestMethod.PUT })
+	public ResponseEntity<?> updatePxbm(
+			@RequestBody List<Map<String,Object>> values,
+			@PathVariable String pxid){
+		User user = accountService.getUserFromHeaderToken(request);
+		pxmkService.updatePxbm(user,pxid,values);
+				return null;
+	}
 
 }
