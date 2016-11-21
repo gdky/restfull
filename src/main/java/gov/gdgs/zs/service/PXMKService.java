@@ -1,6 +1,7 @@
 package gov.gdgs.zs.service;
 
 import gov.gdgs.zs.dao.PXMKDao;
+import gov.gdgs.zs.dao.SWSDao;
 import gov.gdgs.zs.untils.Condition;
 
 import java.util.HashMap;
@@ -23,6 +24,9 @@ import com.gdky.restfull.utils.Common;
 public class PXMKService {
 	@Resource
 	private PXMKDao pxmkDao;
+	
+	@Resource
+	private SWSDao swsDao;
 	
 	public Map<String, Object> getpxfbList(int pn, int ps, String where) throws Exception {
 		HashMap<String, Object> map = new HashMap<String, Object>();
@@ -71,14 +75,30 @@ public class PXMKService {
 		Map<String, Object> obj = pxmkDao.getPxxx(page, pagesize,condition);
 		return obj;
 	}
+	public Map<String,Object> getPxxxMx(String id){
+		return pxmkDao.getPxxxMx(id);
+	}
 	public Map<String,Object> getPxnr(String id) {
 		return pxmkDao.getPxnr(id);
 	}
 	public List<Map<String,Object>> pxtjbmList(String id) {
 		return pxmkDao.pxtjbmList(id);
 	}
-	public Map<String, Object> getPxbmInit(User user,String id) {
-		return null;
+	public Map<String, Object> getPxbmInit(User user,String id ) {
+		Map<String,Object> px = this.getPxxxMx(id);
+		Map<String,Object> jg = swsDao.swsxx(user.getJgId());
+		List<Map<String,Object>> ry = this.pxmkDao.getPxbmRy(id);
+		Map<String,Object> rs = new HashMap<String,Object>();
+		px.put("swsmc", jg.get("dwmc"));
+		px.put("swsdh", jg.get("dhua"));
+		px.put("swscz", jg.get("czhen"));
+		px.put("fddbr", jg.get("fddbr"));
+		px.put("swssj", jg.get("szphone"));
+		px.put("swsdz", jg.get("dzhi"));
+		px.put("swsdzyj", jg.get("dzyj"));
+		rs.put("base", px);
+		rs.put("ry",ry);
+		return rs;
 	}
 	
 }
