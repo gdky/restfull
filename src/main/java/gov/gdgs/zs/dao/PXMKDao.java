@@ -33,16 +33,25 @@ public class PXMKDao extends BaseDao{
 		params.add((pn-1)*ps);
 		params.add(ps);
 		StringBuffer sb = new StringBuffer();
-		sb.append("		SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.id as pxid,a.BT,a.PXNR,a.PXKSSJ,a.PXJSSJ,a.BMJZSJ,a.PXLXR,"); 
-		sb.append("	case a.FBZT when 0 then '进行中'  when 1 then '活动结束' else null end as fbzt,"); 
-		sb.append("	 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.YXBZ=1 )as bmrs,"); 
+		sb.append("		SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.id as pxid,a.BT,a.PXDZ as PXDD,a.QS,a.PXDDDH,a.PXNR,a.PXKSSJ,a.PXJSSJ,a.BMJZSJ,a.PXLXR,"); 
+		sb.append("	a.ZYSX,a.ZAOC,a.WUC,a.WANC,a.DRJ,a.SRJ,a.BGDH as BGZJ,a.HWWZFJH as HWZDHHM,"); 
+		sb.append("	 a.FBZT as fbzt,"); 
+		sb.append("	 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.YXBZ=1 )as bmrs,");
+		sb.append("		(select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX in (1,2) and b.YXBZ=1 )as zszrs,"); 
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=1 and b.YXBZ=1 )as drzs,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=2 and b.XB='男' and b.YXBZ=1 )as srnan,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=2 and b.XB='女' and b.YXBZ=1 )as srnv, ");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and (b.ZAOC=1 or b.WUC=1 or b.WANC=1) and b.YXBZ=1 )as bczrs,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.ZAOC=1 and b.YXBZ=1 )as zcrs,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.WUC=1 and b.YXBZ=1 )as wucrs,");
+		sb.append("		 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.WANC=1 and b.YXBZ=1 )as wcrs,");
 		sb.append("	   concat((select cast(count(b.id) as char) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=1 and b.YXBZ=1 ),'/',"); 
 		sb.append("	  (select cast(ceil (count(b.id) / 2 ) as char) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX=2 and b.YXBZ=1 ))as dfs,");
 		sb.append("	CONCAT((SELECT cast(COUNT(b.id) as char) FROM zs_pxqkbmb b");
 		sb.append("	WHERE a.ID=b.PXID AND b.ZAOC=1 AND b.YXBZ=1),'/',	 (SELECT cast(COUNT(b.id) as char) FROM zs_pxqkbmb b");
 		sb.append("	WHERE a.ID=b.PXID AND b.WUC=1 AND b.YXBZ=1),'/',(SELECT cast(COUNT(b.id) as char) FROM zs_pxqkbmb b");
 		sb.append("	WHERE a.ID=b.PXID AND b.WANC=1 AND b.YXBZ=1)) AS dcs");
-		sb.append("	FROM zs_pxqkb a,(select @rownum:=?) zs_ry "+condition.getSql()+" and a.YXBZ=1 LIMIT ?, ?"); 
+		sb.append("	FROM (select * from zs_pxqkb order by lrrq desc)  a,(select @rownum:=?) zs_ry "+condition.getSql()+" and a.YXBZ=1 LIMIT ?, ?"); 
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
 		Map<String,Object> ob = new HashMap<>();
@@ -58,12 +67,47 @@ public class PXMKDao extends BaseDao{
 	public void pxxxfb(Map<String, Object> sqxx) throws Exception {
 		String sql ="insert into zs_pxqkb (ID,BT,PXDZ,QS,PXKSSJ,PXJSSJ,BMJZSJ,PXDDDH,PXLXR,PXNR,ZYSX,SRJ,DRJ,ZAOC,WUC,WANC,BGDH,HWWZFJH,FBZT,LRRQ,YXBZ) values(replace(uuid(),'-',''),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'0',sysdate(),'1')";
 		this.jdbcTemplate.update(sql, new Object[]{sqxx.get("BT"),sqxx.get("PXDD"),
-				sqxx.get("QS"),sqxx.get("PXKSSJ"),sqxx.get("PXJSSJ"),sqxx.get("BMJSSJ"),
+				sqxx.get("QS"),sqxx.get("PXKSSJ"),sqxx.get("PXJSSJ"),sqxx.get("BMJZSJ"),
 				sqxx.get("PXDDDH"),sqxx.get("PXLXR"),sqxx.get("PXNR"),sqxx.get("ZYSX"),
 				sqxx.get("SRJ"),sqxx.get("DRJ"),sqxx.get("ZAOC"),sqxx.get("WUC"),
 				sqxx.get("WANC"),sqxx.get("BGZJ"),sqxx.get("HWZDHHM")});
 	}
-
+	
+	public void pxxxxg(Map<String, Object> sqxx) throws Exception {
+		String sql ="update zs_pxqkb set BT=?,PXDZ=?,QS=?,PXKSSJ=?,PXJSSJ=?,BMJZSJ=?,PXDDDH=?,PXLXR=?,PXNR=?,ZYSX=?,SRJ=?,DRJ=?,ZAOC=?,WUC=?,WANC=?,BGDH=?,HWWZFJH=?,FBZT='0' where ID=?";
+		this.jdbcTemplate.update(sql, new Object[]{sqxx.get("BT"),sqxx.get("PXDD"),
+				sqxx.get("QS"),sqxx.get("PXKSSJ"),sqxx.get("PXJSSJ"),sqxx.get("BMJZSJ"),
+				sqxx.get("PXDDDH"),sqxx.get("PXLXR"),sqxx.get("PXNR"),sqxx.get("ZYSX"),
+				sqxx.get("SRJ"),sqxx.get("DRJ"),sqxx.get("ZAOC"),sqxx.get("WUC"),
+				sqxx.get("WANC"),sqxx.get("BGZJ"),sqxx.get("HWZDHHM"),sqxx.get("pxid")});
+	}
+	
+	public void pxxxsc(Map<String, Object> sqxx) throws Exception {
+		String sql ="update zs_pxqkb set YXBZ='0' where ID=?";
+		this.jdbcTemplate.update(sql, new Object[]{sqxx.get("pxid")});
+	}
+	
+	public void pxxxtz(Map<String, Object> sqxx) throws Exception {
+		String sql ="update zs_pxqkb set FBZT='1' where ID=?";
+		this.jdbcTemplate.update(sql, new Object[]{sqxx.get("pxid")});
+	}
+	public List<Map<String,Object>> pxtjbmList(String pxid){
+		StringBuffer sb = new StringBuffer();
+		sb.append("	select b.DWMC,a.XMING,a.XB,");
+		sb.append("	a.ZW,a.YDDH,");
+		sb.append("	case a.FJLX when 1 then '单' when 2 then '双' else null end as DF,");
+		sb.append("	a.RZSJ,a.LKSJ,");
+		sb.append("	concat((case a.ZAOC when 1 then '早餐' else '' end),");
+		sb.append("	(case a.WUC when a.ZAOC=1 and a.WUC=1 and a.WANC=1 then '，午餐，' ");
+		sb.append("	when a.ZAOC=0 and a.WUC=1 and a.WANC=1 then '午餐，'");
+		sb.append("	when a.ZAOC=0 and a.WUC=1 and a.WANC=0 then '午餐' ");
+		sb.append("	when a.ZAOC=1 and a.WUC=1 and a.WANC=0 then '，午餐' ");
+		sb.append("	when a.ZAOC=1 and a.WUC=0 and a.WANC=1 then '，'");
+		sb.append("	 else '' end),");
+		sb.append("	(case a.WANC when 1 then '晚餐' else ''end)) as DCQK,a.BZ");
+		sb.append("	 from zs_pxqkbmb a,zs_jg b where a.JG_ID=b.ID and a.pxid=?");
+		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{pxid});
+	}
 	public Map<String, Object> getPxxx(int page, int pagesize,
 			Condition condition) {
 		StringBuffer sb = new StringBuffer();

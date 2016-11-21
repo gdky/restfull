@@ -48,6 +48,12 @@ public class PXMKService {
 		 switch (splx) {
 			case "pxxxfb"://培训信息发布
 				this.pxmkDao.pxxxfb(ptxm);break;
+			case "pxxxxg"://培训信息修改
+				this.pxmkDao.pxxxxg(ptxm);break;
+			case "pxxxsc"://培训信息删除
+				this.pxmkDao.pxxxsc(ptxm);break;
+			case "pxxxtz"://培训信息停止报名
+				this.pxmkDao.pxxxtz(ptxm);break;
 		 }
 	}
 	public Map<String,Object> getPxxx(User user, int page, int pagesize, String whereparam) {
@@ -74,6 +80,9 @@ public class PXMKService {
 	}
 	public Map<String,Object> getPxnr(String id) {
 		return pxmkDao.getPxnr(id);
+	}
+	public List<Map<String,Object>> pxtjbmList(String id) {
+		return pxmkDao.pxtjbmList(id);
 	}
 	public Map<String, Object> getPxbmInit(User user,String id ) {
 		Map<String,Object> px = this.getPxxxMx(id);
