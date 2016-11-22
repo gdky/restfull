@@ -1,10 +1,10 @@
 package gov.gdgs.zs.api;
 
+
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.annotation.Resource;
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 
 import gov.gdgs.zs.configuration.Config;
@@ -153,9 +153,24 @@ public class PXMKController {
 	/*
 	 * 新增培训报名
 	 */
-	@RequestMapping(value = "/pxbm/", method = { RequestMethod.POST })
+	@RequestMapping(value = "/pxbm/{pxid}", method = { RequestMethod.POST })
 	public ResponseEntity<?> addPxbm(
-			@RequestBody Map<String,Object> values){
+			@RequestBody List<Map<String,Object>> values,
+			@PathVariable String pxid){
+		User user = accountService.getUserFromHeaderToken(request);
+		pxmkService.addPxbm(user,pxid,values);
+				return null;
+	}
+	
+	/*
+	 * 修改培训报名
+	 */
+	@RequestMapping(value = "/pxbm/{pxid}", method = { RequestMethod.PUT })
+	public ResponseEntity<?> updatePxbm(
+			@RequestBody List<Map<String,Object>> values,
+			@PathVariable String pxid){
+		User user = accountService.getUserFromHeaderToken(request);
+		pxmkService.updatePxbm(user,pxid,values);
 				return null;
 	}
 
