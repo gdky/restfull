@@ -70,7 +70,13 @@ public class HfglDao extends BaseDao{
 		sb.append("		f_qjgr((select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ),b.id,'"+lyear+"') as qjgr");
 		sb.append("		,(select v.id from zs_sdjl_jg v where v.jg_id=b.id and v.lx=2 and v.yxbz=1 limit 1) as issd ");
 		sb.append("		from zs_jg b,(select @rownum:=0) zs_ry ");
-		sb.append("	"+condition.getSql()+"	and b.yxbz=1 ) g ");
+		sb.append("	"+condition.getSql()+"	and b.yxbz=1 ) g where 1=1 ");
+		if(qury.containsKey("jnqk")){
+		switch((String)qury.get("jnqk")){
+		case "tt":sb.append(" and g.qjtt>0");break;
+		case "gr":sb.append(" and g.qjgr>0");break;
+		case "wcw":sb.append(" and g.jyzsr is null");break;
+		}}
 		if(qury.containsKey("sorder")){
 			Boolean asc = qury.get("sorder").toString().equals("ascend");
 			switch (qury.get("sfield").toString()) {
@@ -145,7 +151,13 @@ public class HfglDao extends BaseDao{
 		ub.append("			f_qjgr((select count(c.RY_ID)*800 as yjgr from zs_zysws c where");
 		ub.append("					c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ),b.id,'"+lyear+"') as qjgr ");
 		ub.append("			from zs_jg b");
-		ub.append("		"+condition.getSql()+"	and b.yxbz=1) as g  ");
+		ub.append("		"+condition.getSql()+"	and b.yxbz=1) as g  where 1=1 ");
+		if(qury.containsKey("jnqk")){
+		switch((String)qury.get("jnqk")){
+		case "tt":ub.append(" and g.qjtt>0");break;
+		case "gr":ub.append(" and g.qjgr>0");break;
+		case "wcw":ub.append(" and g.jyzsr is not null");break;
+		}}
 		if(qury.containsKey("sorder")){
 			Boolean asc = qury.get("sorder").toString().equals("ascend");
 			switch (qury.get("sfield").toString()) {
@@ -461,7 +473,7 @@ public class HfglDao extends BaseDao{
 	    	 lyear=ca.get(Calendar.YEAR)-1;
 	     }
 		Condition condition = new Condition();
-		condition.add("c.xming", Condition.FUZZY, qury.get("ximng"));
+		condition.add("c.xming", Condition.FUZZY, qury.get("xming"));
 		condition.add("c.sfzh", Condition.FUZZY_LEFT, qury.get("sfzh"));
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
@@ -473,6 +485,11 @@ public class HfglDao extends BaseDao{
 		sb.append("a.ZYZGZSBH,a.FZYZCZSBH,a.ZZDW,b.JE,b.BZ,f.MC as ryzt,b.id as jlid,b.YJE,b.LRR,b.XGR,b.YJE,b.JFRQ,'"+uname+"' as KPR ");
 		sb.append("	from zs_ryjbxx c,dm_xb d,dm_cs e,dm_ryspgczt f,(select @rownum:=?) zs_ry,zs_fzysws a left join zs_hyhffzyjfb b on a.RY_ID=b.RY_ID and b.ND=? and b.yxbz=1");
 		sb.append("	"+condition.getSql()+" and a.FZYZT_DM=1 and c.ID=a.RY_ID and c.XB_DM=d.ID and c.CS_DM=e.ID and a.RYSPGCZT_DM=f.ID ");
+		if(qury.containsKey("jnqk")){
+			switch((String)qury.get("jnqk")){
+			case "yj":sb.append(" and b.JE>0");break;
+			case "wj":sb.append(" and g.b.JE is null");break;
+			}}
 		if(qury.containsKey("sorder")){
 			Boolean asc = qury.get("sorder").toString().equals("ascend");
 			switch (qury.get("sfield").toString()) {

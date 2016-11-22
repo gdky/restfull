@@ -1,10 +1,10 @@
 package gov.gdgs.zs.api;
 
-import java.util.List;
-import java.util.Map;
 
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.Resource;
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.http.HttpServletRequest;
 
 import gov.gdgs.zs.configuration.Config;
@@ -30,14 +30,20 @@ import com.gdky.restfull.service.AccountService;
 public class PXMKController {
 	@Resource
 	private PXMKService pxmkService;
-	
 	@Autowired
 	private HttpServletRequest request;
 	
-	@Autowired
+	@Autowired	
 	private AccountService accountService;
-	
-	@RequestMapping(value = "/getpxfbList", method = { RequestMethod.GET })
+	/**
+	 * 中心端发布列表
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pxfbList", method = { RequestMethod.GET })
 	public ResponseEntity<Map<String, Object>> getpxfbList(
 			@RequestParam(value = "pagenum", required = true) int pn,
 			@RequestParam(value = "pagesize", required = true) int ps,
@@ -46,11 +52,71 @@ public class PXMKController {
 		return new ResponseEntity<>(pxmkService.getpxfbList(pn, ps, where),HttpStatus.OK);
 
 	}
-	@RequestMapping(value = "/pxxxapi/{splx}", method = RequestMethod.PUT)
-	public ResponseEntity<ResponseMessage> updatePTXM(@PathVariable(value = "splx") String splx,
+	/**
+	 * 信息发布
+	 * @param ptxm
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pxxxapi", method = RequestMethod.POST)
+	public ResponseEntity<ResponseMessage> pxxxapiInsert(
 			@RequestBody Map<String,Object> ptxm,HttpServletRequest request)throws Exception {
-		pxmkService.fspsq(ptxm,splx);
+		pxmkService.fspsq(ptxm,"pxxxfb");
 		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
+	}
+	/**
+	 * 信息修改
+	 * @param ptxm
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pxxxapi", method = RequestMethod.PUT)
+	public ResponseEntity<ResponseMessage> pxxxapiUpdate(
+			@RequestBody Map<String,Object> ptxm,HttpServletRequest request)throws Exception {
+		pxmkService.fspsq(ptxm,"pxxxxg");
+		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
+	}
+	/**
+	 * 信息删除
+	 * @param pxid
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pxxxapi/{pxid}", method = RequestMethod.DELETE)
+	public ResponseEntity<ResponseMessage> pxxxapiDel(@PathVariable(value = "pxid") String pxid,
+			HttpServletRequest request)throws Exception {
+		Map<String,Object> ptxm=new HashMap<>();
+		ptxm.put("pxid", pxid);
+		pxmkService.fspsq(ptxm,"pxxxsc");
+		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
+	}
+	/**
+	 * 停止报名
+	 * @param pxid
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pxxxapi/{pxid}", method = RequestMethod.PUT)
+	public ResponseEntity<ResponseMessage> pxxxapiStop(@PathVariable(value = "pxid") String pxid,
+			HttpServletRequest request)throws Exception {
+		Map<String,Object> ptxm=new HashMap<>();
+		ptxm.put("pxid", pxid);
+		pxmkService.fspsq(ptxm,"pxxxtz");
+		return new ResponseEntity<>(ResponseMessage.success("更新成功"),HttpStatus.OK);
+	}
+	/**
+	 * 获取报名列表
+	 * @param pxid
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/pxxxtjlist/{pxid}", method = RequestMethod.GET)
+	public ResponseEntity<?> pxtjbmList(@PathVariable(value = "pxid") String pxid)throws Exception {
+		return new ResponseEntity<>(pxmkService.pxtjbmList(pxid),HttpStatus.OK);
 	}
 	
 	/*
