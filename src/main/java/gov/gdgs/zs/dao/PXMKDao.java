@@ -160,6 +160,7 @@ public class PXMKDao extends BaseDao{
 			Condition condition) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT t.id,t.bt,t.pxkssj,t.pxjssj,t.pxlxr,t.bmjzsj,t.fbzt,t.lrrq, ");
+		sb.append(" t.srj,t.drj,t.zaoc,t.wuc,t.wanc,t.bgdh,t.hwwzfjh,t.pxdz,t.pxdddh, ");
 		sb.append(" @rownum := @rownum + 1 as xh, ");
 		sb.append(" if(b.jg_id is not null,1,0) as isbm ");
 		sb.append(" FROM (zs_pxqkb t, ");
@@ -170,9 +171,11 @@ public class PXMKDao extends BaseDao{
 		sb.append("    LIMIT ? , ?) sub, ");
 		// ===> 插入查询条件集合结束
 		sb.append(" (SELECT @rownum:=?) temp) ");
-		sb.append(" left join zs_pxqkbmb b ");
-		sb.append(" on (b.PXID = t.id and jg_id = ?) ");
+		sb.append(" left join ");
+		sb.append(" (select distinct jg_id,pxid from zs_pxqkbmb) b ");
+		sb.append(" on (b.PXID = t.id and b.jg_id = ?) ");
 		sb.append(" where sub.id = t.id ");
+		sb.append(" order by t.lrrq desc ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
@@ -198,20 +201,31 @@ public class PXMKDao extends BaseDao{
 		return obj;
 	}
 
-	public List<Map<String, Object>> getPxbmRy(String id) {
-		String sql = " select xming,xb,zw,yddh,dhhm,nl,email,fjlx,zaoc,wuc,wanc,rzsj,lksj "
-				+ "from zs_pxqkbmb where pxid = ?";
-		return   this.jdbcTemplate.queryForList(sql,new Object[]{id});
+	public List<Map<String, Object>> getPxbmRy(User user, String id) {
+		String sql = " select xming,xb,zw,yddh,dhhm,nl,email,fjlx,zaoc,wuc,wanc,rzsj,lksj,bz "
+				+ "from zs_pxqkbmb where pxid = ? and jg_id= ? and yxbz =1 ";
+		return   this.jdbcTemplate.queryForList(sql,new Object[]{id,user.getJgId()});
 	}
 
 	public Map<String, Object> getPxxxMx(String id) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select fbzt,bt,pxdz,qs,pxkssj,pxjssj,bmjzsj,pxdddh,pxlxr,pxnr,zysx,");
-		sb.append(" srj,drj,zaoc,wuc,wanc,bgdh,hwwzfjh from zs_pxqkb where id = ? ");
+		sb.append(" srj,drj,zaoc,wuc,wanc,bgdh,hwwzfjh from zs_pxqkb where id = ? and yxbz = 1 ");
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{id});
 		if(ls.size()>0){
 			return ls.get(0);
 		}
 		return null;
+	}
+	
+	public int[] addPxbm (Map<String, Object>[] values){
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into zs_pxqkbmb (ID,PXID,JG_ID,XMING,XB,ZW,YDDH,DHHM,NL,EMAIL,FJLX,ZAOC,WUC,WANC,RZSJ,LKSJ,BMSJ,BZ,YXBZ) ");
+		sb.append(" values(:id,:pxid,:jg_id,:xming,:xb,:zw,:yddh,:dhhm,:nl,:email,:fjlx,:zaoc,:wuc,:wanc,:rzsj,:lksj,:bmsj,:bz,1) ");
+		return this.namedParameterJdbcTemplate.batchUpdate(sb.toString(), values);
+	}
+	public int delRyByPxidAndUser(User user, String pxid){
+		String sql = " delete from zs_pxqkbmb where pxid=? and jg_id=? ";
+		return this.jdbcTemplate.update(sql, new Object[]{pxid,user.getJgId()});
 	}
 }
