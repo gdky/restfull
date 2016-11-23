@@ -39,6 +39,9 @@ public class YwglService {
 	
 	@Autowired
 	private ZzglService zzglService;
+	
+	@Autowired
+	private BarcodeEncoder barcode;
 
 	public Map<String, Object> getYwbb(int page, int pageSize, String whereParam) {
 		HashMap<String, Object> where = new HashMap<String, Object>();
@@ -132,6 +135,7 @@ public class YwglService {
 		if(zzglService.isJgLocked(user)){
 			throw new YwbbException("不具备业务上报资质或上报业务资质目前被锁，请联系中心解锁");
 		}
+		//TODO 判断是否在审批中
 
 		// 整理业务记录
 		HashMap<String, Object> o = new HashMap<String, Object>();
@@ -246,10 +250,11 @@ public class YwglService {
 		bbhm.delete(21, 23);
 		bbhm.delete(10, 17);
 		
-		//TODO 生成条形码
+		//生成条码
+		barcode.encodeCode128(bbhm.toString());
 		
 		/* 提交报备 */
-		o.put("BBHM", bbhm);
+		o.put("BBHM", bbhm.toString());
 		o.put("YZM", yzm);
 		o.put("ZT", 1);
 		o.put("XYZT_DM", 3);
@@ -564,9 +569,9 @@ public class YwglService {
 		bbhm.append(cal.getTimeInMillis());
 		bbhm.delete(21, 23);
 		bbhm.delete(10, 17);
-		
-		//TODO 生成条形码
-		
+	
+		//生成条形码
+		barcode.encodeCode128(bbhm.toString());
 		/* 提交报备 */
 		o.put("BBHM", bbhm);
 		o.put("YZM", yzm);
@@ -1169,5 +1174,8 @@ public class YwglService {
 		return obj;
 	}
 
-
+	public void reGenBarcode() {
+		List<Map<String,Object>> ls = ywglDao.getAllBbhm();
+		barcode.reGenGroupBarcode(ls);		
+	}
 }

@@ -398,4 +398,13 @@ public class YwglController {
 				where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
 	}
+	
+	/**
+	 * 中心端 - 重建条形码
+	 */
+	@RequestMapping(value = "/rebarcode", method = RequestMethod.GET)
+	public ResponseEntity<?> reGenBarcode() {
+		ywglService.reGenBarcode();
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
 }
