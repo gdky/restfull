@@ -26,8 +26,9 @@ public class PXMKDao extends BaseDao{
 	 */
 	public Map<String,Object> getpxfbList(int pn,int ps,Map<String, Object> qury){
 		Condition condition = new Condition();
-		condition.add("a.dwmc", Condition.FUZZY, qury.get("dwmc"));
-		condition.add("a.nd", Condition.EQUAL, qury.get("nd"));
+		condition.add("a.bt", Condition.FUZZY, qury.get("BT"));
+		condition.add("a.PXKSSJ", Condition.GREATER_EQUAL, qury.get("clsj"));
+		condition.add("a.PXKSSJ", Condition.LESS_EQUAL, qury.get("clsj2"));
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
 		params.add((pn-1)*ps);
