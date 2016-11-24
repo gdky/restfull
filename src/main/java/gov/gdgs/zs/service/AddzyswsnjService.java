@@ -93,7 +93,6 @@ public class AddzyswsnjService implements IAddzyswsnjService {
 			
 			//执业税务师年度年检
 			public Map<String, Object> checkzyswsnjnd(Integer jgId, String where) {
-				// TODO Auto-generated method stub
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				if (where != null) {
 					try {

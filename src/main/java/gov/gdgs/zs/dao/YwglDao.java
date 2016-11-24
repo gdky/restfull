@@ -1879,4 +1879,8 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" where ID = :ID ");
 		this.namedParameterJdbcTemplate.update(sb.toString(), o);
 	}
+	public List<Map<String,Object>> getAllBbhm(){
+		String sql = "select bbhm from zs_ywbb where yxbz = 1 and (zt = 1 || zt = 3) ";
+		return this.jdbcTemplate.queryForList(sql);
+	}
 }
