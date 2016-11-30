@@ -85,5 +85,16 @@ public class GzApiService {
 		time.append(hour).append(":").append("00").append(":").append("00");
 		return time.toString();
 	}
+	
+	public void insertSWSJG(int jgid,int way){
+		switch(way){
+		case 1:gzApiDao.addJG(jgid);break;//增加
+		case 2:gzApiDao.changedJG(jgid);break;//修改
+		case 0:gzApiDao.delJG(jgid);break;//删除
+		}
+	}
+	public void insertSWS(int zyid,int way){
+		gzApiDao.insertSWS(zyid, way);
+	}
 
 }
