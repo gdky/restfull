@@ -1,14 +1,20 @@
 package com.gdky.restfull.service;
 
+import gov.gdgs.zs.untils.Condition;
+
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.gdky.restfull.entity.User;
+import com.gdky.restfull.utils.Common;
 
 @Service
-public class MsgService {
+public class MessageService {
+	
+	private MessageDao messageDao;
 	/**
 	 * 创建普通消息
 	 * @param sendUser 发送人
@@ -53,7 +59,14 @@ public class MsgService {
 	 * @param sendUser
 	 * @return
 	 */
-	public List<Map<String,Object>> getSendBox (User sendUser){
+	public List<Map<String,Object>> getSendBox (User sendUser,int page, int pagesize,String whereparam){
+		Condition condition = new Condition();
+		if(!StringUtils.isEmpty(whereparam)){
+			Map<String,Object> where = Common.decodeURItoMap(whereparam);
+			condition.add("title", "FUZZY", where.get("title"));
+		}
+		condition.add("sendid", Condition.EQUAL, sendUser.getId());
+		
 		return null;
 	}
 	
