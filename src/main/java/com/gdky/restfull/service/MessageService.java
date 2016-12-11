@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import com.gdky.restfull.dao.MessageDao;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.utils.Common;
 
