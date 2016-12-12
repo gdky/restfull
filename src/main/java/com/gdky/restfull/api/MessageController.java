@@ -1,6 +1,5 @@
 package com.gdky.restfull.api;
 
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,14 +33,14 @@ public class MessageController {
 	/**
 	 * 获取发件箱列表
 	 */
-	@RequestMapping(value = "/messages", method = RequestMethod.GET)
-	public ResponseEntity<?> getYwbb(
+	@RequestMapping(value = "/sendbox", method = RequestMethod.GET)
+	public ResponseEntity<?> getSendbox(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pagesize,
 			@RequestParam(value = "where", required = false) String where) {
 
 		User user = accountService.getUserFromHeaderToken(request);
-		List<Map<String, Object>> obj = messageService.getSendBox(user,page, pagesize, where);
+		Map<String, Object> obj = messageService.getSendBox(user,page, pagesize, where);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 }

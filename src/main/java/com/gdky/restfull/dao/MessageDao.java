@@ -1,18 +1,55 @@
 package com.gdky.restfull.dao;
 
+import gov.gdgs.zs.untils.Condition;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MessageDao extends BaseJdbcDao{
-	
-	public List<Map<String,Object>> getSendBox (){
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class MessageDao extends BaseJdbcDao {
+
+	public Map<String, Object> getSendBox(Condition condition, int page,
+			int pagesize) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select mt.* ");
-		sb.append(" from  fw_msg_text mt,fw_msg_log ml ");
-		sb.append(" where ml.TEXTID = mt.ID ");
-		sb.append(" and ml.SENDID ");
-		sb.append(" and mt.TITLE like ");
-		
-		return null;
+		sb.append(" SELECT t.id,t.title,t.content,t.reciver, ");
+		sb.append(" @rownum := @rownum + 1 as xh ");
+		sb.append(" FROM fw_msg_text t, fw_msg_log l, (SELECT @rownum:=?) temp, ");
+
+		// <=== 查询条件集合
+		sb.append(" ( " + condition.getSelectSql("fw_msg_text", "id"));
+		sb.append("    ORDER BY CREATE_TIME desc  ");
+		sb.append("    LIMIT ? , ?) sub ");
+		// ===> 插入查询条件集合结束
+
+		sb.append(" WHERE t.id = sub.id  ");
+		sb.append(" AND t.id = l.textid  ");
+
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		ArrayList<Object> params = condition.getParams();
+		params.add(startIndex);
+		params.add(startIndex);
+		params.add(pagesize);
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+
+		// 获取符合条件的记录数
+		String countSql = condition.getCountSql("id", "fw_msg_text");
+		int total = jdbcTemplate.queryForObject(countSql, condition.getParams()
+				.toArray(), Integer.class);
+
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+
+		return obj;
 	}
 }
