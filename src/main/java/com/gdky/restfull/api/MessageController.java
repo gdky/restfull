@@ -1,5 +1,6 @@
 package com.gdky.restfull.api;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -7,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,6 +43,17 @@ public class MessageController {
 
 		User user = accountService.getUserFromHeaderToken(request);
 		Map<String, Object> obj = messageService.getSendBox(user,page, pagesize, where);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	/**
+	 * 发送新信息
+	 */
+	@RequestMapping(value = "/messages", method = RequestMethod.GET)
+	public ResponseEntity<?> newMessages(
+			@RequestBody Map<String,Object> message) {
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> obj = messageService.newMsg(user, message);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 }

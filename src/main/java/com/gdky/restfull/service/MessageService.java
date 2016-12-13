@@ -21,13 +21,11 @@ public class MessageService {
 	private MessageDao messageDao;
 	/**
 	 * 创建普通消息
-	 * @param sendUser 发送人
-	 * @param reciUser 接收人
-	 * @param title 消息标题
-	 * @param content 消息内容
+	 * 
 	 */
-	public void newMsg(User sendUser, List<User> reciUser, String title,String content){
-		
+	public Map<String,Object> newMsg(User sendUser,  Map<String,Object> message){
+
+		return null;
 	}
 	
 	/**
@@ -61,6 +59,7 @@ public class MessageService {
 	/**
 	 * 获取发件箱列表
 	 * @param sendUser
+	 * 
 	 * @return
 	 */
 	public Map<String,Object> getSendBox (User sendUser,int page, int pagesize,String whereparam){
@@ -83,4 +82,5 @@ public class MessageService {
 	public List<Map<String,Object>> getInBox (User reciUser){
 		return null;
 	}
+
 }
