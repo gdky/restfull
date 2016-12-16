@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
+import com.gdky.restfull.entity.User;
+
 @Repository
 public class MessageDao extends BaseJdbcDao {
 
@@ -51,5 +53,21 @@ public class MessageDao extends BaseJdbcDao {
 		obj.put("current", page);
 
 		return obj;
+	}
+
+	public List<Map<String, Object>> getUsersBySWS() {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select u.id from fw_users u , zs_jg j , fw_user_role ur ");
+		sb.append(" where u.JG_ID = j.ID ");
+		sb.append(" and u.ID = ur.USER_ID ");
+		sb.append(" and j.yxbz = 1 ");
+		sb.append(" and ur.ROLE_ID =3 ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString());
+		return ls;
+	}
+
+	public void send(User sender, String title, String content, Integer type) {
+		// TODO Auto-generated method stub
+		
 	}
 }
