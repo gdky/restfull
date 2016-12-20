@@ -49,7 +49,7 @@ public class MessageController {
 	/**
 	 * 发送新信息
 	 */
-	@RequestMapping(value = "/messages", method = RequestMethod.GET)
+	@RequestMapping(value = "/messages", method = RequestMethod.POST)
 	public ResponseEntity<?> newMessages(
 			@RequestBody Map<String,Object> message) {
 		User user = accountService.getUserFromHeaderToken(request);

@@ -42,8 +42,8 @@ public class MessageService {
 			Integer type = (Integer) message.get("type");
 					
 			if("1".equals(key)){
-				List<Map<String,Object>> Recivers = messageDao.getUsersBySWS();
-				messageDao.send(sender,title,content,type);
+				List<String> recivers = messageDao.getUsersBySWS();
+				messageDao.send(sender,title,content,type,recivers,"2");
 			}
 
 		} else {
