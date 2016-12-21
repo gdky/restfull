@@ -110,12 +110,19 @@ public class MessageService {
 
 	/**
 	 * 获取收件箱列表
-	 * 
-	 * @param reciUser
-	 * @return
+	 * 	
 	 */
-	public List<Map<String, Object>> getInBox(User reciUser) {
-		return null;
+	public Map<String, Object> getInBox(User user, int page, int pagesize,
+			String whereparam) {
+		Condition condition = new Condition();
+		if (!StringUtils.isEmpty(whereparam)) {
+			Map<String, Object> where = Common.decodeURItoMap(whereparam);
+			condition.add("title", "FUZZY", where.get("title"));
+		}
+		condition.add("reciid", Condition.EQUAL, user.getId());
+		Map<String, Object> obj = messageDao.getInbox(condition, page,
+				pagesize);
+		return obj;
 	}
 
 }

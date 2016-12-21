@@ -56,4 +56,17 @@ public class MessageController {
 		Map<String, Object> obj = messageService.newMsg(user, message);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
+	
+	/**
+	 * 获取收件箱列表
+	 */
+	@RequestMapping(value = "/inbox", method = RequestMethod.GET)
+	public ResponseEntity<?> getInbox(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize,
+			@RequestParam(value = "where", required = false) String where){
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String,Object> obj = messageService.getInBox(user,page,pagesize,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
 }

@@ -105,4 +105,10 @@ public class MessageDao extends BaseJdbcDao {
 		this.jdbcTemplate.batchUpdate(sb.toString(), batchArgs);
 
 	}
+
+	public Map<String, Object> getInbox(Condition condition, int page,
+			int pagesize) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
