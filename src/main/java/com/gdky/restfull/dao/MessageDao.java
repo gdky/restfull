@@ -108,7 +108,44 @@ public class MessageDao extends BaseJdbcDao {
 
 	public Map<String, Object> getInbox(Condition condition, int page,
 			int pagesize) {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select t1.zt,t2.title,t2.create_time, ");
+		sb.append(" (CASE WHEN t2.type=1 THEN '系统通知' WHEN T2.TYPE = 2 THEN '' WHEN T2.TYPE=3 THEN ELSE u.`NAMES` END) as 'type' ");
+		sb.append(" from fw_msg_log t1, fw_msg_text t2 ");
+		sb.append(" where t1.TEXTID = t2.ID ");
+		sb.append(" and t2.EXPIRED_TIME > now() ");
+
+		// <=== 查询条件集合
+		sb.append(" ( " + condition.getSelectSql("fw_msg_text", "id"));
+		sb.append("    ORDER BY CREATE_TIME desc  ");
+		sb.append("    LIMIT ? , ?) sub ");
+		// ===> 插入查询条件集合结束
+
+		sb.append(" WHERE t.id = sub.id  ");
+		sb.append(" AND t.id = l.textid  ");
+
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		ArrayList<Object> params = condition.getParams();
+		params.add(startIndex);
+		params.add(startIndex);
+		params.add(pagesize);
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+
+		// 获取符合条件的记录数
+		String countSql = condition.getCountSql("id", "fw_msg_text");
+		int total = jdbcTemplate.queryForObject(countSql, condition.getParams()
+				.toArray(), Integer.class);
+
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+
+		return obj;
 	}
 }
