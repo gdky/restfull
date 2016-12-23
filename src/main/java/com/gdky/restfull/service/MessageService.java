@@ -2,6 +2,8 @@ package com.gdky.restfull.service;
 
 import gov.gdgs.zs.untils.Condition;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -27,25 +29,46 @@ public class MessageService {
 	 * @message {
 	 * String title, 消息标题
 	 * String content, 消息内容
-	 * int type, 消息类型 1:系统消息；2:普通消息；3.欠费通知
+	 * int type, 消息类型 1:一般消息；2:系统消息；3.欠费通知
 	 * Boolean groupsend 是否按组发送
 	 * Object reciver 接收人
 	 * 组发送为true时，接收人格式{key,value}
+	 * }
 	 */
 	public Map<String, Object> newMsg(User sender, Map<String, Object> message) {
+		//群组发送
 		if (message.get("groupsend") != null
 				&& (Boolean) message.get("groupsend")) {
 			Map<String,Object> reciver = (Map<String,Object>)message.get("reciver");
 			String key = (String)reciver.get("key");
+			String label = (String)reciver.get("label");
 			String title = (String) message.get("title");
 			String content = (String) message.get("content");
 			Integer type = (Integer) message.get("type");
-					
-			if("1".equals(key)){
-				List<String> recivers = messageDao.getUsersBySWS();
-				messageDao.send(sender,title,content,type,recivers,"2");
+			//群组发送的消息设置180天的有效期
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.DATE, 180);
+			String exp_time = Common.getDate2MysqlDateTime(cal.getTime());
+			
+			//接收对象
+			List<String> recivers = new ArrayList<String>();
+			
+				
+			if("3".equals(key)){ 
+				//1表示省内事务所
+				recivers.add("1");
+			
+			}else if ("114".equals(key)){
+				//2表示外省事务所
+				recivers.add("114");
+				
+			}else if( "0".equals(key)){
+				recivers.add("1");
+				recivers.add("114");
 			}
+			messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
 
+		//非群组发送
 		} else {
 
 		}
@@ -117,10 +140,10 @@ public class MessageService {
 		Condition condition = new Condition();
 		if (!StringUtils.isEmpty(whereparam)) {
 			Map<String, Object> where = Common.decodeURItoMap(whereparam);
-			condition.add("title", "FUZZY", where.get("title"));
+			condition.add("t2.title", "FUZZY", where.get("title"));
 		}
-		condition.add("reciid", Condition.EQUAL, user.getId());
-		Map<String, Object> obj = messageDao.getInbox(condition, page,
+		
+		Map<String, Object> obj = messageDao.getInbox(user, condition, page,
 				pagesize);
 		return obj;
 	}
