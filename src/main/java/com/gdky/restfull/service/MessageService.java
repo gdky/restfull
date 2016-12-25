@@ -52,8 +52,6 @@ public class MessageService {
 			
 			//接收对象
 			List<String> recivers = new ArrayList<String>();
-			
-				
 			if("3".equals(key)){ 
 				//1表示省内事务所
 				recivers.add("1");
@@ -122,10 +120,11 @@ public class MessageService {
 		Condition condition = new Condition();
 		if (!StringUtils.isEmpty(whereparam)) {
 			Map<String, Object> where = Common.decodeURItoMap(whereparam);
-			condition.add("title", "FUZZY", where.get("title"));
+			condition.add("title", Condition.FUZZY, where.get("title"));
+			condition.add("type", Condition.EQUAL, where.get("type"));
 		}
-		condition.add("senderid", Condition.EQUAL, sendUser.getId());
-		Map<String, Object> obj = messageDao.getSendBox(condition, page,
+		//condition.add("senderid", Condition.EQUAL, sendUser.getId());
+		Map<String, Object> obj = messageDao.getSendBox(sendUser,condition, page,
 				pagesize);
 
 		return obj;
@@ -146,6 +145,10 @@ public class MessageService {
 		Map<String, Object> obj = messageDao.getInbox(user, condition, page,
 				pagesize);
 		return obj;
+	}
+
+	public Map<String, Object> getMsg(String id) {
+		return messageDao.getMsg(id);
 	}
 
 }

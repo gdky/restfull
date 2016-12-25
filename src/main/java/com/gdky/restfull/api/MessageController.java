@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -54,6 +55,15 @@ public class MessageController {
 			@RequestBody Map<String,Object> message) {
 		User user = accountService.getUserFromHeaderToken(request);
 		Map<String, Object> obj = messageService.newMsg(user, message);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	/**
+	 * 获取消息内容
+	 */
+	@RequestMapping(value = "/messages/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> getMessages(
+			@PathVariable String id) {
+		Map<String, Object> obj = messageService.getMsg( id);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 	

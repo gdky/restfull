@@ -19,12 +19,12 @@ import com.gdky.restfull.utils.Common;
 @Repository
 public class MessageDao extends BaseJdbcDao {
 
-	public Map<String, Object> getSendBox(Condition condition, int page,
+	public Map<String, Object> getSendBox(User user,Condition condition, int page,
 			int pagesize) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" SELECT t.id,t.title,t.content,t.reciver, ");
+		sb.append(" SELECT t.id,t.create_time,t.title,t.reciver,dm.mc as 'type', u.`NAMES` as sender,");
 		sb.append(" @rownum := @rownum + 1 as xh ");
-		sb.append(" FROM fw_msg_text t, fw_msg_log l, (SELECT @rownum:=?) temp, ");
+		sb.append(" FROM fw_msg_text t,dm_msg_type dm,fw_users u, (SELECT @rownum:=?) temp, ");
 
 		// <=== 查询条件集合
 		sb.append(" ( " + condition.getSelectSql("fw_msg_text", "id"));
@@ -33,18 +33,34 @@ public class MessageDao extends BaseJdbcDao {
 		// ===> 插入查询条件集合结束
 
 		sb.append(" WHERE t.id = sub.id  ");
-		sb.append(" AND t.id = l.textid  ");
+		sb.append(" and t.`TYPE` = dm.id  ");
+		sb.append(" and t.SENDERID = u.ID  ");
 
 		// 装嵌传值数组
 		int startIndex = pagesize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
-		params.add(startIndex);
+		params.add(0, startIndex);
 		params.add(startIndex);
 		params.add(pagesize);
 
 		// 获取符合条件的记录
-		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
-				params.toArray());
+		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),params.toArray(),
+				new RowMapper<Map<String, Object>>() {
+			public Map<String, Object> mapRow(ResultSet rs, int arg1)
+					throws SQLException {
+				java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss");
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("xh", rs.getObject("xh"));
+				map.put("id", rs.getObject("id"));
+				map.put("create_time", sdf.format(rs.getTimestamp("create_time")));
+				map.put("title", rs.getObject("title"));
+				map.put("reciver", rs.getObject("reciver"));
+				map.put("sender", rs.getObject("sender"));
+				map.put("type", rs.getObject("type"));
+				return map;
+			}
+		});
 
 		// 获取符合条件的记录数
 		String countSql = condition.getCountSql("id", "fw_msg_text");
@@ -171,15 +187,24 @@ public class MessageDao extends BaseJdbcDao {
 		StringBuffer sb = new StringBuffer();
 		// 先添加消息本体
 		sb.append(" insert into fw_msg_text ");
-		sb.append(" (id,title,content,senderid,reciver,role,type,create_time,expired_time) ");
+		sb.append(" (id,title,content,senderid,role,reciver,type,create_time,expired_time) ");
 		sb.append(" values(?,?,?,?,?,?,?,?,?) ");
 		List<Object[]> batchArgs = new ArrayList<>();
 		for (int i = 0; i < recivers.size(); i++) {
-			batchArgs.add(new Object[] { title, content, sender.getId(), reciverDes, type, cre_time,
+			batchArgs.add(new Object[] {uuid_text, title, content, sender.getId(), recivers.get(i),reciverDes, type, cre_time,
 					exp_time });
 		}
 		this.jdbcTemplate.batchUpdate(sb.toString(), batchArgs);
 
 		
+	}
+
+	public Map<String, Object> getMsg(String id) {
+		String sql = " select title,content,DATE_FORMAT(create_time,'%Y-%m-%d %T') as create_time from fw_msg_text where id = ? ";
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql,new Object[]{id});
+		if(ls.size()>0){
+			return ls.get(0);
+		}
+		return null;
 	}
 }
