@@ -78,19 +78,6 @@ public class MessageService {
 		return null;
 	}
 
-	/**
-	 * 创建一条系统消息
-	 * 
-	 * @param reciUser
-	 *            接收人
-	 * @param title
-	 *            消息标题
-	 * @param content
-	 *            消息内容
-	 */
-	public void newSysMsg(List<User> reciUser, String title, String content) {
-
-	}
 
 	/**
 	 * 撤回一条发送的消息
