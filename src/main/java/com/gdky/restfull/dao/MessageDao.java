@@ -207,4 +207,13 @@ public class MessageDao extends BaseJdbcDao {
 		}
 		return null;
 	}
+
+	/*
+	 * 发送至未缴费会员信息
+	 */
+	public void sendToWJF(User sender, String title, String content,
+			Integer type, String label, String exp_time) {
+		// TODO Auto-generated method stub
+		
+	}
 }

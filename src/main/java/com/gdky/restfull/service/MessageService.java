@@ -55,16 +55,20 @@ public class MessageService {
 			if("3".equals(key)){ 
 				//1表示省内事务所
 				recivers.add("1");
+				messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
 			
 			}else if ("114".equals(key)){
 				//2表示外省事务所
 				recivers.add("114");
+				messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
 				
 			}else if( "0".equals(key)){
 				recivers.add("1");
 				recivers.add("114");
+				messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
+			}else if ("211".equals(key)){
+				messageDao.sendToWJF(sender,title,content,type,label,exp_time);
 			}
-			messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
 
 		//非群组发送
 		} else {
