@@ -4,6 +4,7 @@ import gov.gdgs.zs.untils.Condition;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -11,12 +12,14 @@ import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gdky.restfull.dao.MessageDao;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.utils.Common;
 
 @Service
+@Transactional
 public class MessageService {
 
 	@Resource
@@ -140,6 +143,15 @@ public class MessageService {
 
 	public Map<String, Object> getMsg(String id) {
 		return messageDao.getMsg(id);
+	}
+
+
+	public void delMsg(List<String> message) {
+		Iterator<String> iter = message.iterator();
+		while(iter.hasNext()){
+			String id = iter.next();
+			messageDao.delMsg(id);			
+		}
 	}
 
 }

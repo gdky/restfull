@@ -254,4 +254,12 @@ public class MessageDao extends BaseJdbcDao {
 		this.jdbcTemplate.update(sb.toString(), new Object[]{sender.getId(),uuid,1});
 		
 	}
+
+	public void delMsg(String id) {
+		String sql = "delete from fw_msg_log where textid = ?";
+		this.jdbcTemplate.update(sql, new Object[]{id});
+		sql = "delete from fw_msg_text where id =?";
+		this.jdbcTemplate.update(sql, new Object[]{id});
+		
+	}
 }

@@ -1,5 +1,6 @@
 package com.gdky.restfull.api;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,16 @@ public class MessageController {
 	public ResponseEntity<?> getMessages(
 			@PathVariable String id) {
 		Map<String, Object> obj = messageService.getMsg( id);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	/**
+	 * 撤销信息
+	 */
+	@RequestMapping(value = "/messages", method = RequestMethod.DELETE)
+	public ResponseEntity<?> delMessages(
+			@RequestBody List<String> message) {
+		messageService.delMsg(message);
+		Map<String, Object> obj = new HashMap<String,Object>();
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 	
