@@ -45,6 +45,7 @@ public class MessageService {
 			Map<String,Object> reciver = (Map<String,Object>)message.get("reciver");
 			String key = (String)reciver.get("key");
 			String label = (String)reciver.get("label");
+			String year =(String)message.get("year");
 			String title = (String) message.get("title");
 			String content = (String) message.get("content");
 			Integer type = (Integer) message.get("type");
@@ -66,11 +67,12 @@ public class MessageService {
 				messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
 				
 			}else if ("211".equals(key)){
-				messageDao.sendToWJF(sender,title,content,type,label,exp_time);
+				String reciverDes = year + label;
+				messageDao.sendToWJF(sender,title,content,type,reciverDes,exp_time,year);
 			}else if ("212".equals(key)){
-				messageDao.sendToWSBCWBB(sender,title,content,type,label,exp_time);
+				messageDao.sendToWSBCWBB(sender,title,content,type,label,exp_time,year);
 			}else if ("213".equals(key)){
-				messageDao.sendToWSBHYBB(sender,title,content,type,label,exp_time);
+				messageDao.sendToWSBHYBB(sender,title,content,type,label,exp_time,year);
 			}
 
 		//非群组发送

@@ -211,7 +211,7 @@ public class MessageDao extends BaseJdbcDao {
 	 * 发送至未缴费会员信息
 	 */
 	public void sendToWJF(User sender, String title, String content,
-			Integer type, String label, String exp_time) {
+			Integer type, String label, String exp_time, String year) {
 		String uuid = Common.newUUID();
 		String cre_time = Common.getCurrentTime2MysqlDateTime();
 		
@@ -228,29 +228,20 @@ public class MessageDao extends BaseJdbcDao {
 		sb.append(" insert into fw_msg_log (reciid,sendid,textid,zt) ");
 		sb.append(" select t1.id,?,?,? from ( ");
 		sb.append(" select distinct u.id from ( ");
-		sb.append(" SELECT b.id,	f_qjtt(f_yjtt(b.id,year(now())),b.id,year(now())) AS qjtt,	f_qjgr(( ");
+		sb.append(" SELECT b.id,	f_qjtt(f_yjtt(b.id,?),b.id,?) AS qjtt,	f_qjgr(( ");
 		sb.append(" SELECT COUNT(c.RY_ID)*800 AS yjgr ");
 		sb.append(" FROM zs_zysws c ");
 		sb.append(" WHERE c.JG_ID=b.id AND c.YXBZ=1 AND c.ry_id NOT IN ( ");
 		sb.append(" SELECT d.RY_ID ");
 		sb.append(" FROM zs_hyhfjfryls d ");
-		sb.append(" WHERE d.nd=year(now()))),b.id,year(now())) AS qjgr	 ");
+		sb.append(" WHERE d.nd=?)),b.id,?) AS qjgr	 ");
 		sb.append(" FROM zs_jg b ");
-		sb.append(" WHERE 1=1 AND b.yxbz=1 ");
-		sb.append(" union all ");
-		sb.append(" SELECT b.id,	f_qjtt(f_yjtt(b.id, year(now())-1),b.id,year(now())-1) AS qjtt,	f_qjgr(( ");
-		sb.append(" SELECT COUNT(c.RY_ID)*800 AS yjgr ");
-		sb.append(" FROM zs_zysws c ");
-		sb.append(" WHERE c.JG_ID=b.id AND c.YXBZ=1 AND c.ry_id NOT IN ( ");
-		sb.append(" SELECT d.RY_ID ");
-		sb.append(" FROM zs_hyhfjfryls d ");
-		sb.append(" WHERE d.nd=year(now())-1)),b.id,year(now())-1) AS qjgr	 ");
-		sb.append(" FROM zs_jg b ");
-		sb.append(" WHERE 1=1 AND b.yxbz=1)g,fw_users u  ");
+		sb.append(" WHERE 1=1 AND b.yxbz=1) g, ");
+		sb.append(" fw_users u  ");
 		sb.append(" where (g.qjtt>0 || g.qjgr>0) ");
 		sb.append(" and g.id = u.JG_ID ");
 		sb.append(" ) as t1 ");
-		this.jdbcTemplate.update(sb.toString(), new Object[]{sender.getId(),uuid,1});
+		this.jdbcTemplate.update(sb.toString(), new Object[]{sender.getId(),uuid,1,year,year,year,year});
 		
 	}
 
@@ -263,13 +254,13 @@ public class MessageDao extends BaseJdbcDao {
 	}
 
 	public void sendToWSBCWBB(User sender, String title, String content,
-			Integer type, String label, String exp_time) {
+			Integer type, String label, String exp_time, String year) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	public void sendToWSBHYBB(User sender, String title, String content,
-			Integer type, String label, String exp_time) {
+			Integer type, String label, String exp_time, String year) {
 		// TODO Auto-generated method stub
 		
 	}
