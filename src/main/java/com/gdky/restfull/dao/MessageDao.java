@@ -181,9 +181,7 @@ public class MessageDao extends BaseJdbcDao {
 
 	public void groupSend(User sender, String title, String content,
 			Integer type, List<String> recivers, String reciverDes, String exp_time) {
-		String uuid_text = Common.newUUID();
 		String cre_time = Common.getCurrentTime2MysqlDateTime();
-
 		StringBuffer sb = new StringBuffer();
 		// 先添加消息本体
 		sb.append(" insert into fw_msg_text ");
@@ -191,6 +189,7 @@ public class MessageDao extends BaseJdbcDao {
 		sb.append(" values(?,?,?,?,?,?,?,?,?) ");
 		List<Object[]> batchArgs = new ArrayList<>();
 		for (int i = 0; i < recivers.size(); i++) {
+			String uuid_text = Common.newUUID();
 			batchArgs.add(new Object[] {uuid_text, title, content, sender.getId(), recivers.get(i),reciverDes, type, cre_time,
 					exp_time });
 		}
@@ -260,6 +259,18 @@ public class MessageDao extends BaseJdbcDao {
 		this.jdbcTemplate.update(sql, new Object[]{id});
 		sql = "delete from fw_msg_text where id =?";
 		this.jdbcTemplate.update(sql, new Object[]{id});
+		
+	}
+
+	public void sendToWSBCWBB(User sender, String title, String content,
+			Integer type, String label, String exp_time) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendToWSBHYBB(User sender, String title, String content,
+			Integer type, String label, String exp_time) {
+		// TODO Auto-generated method stub
 		
 	}
 }

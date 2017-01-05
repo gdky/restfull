@@ -61,16 +61,16 @@ public class MessageService {
 				messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
 			
 			}else if ("114".equals(key)){
-				//2表示外省事务所
+				//114表示外省事务所
 				recivers.add("114");
 				messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
 				
-			}else if( "0".equals(key)){
-				recivers.add("1");
-				recivers.add("114");
-				messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
 			}else if ("211".equals(key)){
 				messageDao.sendToWJF(sender,title,content,type,label,exp_time);
+			}else if ("212".equals(key)){
+				messageDao.sendToWSBCWBB(sender,title,content,type,label,exp_time);
+			}else if ("213".equals(key)){
+				messageDao.sendToWSBHYBB(sender,title,content,type,label,exp_time);
 			}
 
 		//非群组发送
@@ -137,7 +137,7 @@ public class MessageService {
 		}
 		
 		Map<String, Object> obj = messageDao.getInbox(user, condition, page,
-				pagesize);
+				pagesize); 
 		return obj;
 	}
 
