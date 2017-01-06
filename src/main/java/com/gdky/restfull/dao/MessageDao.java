@@ -127,13 +127,14 @@ public class MessageDao extends BaseJdbcDao {
 	public Map<String, Object> getInbox(User user, Condition condition, int page,
 			int pagesize) {
 		condition.add("t1.reciid", Condition.EQUAL, user.getId());
-		condition.add(" t2.expired_time > now()" );
-		condition.add(" t1.textid = t2.id ");
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select SQL_CALC_FOUND_ROWS t1.zt,t2.title,t2.create_time, ");
+		sb.append(" select SQL_CALC_FOUND_ROWS t1.id,t1.textid, t1.zt,t2.title,t2.create_time, ");
 		sb.append(" (CASE WHEN t2.type=2 THEN '系统通知' WHEN T2.TYPE = 3 THEN '缴费通知'  ELSE '一般消息' END) as 'type' ");
 		sb.append(" from fw_msg_log t1, fw_msg_text t2 ");
 		sb.append(condition.getSql());
+		sb.append(" and t2.expired_time > now() ");
+		sb.append(" and t1.textid = t2.id ");
+		sb.append(" and t1.zt != 0 ");
 		sb.append(" order by t2.create_time desc ");
 		sb.append(" limit ?, ? " );
 
@@ -145,8 +146,22 @@ public class MessageDao extends BaseJdbcDao {
 		params.add(pagesize);
 
 		// 获取符合条件的记录
-		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
-				params.toArray());
+		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),
+				params.toArray(),new RowMapper<Map<String, Object>>() {
+					public Map<String, Object> mapRow(ResultSet rs, int arg1)
+							throws SQLException {
+						java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+								"yyyy-MM-dd HH:mm:ss");
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("id", rs.getObject("id"));
+						map.put("create_time", sdf.format(rs.getTimestamp("create_time")));
+						map.put("title", rs.getObject("title"));
+						map.put("zt", rs.getObject("zt"));
+						map.put("type", rs.getObject("type"));
+						map.put("textid", rs.getObject("textid"));
+						return map;
+					}
+				});
 
 		// 获取符合条件的记录数
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()",
@@ -181,9 +196,7 @@ public class MessageDao extends BaseJdbcDao {
 
 	public void groupSend(User sender, String title, String content,
 			Integer type, List<String> recivers, String reciverDes, String exp_time) {
-		String uuid_text = Common.newUUID();
 		String cre_time = Common.getCurrentTime2MysqlDateTime();
-
 		StringBuffer sb = new StringBuffer();
 		// 先添加消息本体
 		sb.append(" insert into fw_msg_text ");
@@ -191,6 +204,7 @@ public class MessageDao extends BaseJdbcDao {
 		sb.append(" values(?,?,?,?,?,?,?,?,?) ");
 		List<Object[]> batchArgs = new ArrayList<>();
 		for (int i = 0; i < recivers.size(); i++) {
+			String uuid_text = Common.newUUID();
 			batchArgs.add(new Object[] {uuid_text, title, content, sender.getId(), recivers.get(i),reciverDes, type, cre_time,
 					exp_time });
 		}
@@ -204,6 +218,78 @@ public class MessageDao extends BaseJdbcDao {
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql,new Object[]{id});
 		if(ls.size()>0){
 			return ls.get(0);
+		}
+		return null;
+	}
+
+	/*
+	 * 发送至未缴费会员信息
+	 */
+	public void sendToWJF(User sender, String title, String content,
+			Integer type, String label, String exp_time, String year) {
+		String uuid = Common.newUUID();
+		String cre_time = Common.getCurrentTime2MysqlDateTime();
+		
+		StringBuffer sb = new StringBuffer();
+		// 先添加消息本体
+		sb.append(" insert into fw_msg_text ");
+		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time) ");
+		sb.append(" values(?,?,?,?,?,?,?,?) ");
+		this.jdbcTemplate.update(sb.toString(), new Object[] { uuid,
+				title, content, sender.getId(), label, type, cre_time,
+				exp_time });
+		//再添加接收人记录
+		sb.setLength(0);
+		sb.append(" insert into fw_msg_log (reciid,sendid,textid,zt) ");
+		sb.append(" select t1.id,?,?,? from ( ");
+		sb.append(" select distinct u.id from ( ");
+		sb.append(" SELECT b.id,	f_qjtt(f_yjtt(b.id,?),b.id,?) AS qjtt,	f_qjgr(( ");
+		sb.append(" SELECT COUNT(c.RY_ID)*800 AS yjgr ");
+		sb.append(" FROM zs_zysws c ");
+		sb.append(" WHERE c.JG_ID=b.id AND c.YXBZ=1 AND c.ry_id NOT IN ( ");
+		sb.append(" SELECT d.RY_ID ");
+		sb.append(" FROM zs_hyhfjfryls d ");
+		sb.append(" WHERE d.nd=?)),b.id,?) AS qjgr	 ");
+		sb.append(" FROM zs_jg b ");
+		sb.append(" WHERE 1=1 AND b.yxbz=1) g, ");
+		sb.append(" fw_users u  ");
+		sb.append(" where (g.qjtt>0 || g.qjgr>0) ");
+		sb.append(" and g.id = u.JG_ID ");
+		sb.append(" ) as t1 ");
+		this.jdbcTemplate.update(sb.toString(), new Object[]{sender.getId(),uuid,1,year,year,year,year});
+		
+	}
+
+	public void delMsg(String id) {
+		String sql = "delete from fw_msg_log where textid = ?";
+		this.jdbcTemplate.update(sql, new Object[]{id});
+		sql = "delete from fw_msg_text where id =?";
+		this.jdbcTemplate.update(sql, new Object[]{id});
+		
+	}
+
+	public void sendToWSBCWBB(User sender, String title, String content,
+			Integer type, String label, String exp_time, String year) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendToWSBHYBB(User sender, String title, String content,
+			Integer type, String label, String exp_time, String year) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setRead(String id, String logId) {
+		String sql = " update fw_msg_log set zt = 2 where id=? and textid=? ";
+		this.jdbcTemplate.update(sql, new Object[]{logId,id});		
+	}
+
+	public List<Map<String, Object>> getUserUnread(User user) {
+		String sql = "select id from fw_msg_log where reciid = ? and zt = 1 ";
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql, new Object[]{user.getId()});
+		if(ls.size()>0){
+			return ls;
 		}
 		return null;
 	}

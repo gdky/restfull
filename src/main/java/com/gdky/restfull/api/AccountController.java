@@ -3,10 +3,12 @@ package com.gdky.restfull.api;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +18,7 @@ import com.gdky.restfull.entity.AsideMenu;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.service.AccountService;
 import com.gdky.restfull.service.AuthService;
+import com.gdky.restfull.service.MessageService;
 
 @RestController
 @RequestMapping(value = Constants.URI_API_PREFIX)
@@ -26,6 +29,9 @@ public class AccountController {
 	
 	@Resource
 	AuthService userService;
+	
+	@Autowired
+	MessageService messageService;
 
 	/**
 	 * 获取用户登录基本信息
@@ -48,12 +54,14 @@ public class AccountController {
 				permission.append(item.getHref()).append(",");
 			}			
 		}*/
+		//获取新信息
+		Map<String,Object> ms = messageService.getMessageShortcut(user);
 		
 		HashMap<String,Object> resp = new HashMap<String,Object>();
 		resp.put("lo", userService.getRolesByUser(user.getUsername()).get(0).getId());
 		resp.put("names", user.getNames());
 		resp.put("menu", menu);
-		resp.put("newMsg", false);
+		resp.put("newMsg", ms);
 		return  ResponseEntity.ok(resp);
 	}
 }
