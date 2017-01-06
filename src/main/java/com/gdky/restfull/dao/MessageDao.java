@@ -127,13 +127,14 @@ public class MessageDao extends BaseJdbcDao {
 	public Map<String, Object> getInbox(User user, Condition condition, int page,
 			int pagesize) {
 		condition.add("t1.reciid", Condition.EQUAL, user.getId());
-		condition.add(" t2.expired_time > now()" );
-		condition.add(" t1.textid = t2.id ");
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select SQL_CALC_FOUND_ROWS t1.zt,t2.title,t2.create_time, ");
+		sb.append(" select SQL_CALC_FOUND_ROWS t1.id,t1.textid, t1.zt,t2.title,t2.create_time, ");
 		sb.append(" (CASE WHEN t2.type=2 THEN '系统通知' WHEN T2.TYPE = 3 THEN '缴费通知'  ELSE '一般消息' END) as 'type' ");
 		sb.append(" from fw_msg_log t1, fw_msg_text t2 ");
 		sb.append(condition.getSql());
+		sb.append(" and t2.expired_time > now() ");
+		sb.append(" and t1.textid = t2.id ");
+		sb.append(" and t1.zt != 0 ");
 		sb.append(" order by t2.create_time desc ");
 		sb.append(" limit ?, ? " );
 
@@ -145,8 +146,22 @@ public class MessageDao extends BaseJdbcDao {
 		params.add(pagesize);
 
 		// 获取符合条件的记录
-		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
-				params.toArray());
+		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),
+				params.toArray(),new RowMapper<Map<String, Object>>() {
+					public Map<String, Object> mapRow(ResultSet rs, int arg1)
+							throws SQLException {
+						java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+								"yyyy-MM-dd HH:mm:ss");
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("id", rs.getObject("id"));
+						map.put("create_time", sdf.format(rs.getTimestamp("create_time")));
+						map.put("title", rs.getObject("title"));
+						map.put("zt", rs.getObject("zt"));
+						map.put("type", rs.getObject("type"));
+						map.put("textid", rs.getObject("textid"));
+						return map;
+					}
+				});
 
 		// 获取符合条件的记录数
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()",
@@ -263,5 +278,19 @@ public class MessageDao extends BaseJdbcDao {
 			Integer type, String label, String exp_time, String year) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void setRead(String id, String logId) {
+		String sql = " update fw_msg_log set zt = 2 where id=? and textid=? ";
+		this.jdbcTemplate.update(sql, new Object[]{logId,id});		
+	}
+
+	public List<Map<String, Object>> getUserUnread(User user) {
+		String sql = "select id from fw_msg_log where reciid = ? and zt = 1 ";
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql, new Object[]{user.getId()});
+		if(ls.size()>0){
+			return ls;
+		}
+		return null;
 	}
 }

@@ -4,6 +4,7 @@ import gov.gdgs.zs.untils.Condition;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +144,10 @@ public class MessageService {
 		return obj;
 	}
 
-	public Map<String, Object> getMsg(String id) {
+	public Map<String, Object> getMsg(String id, String logId) {
+		if(!StringUtils.isEmpty(logId)){
+			messageDao.setRead(id,logId);
+		}
 		return messageDao.getMsg(id);
 	}
 
@@ -154,6 +158,39 @@ public class MessageService {
 			String id = iter.next();
 			messageDao.delMsg(id);			
 		}
+	}
+
+
+	/**
+	 * 获取用户短信息快照，包括未读信息状态和前5条短信,如有新的用户组群发消息，在log表添加相应的未读记录。
+	 * @param user
+	 * @return
+	 */
+	public Map<String, Object> getMessageShortcut(User user) {
+		HashMap<String,Object> rs = new HashMap<String,Object>();
+		// TODO 首先检查新的用户组群发消息
+		
+		//获取未读状态
+		rs.put("unread", this.getUserUnreadStatus(user));
+		//获取前5条用户短信
+		rs.put("inbox", this.getUserInboxShort(user));
+		return rs;
+	}
+
+
+	private List<Map<String,Object>> getUserInboxShort(User user) {
+		Map<String,Object> rs = this.getInBox(user, 1, 5, "");
+		List<Map<String,Object>> ls = (List<Map<String,Object>>)rs.get("data");
+		return ls;
+	}
+
+
+	private Boolean getUserUnreadStatus(User user) {
+		List<Map<String,Object>> ls = messageDao.getUserUnread(user);
+		if(ls != null){
+			return true;
+		}
+		return false;
 	}
 
 }

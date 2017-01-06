@@ -63,8 +63,9 @@ public class MessageController {
 	 */
 	@RequestMapping(value = "/messages/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> getMessages(
-			@PathVariable String id) {
-		Map<String, Object> obj = messageService.getMsg( id);
+			@PathVariable String id,
+			@RequestParam(value = "setRead", required = false)  String logId) {
+		Map<String, Object> obj = messageService.getMsg(id,logId);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 	/**
