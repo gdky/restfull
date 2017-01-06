@@ -1,6 +1,7 @@
 package gov.gdgs.zs.dao;
 
 import gov.gdgs.zs.configuration.Config;
+import gov.gdgs.zs.service.GzApiService;
 import gov.gdgs.zs.untils.Common;
 import gov.gdgs.zs.untils.Condition;
 
@@ -13,12 +14,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.hashids.Hashids;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class SPDao extends BaseDao{
 	/*-------------------------------中心端-------------------------------------*/
+	@Autowired
+	private GzApiService gzApiService ;
 	/**
 	 * 未审批查询
 	 * @param uid
@@ -380,7 +384,7 @@ public class SPDao extends BaseDao{
 	  */
 		public boolean sptj(Map<String,Object> spsq) throws Exception{
 		 StringBuffer sb = new StringBuffer();
-		 sb.append("	 select a.ID,b.LCBZ,b.SPBZLX,b.BHBZLX,b.LCID,c.LCLXID,b.ROLEID,e.SJID from zs_spxx a,zs_splcbz b,zs_splc c,zs_spzx e,fw_user_role f ");
+		 sb.append("	 select a.ID,b.LCBZ,b.SPBZLX,b.BHBZLX,b.LCID,c.LCLXID,b.ROLEID,e.SJID,e.ZSJG_ID from zs_spxx a,zs_splcbz b,zs_splc c,zs_spzx e,fw_user_role f ");
 		 sb.append("	 where a.LCBZID=b.ID and b.LCID=c.ID and a.SPID=e.ID and f.ROLE_ID=b.ROLEID and c.ZTBJ=2");
 		 sb.append("	 and a.spid = ? ");
 		 sb.append("	 and f.USER_ID=?");
@@ -425,7 +429,8 @@ public class SPDao extends BaseDao{
 					 }else{
 						 this.jdbcTemplate.update("update fw_user_role set ROLE_ID=3 where USER_ID =?",
 								 new Object[]{spsq.get("uid")});
-					 }
+					 };
+					 gzApiService.insertSWSJG(Integer.valueOf(mp.get("ZSJG_ID").toString()), 1);
 					 break;
 				 case 2:
 					 this.jdbcTemplate.update("update zs_jgbgspb set SPZT_DM='8',YJIAN=?,SPRQ=sysdate(),SPR_ID=? where id =?",
@@ -436,14 +441,17 @@ public class SPDao extends BaseDao{
 							this.jdbcTemplate.update("insert into zs_jglsbgxxb (MC,JZHI,XZHI,GXSJ,JGB_ID,ID) values(?,?,?,sysdate(),?,?)",
 									new Object[]{rec.get("MC"),rec.get("JZHI"),rec.get("XZHI"),rec.get("jgid"),new Common().newUUID()});
 						}
+					 gzApiService.insertSWSJG(Integer.valueOf(mp.get("ZSJG_ID").toString()), 2);
 					 break;
 				 case 4:
 					 this.jdbcTemplate.update("update zs_jg a,zs_jgzx b set a.JGZT_DM='9',a.yxbz='0',b.SPZT='2',b.ZXRQ=sysdate() where b.id =? and a.id=b.jg_id",
 							 new Object[]{mp.get("SJID")});
+					 gzApiService.insertSWSJG(Integer.valueOf(mp.get("ZSJG_ID").toString()), 0);
 					 break;
 				 case 5:
 					 this.jdbcTemplate.update("update zs_zyswsbasp a,zs_zysws b,zs_ryjbxx c,zs_zyrybayyb d set a.SPZT_DM='2',d.SHZT='2',a.YJIAN=?,c.RYZT_DM='1',c.YXBZ='1',b.RHSJ=sysdate(),b.ZYZT_DM='1',b.RYSPGCZT_DM='1',b.YXBZ='1',b.ZYZCRQ=sysdate() where a.id =? and a.ZYSWS_ID=b.id and b.ry_id=c.id and d.ZYSWS_ID=b.id",
 							 new Object[]{spsq.get("spyj"),mp.get("SJID")});
+					 gzApiService.insertSWS(getSWSID("zs_zyswsbasp",(String)mp.get("SJID")), 1);
 					 break;
 				 case 6:
 					 this.jdbcTemplate.update("update zs_zyswsbgsp set SPZT_DM='2',YJIAN=?,SPRQ=sysdate(),SPR=? where id =?",
@@ -457,6 +465,7 @@ public class SPDao extends BaseDao{
 								this.jdbcTemplate.update("insert into zs_zyswslsbgxxb (MC,JZHI,XZHI,GXSJ,ZYSWS_ID,ID) values(?,?,?,sysdate(),?,?)",
 										new Object[]{rec.get("MC"),rec.get("JZHI"),rec.get("XZHI"),rec.get("zyid"),new Common().newUUID()});
 							}
+					 gzApiService.insertSWS(getSWSID("zs_zyswsbgsp",(String)mp.get("SJID")), 2);
 					 break;
 				 case 7:
 					 Map<String, Object> fzyy = this.jdbcTemplate.queryForMap("select c.ID,b.ZYZGZSBH,b.ZGZSQFRQ,b.ZW_DM from zs_zyswszfzy a,zs_zysws b,zs_ryjbxx c where a.ZYSWS_ID=b.ID and c.ID=b.RY_ID and a.id=?",
@@ -471,18 +480,22 @@ public class SPDao extends BaseDao{
 							 listValue.toArray(),new String[] {"ID"});
 					 this.jdbcTemplate.update("update zs_zyswszfzy a,zs_zysws b,zs_ryjbxx c set b.RYSPGCZT_DM=1,b.ZYZT_DM=9,b.YXBZ=0,c.RYSF_DM=2,a.SPZT_DM=2,a.FZYSWS_ID=?,a.SGLZXYJRQ=sysdate() where a.ZYSWS_ID=b.ID and c.ID=b.RY_ID and a.id=?",
 							 new Object[]{fzyid,mp.get("SJID")});
+					 gzApiService.insertSWS(getSWSID("zs_zyswszfzy",(String)mp.get("SJID")), 0);
 					 break;
 				 case 8:
 					 this.jdbcTemplate.update("update zs_zyswszj a,zs_zysws b,zs_ryjbxx c set a.SPZT_DM='2',c.RYZT_DM='6',c.YXBZ='0',b.ZYZT_DM='6',b.RYSPGCZT_DM='1',b.YXBZ='0' where a.id =? and a.ZYSWS_ID=b.id and b.ry_id=c.id",
 							 new Object[]{mp.get("SJID")});
+					 gzApiService.insertSWS(getSWSID("zs_zyswszj",(String)mp.get("SJID")), 0);
 					 break;
 				 case 9:
 					 this.jdbcTemplate.update("update zs_zyswssndz a,zs_zysws b  set a.SGLZXYJ=?,a.SGLZXYJRQ=sysdate(),a.SPZT_DM=2,b.RYSPGCZT_DM='1',b.JG_ID=a.XJG_ID where a.id =? and a.RY_ID=b.id",
 							 new Object[]{mp.get("SJID")});
+					 gzApiService.insertSWS(getSWSID("zs_zyswssndz",(String)mp.get("SJID")), 2);
 					 break;
 				 case 10:
 					 this.jdbcTemplate.update("update zs_zyswszx a,zs_zysws b,zs_ryjbxx c set a.SPZT_DM='2',c.RYZT_DM='5',c.YXBZ='0',b.ZYZT_DM='5',b.RYSPGCZT_DM='1',b.YXBZ='0' where a.id =? and a.ZYSWS_ID=b.id and b.ry_id=c.id",
 							 new Object[]{mp.get("SJID")});
+					 gzApiService.insertSWS(getSWSID("zs_zyswszx",(String)mp.get("SJID")), 0);
 					 break;
 				 case 13:
 					 Map<String, Object> zzyy = this.jdbcTemplate.queryForMap("select c.ID,b.ZYZGZSBH,b.ZGZSQFRQ,b.ZW_DM,a.XDW from zs_fzyzzy a,zs_fzysws b,zs_ryjbxx c where a.FZY_ID=b.ID and c.ID=b.RY_ID and a.id=?",
@@ -527,10 +540,12 @@ public class SPDao extends BaseDao{
 				 case 38:
 					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1',a.jg_id='-2' where a.id =?",
 							 new Object[]{mp.get("SJID")});
+					 gzApiService.insertSWS((Integer)mp.get("SJID"), 2);
 					 break;
 				 case 39:
 					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1'  where a.id =?",
 							 new Object[]{mp.get("SJID")});
+					 gzApiService.insertSWS((Integer)mp.get("SJID"), 2);
 					 break;
 				 case 46:
 					 Map<String, Object> zzyy2 = this.jdbcTemplate.queryForMap("select c.ID,b.ZYZGZSBH,b.ZGZSQFRQ,b.ZW_DM,a.XDW from zs_fzyzzy a,zs_fzysws b,zs_ryjbxx c where a.FZY_ID=b.ID and c.ID=b.RY_ID and a.id=?",
@@ -1250,7 +1265,7 @@ public class SPDao extends BaseDao{
 				for(Map<String, Object> rec:forupdate){//插入变更项目信息
 					this.jdbcTemplate.update(sql2,new Object[]{rec.get("mc"),rec.get("jzhi"),rec.get("xzhi"),ptxm.get("jgid")});
 				}
-					
+				gzApiService.insertSWSJG(Integer.valueOf(ptxm.get("jgid").toString()), 2);	
 			}
 		/**
 		 * 执业税务师撤销备案申请
@@ -1273,6 +1288,7 @@ public class SPDao extends BaseDao{
 			this.jdbcTemplate.update("insert into zs_zyswslsbgxxb (ID,MC,JZHI,XZHI,GXSJ,ZYSWS_ID) values(replace(uuid(),'-',''),'所属单位',"
 					+ "(select dwmc from zs_jg where id=?),(select dwmc from zs_jg where id=?),now(),?)",
 					new Object []{sqxm.get("jgid"),jgid,zyid});
+			gzApiService.insertSWS(Integer.valueOf(sqxm.get("zyswsid").toString()), 2);
 		}
 		/**
 		 * 执业调入主所申请
@@ -1286,6 +1302,7 @@ public class SPDao extends BaseDao{
 			this.jdbcTemplate.update("insert into zs_zyswslsbgxxb (ID,MC,JZHI,XZHI,GXSJ,ZYSWS_ID) values(replace(uuid(),'-',''),'所属单位',"
 					+ "(select dwmc from zs_jg where id=?),(select b.dwmc from zs_jg a,zs_jg b where a.id=? and b.id=a.PARENTJGID),now(),?)",
 					new Object []{sqxm.get("jgid"),sqxm.get("jgid"),zyid});
+			gzApiService.insertSWS(Integer.valueOf(sqxm.get("zyswsid").toString()), 2);
 		}
 		/**
 		 * 从业转入分所申请
@@ -1508,6 +1525,10 @@ public class SPDao extends BaseDao{
 		meta.put("pageTotal",total);
 		ob.put("page", meta);
 		return ob;
+	}
+	
+	public Integer getSWSID(String dbb,String sid){
+		return this.jdbcTemplate.queryForObject("select ZYSWS_ID from "+dbb+" where id= '"+sid+"'", int.class);
 	}
 }
 
