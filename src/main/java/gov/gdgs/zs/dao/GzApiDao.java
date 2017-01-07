@@ -64,6 +64,55 @@ public class GzApiDao extends BaseJdbcDao {
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{start,end});
 		return ls;
 	}
+	
+	public void addJG(int jgid){//机构
+		StringBuffer sb = new StringBuffer();
+		sb.append("insert into gzapi_data_swsjg (SWSSWSXLH,SWDJZHM,DWMC,SZCS,FRDB,DZ,SWJG_DM,ZJPZWH,ZJPZSJ,YZBM,");
+		sb.append("DH,CZ,JGXZ,ZSBH,ZCZJ,JYFW,DZYJ,KHH,KHHZH,ZXSJ,ZXYY,PARENTJGID,SJZT,ADDTIME) select a.id,a.SWDJHM,a.DWMC,");
+		sb.append(" (select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ) as cs,");
+		sb.append("a.FDDBR,a.DZHI,");
+		sb.append(" concat((select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ),'国税局') as swjg_dm,");
+		sb.append("a.ZJPZWH,a.ZJPZSJ,a.YZBM,a.DHUA,a.CZHEN,a.JGXZ_DM,a.JGZCH,a.ZCZJ,a.JYFW,a.DZYJ,a.KHH,a.KHHZH,null as ZXSJ,null as ZXYY,a.PARENTJGID,'1' as SJZT,sysdate()  from zs_jg a where a.id=?");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{jgid});
+	}
+	public void changedJG(int jgid){
+		StringBuffer sb = new StringBuffer();
+		sb.append("insert into gzapi_data_swsjg (SWSSWSXLH,SWDJZHM,DWMC,SZCS,FRDB,DZ,SWJG_DM,ZJPZWH,ZJPZSJ,YZBM,");
+		sb.append("DH,CZ,JGXZ,ZSBH,ZCZJ,JYFW,DZYJ,KHH,KHHZH,ZXSJ,ZXYY,PARENTJGID,SJZT,ADDTIME) select a.id,a.SWDJHM,a.DWMC,");
+		sb.append(" (select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ) as cs,");
+		sb.append("a.FDDBR,a.DZHI,");
+		sb.append(" concat((select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ),'国税局') as swjg_dm,");
+		sb.append("a.ZJPZWH,a.ZJPZSJ,a.YZBM,a.DHUA,a.CZHEN,a.JGXZ_DM,a.JGZCH,a.ZCZJ,a.JYFW,a.DZYJ,a.KHH,a.KHHZH,null as ZXSJ,null as ZXYY,a.PARENTJGID,'2' as SJZT,sysdate()  from zs_jg a where a.id=?");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{jgid});
+	}
+	public void delJG(int jgid){
+		StringBuffer sb = new StringBuffer();
+		sb.append("insert into gzapi_data_swsjg (SWSSWSXLH,SWDJZHM,DWMC,SZCS,FRDB,DZ,SWJG_DM,ZJPZWH,ZJPZSJ,YZBM,");
+		sb.append("DH,CZ,JGXZ,ZSBH,ZCZJ,JYFW,DZYJ,KHH,KHHZH,ZXSJ,ZXYY,PARENTJGID,SJZT,ADDTIME) select a.id,a.SWDJHM,a.DWMC,");
+		sb.append(" (select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ) as cs,");
+		sb.append("a.FDDBR,a.DZHI,");
+		sb.append(" concat((select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ),'国税局') as swjg_dm,");
+		sb.append("a.ZJPZWH,a.ZJPZSJ,a.YZBM,a.DHUA,a.CZHEN,a.JGXZ_DM,a.JGZCH,a.ZCZJ,a.JYFW,a.DZYJ,a.KHH,a.KHHZH,b.ZXRQ,");
+		sb.append("(select l.mc from dm_jgzxyy l where l.id=b.ZXYY_ID ) as ZXYY,a.PARENTJGID,'0' as SJZT,sysdate()  from zs_jg a,zs_jgzx b where a.id=? and a.id=b.jg_id");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{jgid});
+	}
 
+	public void insertSWS(int zyid,int way){//税务师
+		StringBuffer sb = new StringBuffer();
+		sb.append("insert into gzapi_data_sws (ID,XM,XB,CSNY,SFZH,SWSSWSXLH,CS,MZ,XL,ZZMM,");
+		sb.append("ZYZGZH,ZYZGZQFRQ,ZYZCHM,ZYZCRQ,YZBM,DH,YDDH,ZW,SFSC,SFCZR,SFFQR,SJZT,ADDTIME) select a.id,b.XMING,");
+		sb.append(" (select z.mc from dm_xb z where z.id=b.xb_dm ) as xb,b.SRI,b.SFZH,a.JG_ID,");
+		sb.append("(select j.mc from dm_cs j where j.id=b.CS_DM ) as cs,");
+		sb.append("(select k.mc from dm_mz k where k.id=b.MZ_DM ) as mz,");
+		sb.append("(select l.mc from dm_xl l where l.id=b.xl_DM ) as xl,");
+		sb.append("(select h.mc from dm_zzmm h where h.id=b.zzmm_DM ) as zzmm,");
+		sb.append("a.ZYZGZSBH,a.ZGZSQFRQ,a.ZYZSBH,a.ZYZCRQ,b.YZBM,b.DHHM,b.YDDH,");
+		sb.append("(select g.mc from dm_zw g where g.id=a.zw_DM ) as zw,");
+		sb.append("case a.SZ_DM when 1 then \"是\"  when 2 then \"否\" else null end as sz,");
+		sb.append("case a.CZR_DM when 1 then \"是\"  when 2 then \"否\" else null end as czr,");
+		sb.append("case a.FQR_DM when 1 then \"是\"  when 2 then \"否\" else null end as fqr,");
+		sb.append("'"+way+"' as SJZT,sysdate()  from zs_zysws a,zs_ryjbxx b where a.id=? and a.ry_id=b.id");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{zyid});
+	}
 	
 }
