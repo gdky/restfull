@@ -173,7 +173,7 @@ public class MessageService {
 		//获取未读状态
 		rs.put("unread", this.getUserUnreadStatus(user));
 		//获取前5条用户短信
-		rs.put("inbox", this.getUserInboxShort(user));
+		//rs.put("inbox", this.getUserInboxShort(user));
 		return rs;
 	}
 
