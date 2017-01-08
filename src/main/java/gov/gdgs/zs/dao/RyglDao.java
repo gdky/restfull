@@ -616,6 +616,9 @@ public class RyglDao extends BaseDao{
 				String id = hashids.encode(rs.getLong("id"));
 				link.put("herf_xxzl", url+"/ryxx/zyryxx/"+id);
 				link.put("herf_bgjl", url+"/ryxx/zyrybgjl/"+id);
+				link.put("herf_zsjl", url+"/ryxx/zyryzsjl/"+id);
+				link.put("herf_zjjl", url+"/ryxx/zyryzjjl/"+id);
+				link.put("herf_zzjl", url+"/ryxx/zyryzzjl/"+id);
 				link.put("herf_njjl", url+"/ryxx/zyrynjjl/"+id);
 				map.put("key", rs.getObject("key"));
 				map.put("xh", rs.getObject("key"));
