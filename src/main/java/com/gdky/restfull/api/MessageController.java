@@ -49,13 +49,23 @@ public class MessageController {
 	}
 	
 	/**
-	 * 发送新信息
+	 * 向群组发送信息
 	 */
-	@RequestMapping(value = "/messages", method = RequestMethod.POST)
-	public ResponseEntity<?> newMessages(
+	@RequestMapping(value = "/messages/sendtogroup", method = RequestMethod.POST)
+	public ResponseEntity<?> newGroupMessages(
 			@RequestBody Map<String,Object> message) {
 		User user = accountService.getUserFromHeaderToken(request);
-		Map<String, Object> obj = messageService.newMsg(user, message);
+		Map<String, Object> obj = messageService.newGroupMsg(user, message);
+		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	/**
+	 * 向特定事务所个体发送信息
+	 */
+	@RequestMapping(value = "/messages/sendtosws", method = RequestMethod.POST)
+	public ResponseEntity<?> newSWSMessages(
+			@RequestBody Map<String,Object> message) {
+		User user = accountService.getUserFromHeaderToken(request);
+		Map<String, Object> obj = messageService.newSWSMsg(user, message);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 	/**
