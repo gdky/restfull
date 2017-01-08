@@ -229,4 +229,20 @@ public class SPservice {
 		}
 		return spDao.splsjlcx(pn, ps, map);
 	}
+	
+	public Map<String, Object> clientsplsjl(int pn, int ps, String where,int jgid) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return spDao.clientsplsjlcx(pn, ps, map,jgid);
+	}
 }
