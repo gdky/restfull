@@ -176,4 +176,20 @@ public class SPController {
 		return new ResponseEntity<>(spPservice.splsjlcx(pn, ps, where),HttpStatus.OK);
 
 	}
+	/**
+	 * 历史审批记录查询
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/spapi/client/lsspjlcx", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> clientSplsjl(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where,HttpServletRequest request)  {
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(spPservice.clientsplsjl(pn, ps, where,user.getJgId()),HttpStatus.OK);
+		
+	}
 }

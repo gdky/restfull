@@ -443,6 +443,8 @@ public class SPDao extends BaseDao{
 						}
 					 gzApiService.insertSWSJG(Integer.valueOf(mp.get("ZSJG_ID").toString()), 2);
 					 break;
+				 case 3:// TODO 合并同意处理
+					 break;
 				 case 4:
 					 this.jdbcTemplate.update("update zs_jg a,zs_jgzx b set a.JGZT_DM='9',a.yxbz='0',b.SPZT='2',b.ZXRQ=sysdate() where b.id =? and a.id=b.jg_id",
 							 new Object[]{mp.get("SJID")});
@@ -538,14 +540,14 @@ public class SPDao extends BaseDao{
 							 new Object[]{spsq.get("uid"),mp.get("SJID")});
 					 break;
 				 case 38:
-					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1',a.jg_id='-2' where a.id =?",
+					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='1',a.jg_id='-2' where a.id =?",
 							 new Object[]{mp.get("SJID")});
-					 gzApiService.insertSWS((Integer)mp.get("SJID"), 2);
+					 gzApiService.insertSWS(Integer.valueOf(mp.get("SJID").toString()), 2);
 					 break;
 				 case 39:
-					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1'  where a.id =?",
+					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='1'  where a.id =?",
 							 new Object[]{mp.get("SJID")});
-					 gzApiService.insertSWS((Integer)mp.get("SJID"), 2);
+					 gzApiService.insertSWS(Integer.valueOf(mp.get("SJID").toString()), 2);
 					 break;
 				 case 46:
 					 Map<String, Object> zzyy2 = this.jdbcTemplate.queryForMap("select c.ID,b.ZYZGZSBH,b.ZGZSQFRQ,b.ZW_DM,a.XDW from zs_fzyzzy a,zs_fzysws b,zs_ryjbxx c where a.FZY_ID=b.ID and c.ID=b.RY_ID and a.id=?",
@@ -1011,7 +1013,7 @@ public class SPDao extends BaseDao{
 	public void zydrsq(Map<String, Object> sqxm) throws Exception{
 		this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='12',a.jg_id=? where a.id=?",new Object []{sqxm.get("jgid"),sqxm.get("ryid")});
 		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
-		spsq.put("sid", sqxm.get("zyid"));
+		spsq.put("sid", sqxm.get("ryid"));
 		spsq.put("lclx", "402882891d46ef7b011d470758a20007");
 		spsq.put("jgid", sqxm.get("jgid"));
 		swsSPqq(spsq);
@@ -1022,11 +1024,10 @@ public class SPDao extends BaseDao{
 	 * @throws Exception
 	 */
 	public void zyzcsq(Map<String, Object> sqxm) throws Exception{
-		String uuid = new Common().newUUID();
 		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
 		this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='11' where a.id=?",hashids.decode((String)sqxm.get("zyswsid"))[0]);
 		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
-		spsq.put("sid", uuid);
+		spsq.put("sid", sqxm.get("zyswsid"));
 		if(this.jdbcTemplate.queryForList("select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",new Object[]{sqxm.get("jgid")}).size()==0){
 			spsq.put("lclx", "402882891d46ef7b011d470555220004");
 		}else{
@@ -1514,6 +1515,67 @@ public class SPDao extends BaseDao{
 		sb.append("		FROM zs_spzx a,zs_splcbz b,zs_splc c,(select @rownum:=?) zs_ry ");
 		sb.append(condition.getSql());
 		sb.append("		and a.LCBZID=b.ID AND b.LCID=c.ID AND c.ZTBJ=2");
+		sb.append("		order by a.tjsj desc LIMIT ?, ?");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		ob.put("page", meta);
+		return ob;
+	}
+	/**
+	 *事务所端审批历史记录查询 
+	 * @param pn
+	 * @param ps
+	 * @param qury
+	 * @return
+	 */
+	public Map<String,Object> clientsplsjlcx(int pn,int ps,Map<String, Object> qury,int jgid) {
+		Condition condition = new Condition();
+		condition.add("c.lclxid", Condition.EQUAL, qury.get("splx"));
+		if(qury.containsKey("sqsj")){
+			String sbsj = new Common().getTime2MysqlDateTime((String)qury.get("sqsj"));
+			condition.add("a.tjsj", Condition.GREATER_EQUAL, sbsj);
+		}
+		if(qury.containsKey("sqsj2")){
+			String sbsj = new Common().getTime2MysqlDateTime((String)qury.get("sqsj2"));
+			condition.add("a.tjsj", Condition.LESS_EQUAL, sbsj);
+		}
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add(jgid);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		StringBuffer sb = new StringBuffer();
+		sb.append("		SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',c.LCMC,");
+		sb.append("		IF(c.LCLXID in(1,2,3,4,11),(");
+		sb.append("				SELECT dwmc FROM zs_jg WHERE id=a.zsjg_id),		(");
+		sb.append("				SELECT XMING FROM zs_ryjbxx k,zs_zysws l");
+		sb.append("				WHERE k.id=l.RY_ID and l.ID=");
+		sb.append("				if(c.LCLXID=5,(select d.ZYSWS_ID from zs_zyswsbasp d where d.ID = a.SJID),");
+		sb.append("					if(c.LCLXID=6,(select e.ZYSWS_ID from zs_zyswsbgsp e where e.ID = a.SJID),");
+		sb.append("						if(c.LCLXID=9,(select f.RY_ID from zs_zyswssndz f where f.ID = a.SJID),");
+		sb.append("							if(c.LCLXID=7,(select g.ZYSWS_ID from zs_zyswszfzy g where g.ID = a.SJID),");
+		sb.append("								if(c.LCLXID=8,(select h.ZYSWS_ID from zs_zyswszj h where h.ID = a.SJID),");
+		sb.append("									if(c.LCLXID=10,(select i.ZYSWS_ID from zs_zyswszx i where i.ID = a.SJID),");
+		sb.append("										if(c.LCLXID=12,(select j.SWS_ID from zs_zcswsnj j where j.ID = a.SJID),null)");
+		sb.append("									)");
+		sb.append("								)");
+		sb.append("							)");
+		sb.append("						)");
+		sb.append("					)");
+		sb.append("				)))");
+		sb.append("		 AS sqdw,");
+		sb.append("		(select DESCRIPTION from fw_role where id=b.ROLEID) as fzr,");
+		sb.append("		case a.ZTBJ when 'Y' then '审批中' when 'N' then '已审批' else null end as spzt,");
+		sb.append("		date_format(a.TJSJ,'%Y-%m-%d') as tjsj");
+		sb.append("		FROM zs_spzx a,zs_splcbz b,zs_splc c,(select @rownum:=?) zs_ry ");
+		sb.append(condition.getSql());
+		sb.append("		and a.LCBZID=b.ID AND b.LCID=c.ID AND c.ZTBJ=2 and a.zsjg_id=?");
 		sb.append("		order by a.tjsj desc LIMIT ?, ?");
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
 		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
