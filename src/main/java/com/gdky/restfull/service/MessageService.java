@@ -185,12 +185,12 @@ public class MessageService {
 	}
 
 
-	private Boolean getUserUnreadStatus(User user) {
+	private Number getUserUnreadStatus(User user) {
 		List<Map<String,Object>> ls = messageDao.getUserUnread(user);
 		if(ls != null){
-			return true;
+			return ls.size();
 		}
-		return false;
+		return 0;
 	}
 
 }
