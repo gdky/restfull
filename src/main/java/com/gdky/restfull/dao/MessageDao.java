@@ -13,6 +13,7 @@ import java.util.Map;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import com.gdky.restfull.entity.Role;
 import com.gdky.restfull.entity.User;
 import com.gdky.restfull.utils.Common;
 
@@ -259,6 +260,72 @@ public class MessageDao extends BaseJdbcDao {
 		this.jdbcTemplate.update(sb.toString(), new Object[]{sender.getId(),uuid,1,year,year,year,year});
 		
 	}
+	/*
+	 * 发送至未交财务报表会员
+	 */
+	public void sendToWSBCWBB(User sender, String title, String content,
+			Integer type, String label, String exp_time, String year) {
+		String uuid = Common.newUUID();
+		String cre_time = Common.getCurrentTime2MysqlDateTime();
+		
+		StringBuffer sb = new StringBuffer();
+		// 先添加消息本体
+		sb.append(" insert into fw_msg_text ");
+		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time) ");
+		sb.append(" values(?,?,?,?,?,?,?,?) ");
+		this.jdbcTemplate.update(sb.toString(), new Object[] { uuid,
+				title, content, sender.getId(), label, type, cre_time,
+				exp_time });
+		//再添加接收人记录
+		sb.setLength(0);
+		sb.append(" insert into fw_msg_log (reciid,sendid,textid,zt) ");
+		sb.append(" select u.id,?,?,? ");
+		sb.append(" FROM zs_jg d,fw_users u ");
+		sb.append(" where ( d.ID not in( select a.JG_ID from zs_cwbb_lrgd a where a.nd = ? AND a.ZTBJ= 1 ) ");
+		sb.append(" or d.ID not in (select a.JG_ID from zs_cwbb_zcfzgd a where a.nd = ? AND a.ZTBJ= 1 ) ");
+		sb.append(" or d.ID not in (select a.JG_ID from zs_cwbb_lrfp a where a.nd = ? AND a.ZTBJ = 1) ");
+		sb.append(" or d.ID not in (select a.JG_ID from zs_cwbb_xjll a where a.nd = ? AND a.ZTBJ = 1) ");
+		sb.append(" or d.ID not in (select a.JG_ID from zs_cwbb_zcmx a where a.nd = ? AND a.ZTBJ = 1) ");
+		sb.append(" ) ");
+		sb.append(" and d.id = u.jg_id ");
+		sb.append(" and d.YXBZ =1 ");
+		sb.append(" order by d.id ");
+		this.jdbcTemplate.update(sb.toString(), new Object[]{sender.getId(),uuid,1,year,year,year,year,year});
+	}
+
+	/*
+	 * 发送至未上报报表事务所
+	 */
+	public void sendToWSBHYBB(User sender, String title, String content,
+			Integer type, String label, String exp_time, String year) {
+		String uuid = Common.newUUID();
+		String cre_time = Common.getCurrentTime2MysqlDateTime();
+		
+		StringBuffer sb = new StringBuffer();
+		// 先添加消息本体
+		sb.append(" insert into fw_msg_text ");
+		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time) ");
+		sb.append(" values(?,?,?,?,?,?,?,?) ");
+		this.jdbcTemplate.update(sb.toString(), new Object[] { uuid,
+				title, content, sender.getId(), label, type, cre_time,
+				exp_time });
+		//再添加接收人记录
+		sb.setLength(0);
+		sb.append(" insert into fw_msg_log (reciid,sendid,textid,zt) ");
+		sb.append(" select u.id,?,?,? ");
+		sb.append(" FROM zs_jg d, fw_users u ");
+		sb.append(" where ( d.ID not in( SELECT b.jg_id from zs_sdsb_swsjbqk b where  b.nd = ? and b.ZTBJ=2) ");
+		sb.append(" or d.ID not in( SELECT b.jg_id from zs_sdsb_hyryqktj b where  b.nd = ? and b.ZTBJ=2) ");
+		sb.append(" or d.ID not in( SELECT b.jg_id from zs_sdsb_jysrqk b where  b.nd = ? and b.ZTBJ=2) ");
+		sb.append(" or d.ID not in( SELECT b.jg_id from zs_sdsb_jygmtjb b where  b.nd = ? and b.ZTBJ=2) ");
+		sb.append(" or d.ID not in( SELECT b.jg_id from zs_sdsb_jzywqktjb b where  b.nd = ? and b.ZTBJ=2) ");
+		sb.append(" ) ");
+		sb.append(" and d.ID = u.JG_ID ");
+		sb.append(" and d.YXBZ =1 ");
+		sb.append(" order by d.id ");
+		this.jdbcTemplate.update(sb.toString(), new Object[]{sender.getId(),uuid,1,year,year,year,year,year});
+		
+	}
 
 	public void delMsg(String id) {
 		String sql = "delete from fw_msg_log where textid = ?";
@@ -268,17 +335,7 @@ public class MessageDao extends BaseJdbcDao {
 		
 	}
 
-	public void sendToWSBCWBB(User sender, String title, String content,
-			Integer type, String label, String exp_time, String year) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void sendToWSBHYBB(User sender, String title, String content,
-			Integer type, String label, String exp_time, String year) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	public void setRead(String id, String logId) {
 		String sql = " update fw_msg_log set zt = 2 where id=? and textid=? ";
@@ -292,5 +349,18 @@ public class MessageDao extends BaseJdbcDao {
 			return ls;
 		}
 		return null;
+	}
+
+	public void pullUnreadMessageFromRole(User user, Role role) {
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into fw_msg_log (textid,sendid,reciid,zt) ");
+		sb.append(" select t.ID,t.SENDERID,?,1 ");
+		sb.append(" from fw_msg_text t ");
+		sb.append(" where t.ROLE = ? ");
+		sb.append(" and t.EXPIRED_TIME > now() ");
+		sb.append(" and t.ID not in (select textid from fw_msg_log l where l.reciid= ?) ");
+		this.jdbcTemplate.update(sb.toString(), new Object[]{user.getId(),role.getId(),user.getId()});
+		
 	}
 }

@@ -61,7 +61,7 @@ public class AccountController {
 		resp.put("lo", userService.getRolesByUser(user.getUsername()).get(0).getId());
 		resp.put("names", user.getNames());
 		resp.put("menu", menu);
-		resp.put("newMsg", ms);
+		resp.put("unread", ms.get("unread"));
 		return  ResponseEntity.ok(resp);
 	}
 }
