@@ -12,7 +12,7 @@ public class NDJZQKTJDao extends BaseDao {
 	public Map<String, Object> ndjzqktj(int page, int pageSize,
 			HashMap<String, Object> map){
 	StringBuffer sb=new StringBuffer();
-	sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1,t.*");
+	sb.append(" select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as xh,t.*");
 	sb.append(" from( select '汇算清缴鉴证业务' xmlx, ");
 	sb.append("        hs_qn, ");
 	sb.append("        je_qn, ");
@@ -344,7 +344,7 @@ public class NDJZQKTJDao extends BaseDao {
 	sb.append("                ifnull(sum(QT_JE), 0) - ifnull(sum(QT_JE0),0) je_zj, ");
 	sb.append("                ifnull(sum(QT_HS), 0) - ifnull(sum(QT_HS0), 0) hs_zj ");
 	sb.append("           from zs_sdsb_jzywqktjb ");
-	sb.append("          where nd = 2014) a) as t ");
+	sb.append("          where nd = 2014) a) as t,(SELECT @rownum:=0) as tmp ");
 	
 	List<Map<String, Object>> ls=jdbcTemplate.queryForList(sb.toString());
 	int total=this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
