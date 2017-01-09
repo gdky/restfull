@@ -512,6 +512,7 @@ public class SPDao extends BaseDao{
 							 listValuezzyy.toArray(),new String[] {"ID"});
 					 this.jdbcTemplate.update("update zs_fzyzzy a,zs_fzysws b,zs_ryjbxx c set b.RYSPGCZT_DM=1,b.FZYZT_DM=7,b.YXBZ=0,c.RYSF_DM=1,a.RYSPZT=1,a.ZYSWS_ID=?,a.XDWYJ=?,a.LRR=?,a.BDRQ=sysdate() where a.FZY_ID=b.ID and c.ID=b.RY_ID and a.id=?",
 							 new Object[]{zyid,spsq.get("spyj"),spsq.get("uname"),mp.get("SJID")});
+					 gzApiService.insertSWS(getSWSID("zs_fzyzzy",(String)mp.get("SJID")), 1);
 					 break;
 				 case 14:
 					 this.jdbcTemplate.update("update zs_fzyswszj a,zs_fzysws b,zs_ryjbxx c set a.RYSPZT_DM='1',c.RYZT_DM='6',c.YXBZ='0',b.FZYZT_DM='6',b.RYSPGCZT_DM='1',b.YXBZ='0' where a.id =? and a.FZY_ID=b.id and b.ry_id=c.id",
@@ -562,6 +563,7 @@ public class SPDao extends BaseDao{
 							 listValuezzyy2.toArray(),new String[] {"ID"});
 					 this.jdbcTemplate.update("update zs_fzyzzy a,zs_fzysws b,zs_ryjbxx c set b.RYSPGCZT_DM=1,b.FZYZT_DM=7,b.YXBZ=0,c.RYSF_DM=1,a.RYSPZT=2,a.ZYSWS_ID=?,a.XDWYJ=?,a.LRR=?,a.BDRQ=sysdate() where a.FZY_ID=b.ID and c.ID=b.RY_ID and a.id=?",
 							 new Object[]{zyid2,spsq.get("spyj"),spsq.get("uname"),mp.get("SJID")});
+					 gzApiService.insertSWS(getSWSID("zs_fzyzzy",(String)mp.get("SJID")), 1);
 					 break;
 				 };
 			 }else{
