@@ -322,7 +322,7 @@ public class YwglService {
 			
 		} else if (lx != null && lx == 6) {
 			this.ywglDao.updateYwbbZT(id, 5, 0);
-			gzapiService.insertYWBB(id, 2);
+			gzapiService.insertYWBB(id, 0);
 			
 		} else if (lx != null && lx == 7) {
 			this.ywglDao.updateYwbbZT(id, 1, 3);

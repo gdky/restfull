@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gdky.restfull.exception.YwbbException;
 import com.gdky.restfull.utils.Common;
 
 @Service
@@ -112,10 +113,17 @@ public class GzApiService {
 	 */
 	public void insertYWBB(Number ywId,Integer type){
 		Map<String,Object> yw = gzApiDao.getYwbbSource(ywId);
-		yw.put("ztbj", type);
-		yw.put("addtime",Common.getCurrentTime2MysqlDateTime());
-		gzApiDao.insertZSXY(yw);
-		gzApiDao.insertYWBA(yw);
+		if(yw != null){
+			yw.put("ZTBJ", type);
+			yw.put("ADDTIME",Common.getCurrentTime2MysqlDateTime());
+			if((Integer)yw.get("JGCITY") == 1){
+				gzApiDao.insertZSXY(yw);
+				gzApiDao.insertYWBA(yw);
+			}
+		}else {
+			throw new YwbbException("业务信息保存失败");
+		}
+		
 	}
 
 }

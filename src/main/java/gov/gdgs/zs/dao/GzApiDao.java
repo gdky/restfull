@@ -135,10 +135,21 @@ public class GzApiDao extends BaseJdbcDao {
 
 	public Map<String, Object> getYwbbSource(Number ywId) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select y.*,lx.mc as YWLX from zs_ywbb y,dm_ywlx lx  ");
-		sb.append(" where y.id = ? ");
-		sb.append(" and y.ywlx_dm = lx.id ");
-		this.jdbcTemplate.query(sb.toString(), new Object[] { ywId },
+		sb.append(" SELECT y.*,l.mc AS YWLX,hy.mc AS HYLX,cs.mc AS CS,qx.mc AS QX,xy.MC as XYZT, j.cs_dm as JGCITY ");
+		sb.append(" FROM (zs_ywbb y,zs_jg j) ");
+		sb.append(" left join dm_hy AS hy  ");
+		sb.append(" on y.hy_id = hy.id ");
+		sb.append(" left join dm_cs AS cs ");
+		sb.append(" on y.cs_dm = cs.id ");
+		sb.append(" left join dm_cs AS qx ");
+		sb.append(" on y.qx_dm = qx.id ");
+		sb.append(" left join dm_ywlx as l ");
+		sb.append(" on y.ywlx_dm = l.id ");
+		sb.append(" left join dm_xyzt as xy ");
+		sb.append(" on y.xyzt_dm = xy.ID ");
+		sb.append(" where y.ID = ? ");
+		sb.append(" and y.jg_id = j.id ");
+		List<Map<String,Object>> ls = this.jdbcTemplate.query(sb.toString(), new Object[] { ywId },
 				new RowMapper<Map<String, Object>>() {
 					public Map<String, Object> mapRow(ResultSet rs, int arg1)
 							throws SQLException {
@@ -158,7 +169,7 @@ public class GzApiDao extends BaseJdbcDao {
 						map.put("SWSMC", rs.getObject("SWSMC"));
 						map.put("SWSSWDJZH", rs.getObject("SWSSWDJZH"));
 						map.put("WTDW", rs.getObject("WTDW"));
-						map.put("WTDWNSRSBH", rs.getObject("WTDWNSRSBH"));
+						map.put("WTDWSWDJZH", rs.getObject("WTDWNSRSBH"));
 						map.put("XYH", rs.getObject("XYH"));
 						map.put("YJFH", rs.getObject("YJFH"));
 						map.put("RJFH", rs.getObject("RJFH"));
@@ -174,27 +185,86 @@ public class GzApiDao extends BaseJdbcDao {
 						map.put("VALUE2", rs.getObject("TJVALUE2"));
 						map.put("SSTARTTIME", rs.getObject("SSTARTTIME"));
 						map.put("SENDTIME", rs.getObject("SENDTIME"));
-						map.put("NSRXZ", rs.getObject("NSRXZ"));
-						map.put("WTDW", rs.getObject("WTDW"));
-						map.put("WTDW", rs.getObject("WTDW"));
-						map.put("WTDW", rs.getObject("WTDW"));
-						map.put("create_time",
-								sdf.format(rs.getTimestamp("create_time")));
-
+						map.put("HYLX", rs.getObject("HYLX"));
+						if (rs.getInt("NSRXZ") == 0) {
+							map.put("NSRXZ", "一般纳税人");
+						} else if (rs.getInt("nsrxz") == 1) {
+							map.put("NSRXZ", "小规模纳税人");
+						} else {
+							map.put("NSRXZ", "非增值税纳税人");
+						}
+						if (rs.getInt("ZSFS_DM") == 0) {
+							map.put("ZSFS", "查账征收");
+						} else {
+							map.put("ZSFS", "核定征收");
+						}
+						if (rs.getString("ISWS") == null
+								|| rs.getString("ISWS").equals("N")) {
+							map.put("ISWS", "广东省");
+						} else {
+							map.put("ISWS", "外省");
+						}
+						if (rs.getInt("SB_DM") == 1) {
+							map.put("SB", "国税");
+						} else {
+							map.put("SB", "地税");
+						}
+						if (rs.getInt("WTDWXZ_DM") == 0) {
+							map.put("WTDWXZ", "居民企业");
+						} else {
+							map.put("WTDWXZ", "非居民企业税");
+						}
+						map.put("CITY", rs.getObject("CITY"));
+						map.put("QX", rs.getObject("QX"));
+						map.put("YWLXNAME", rs.getObject("YWLX"));
+						map.put("XYKSSJ", rs.getObject("SSTARTTIME"));
+						map.put("XYJSSJ", rs.getObject("SENDTIME"));
+						map.put("WTFMC", rs.getObject("WTDW"));
+						map.put("DJHM_GS", rs.getObject("WTDWNSRSBH"));
+						map.put("DJHM_DS", rs.getObject("WTDWNSRSBHDF"));
+						map.put("JFLXR", rs.getObject("WTDWLXR"));
+						map.put("JFTELEPHONE", rs.getObject("WTDWLXDH"));
+						map.put("JFADDRESS", rs.getObject("WTDXLXDZ"));
+						map.put("EDITDATE", rs.getObject("ZBRQ"));
+						map.put("FPHM", rs.getObject("FPHM"));
+						map.put("XYJE", rs.getObject("XYJE"));
+						map.put("SSJE", rs.getObject("SJSQJE"));
+						map.put("MEMO", rs.getObject("MEMO"));
+						map.put("SSJE", rs.getObject("SJSQJE"));
+						map.put("XYZT", rs.getObject("XYZT"));
+						map.put("JGCITY", rs.getInt("JGCITY"));
+						map.put("JG_ID", rs.getInt("JG_ID"));
 						return map;
 					}
 				});
+		if(ls.size()>0){
+			return ls.get(0);
+		}
 		return null;
 	}
 
 	public void insertZSXY(Map<String, Object> yw) {
-		// TODO Auto-generated method stub
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into gzapi_data_zsxy ");
+		sb.append(" (ID,XYH,YWLXNAME,XYKSSJ,XYJSSJ,WTFMC,DJHM_GS,DJHM_DS,JFLXR,JFTELEPHONE, ");
+		sb.append(" JFADDRESS,JG_ID,SWSMC,EDITDATE,FPHM,XYJE,SSJE,XYZT,MEMO,ZTBJ,ADDTIME) ");
+		sb.append(" values(:ID,:XYH,:YWLXNAME,:XYKSSJ,:XYJSSJ,:WTFMC,:DJHM_GS,:DJHM_DS,:JFLXR,:JFTELEPHONE, ");
+		sb.append(" :JFADDRESS,:JG_ID,:SWSMC,:EDITDATE,:FPHM,:XYJE,:SSJE,:XYZT,:MEMO,:ZTBJ,:ADDTIME) ");
+		this.namedParameterJdbcTemplate.update(sb.toString(), yw);
+		
 
 	}
 
 	public void insertYWBA(Map<String, Object> yw) {
-		// TODO Auto-generated method stub
-
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into gzapi_data_ywba ");
+		sb.append(" (ID,BBHM,BBRQ,ND,BGWH,BGRQ,YZM,SFJE,SWSSWSXLH,SWSMC,SWSSWDJZH,WTDW,WTDWSWDJZH,XYH, ");
+		sb.append(" YJFH,RJFH,SJFH,QZSWS,TXDZ,SWSDZYJ,SWSWZ,YWLX,JTXM,ZBRQ,VALUE1,VALUE2,ZSXYID, ");
+		sb.append(" SSTARTTIME,SENDTIME,NSRXZ,HYLX,ZSFS,ISWS,SB,CITY,QX,WTDWXZ,ZTBJ,ADDTIME) ");
+		sb.append(" values (:ID,:BBHM,:BBRQ,:ND,:BGWH,:BGRQ,:YZM,:SFJE,:SWSSWSXLH,:SWSMC,:SWSSWDJZH,:WTDW,:WTDWSWDJZH,:XYH, ");
+		sb.append(" :YJFH,:RJFH,:SJFH,:QZSWS,:TXDZ,:SWSDZYJ,:SWSWZ,:YWLX,:JTXM,:ZBRQ,:VALUE1,:VALUE2,:ZSXYID, ");
+		sb.append(" :SSTARTTIME,:SENDTIME,:NSRXZ,:HYLX,:ZSFS,:ISWS,:SB,:CITY,:QX,:WTDWXZ,:ZTBJ,:ADDTIME) ");
+		this.namedParameterJdbcTemplate.update(sb.toString(), yw);
 	}
 
 }

@@ -186,9 +186,9 @@ public class YwglDao extends BaseJdbcDao {
 						}
 						if (rs.getString("ISWS") == null
 								|| rs.getString("ISWS").equals("N")) {
-							map.put("zsfs", "广东省");
+							map.put("isws", "广东省");
 						} else {
-							map.put("zsfs", "外省");
+							map.put("isws", "外省");
 						}
 						if (rs.getInt("SB_DM") == 1) {
 							map.put("sb", "国税");
