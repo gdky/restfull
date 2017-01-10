@@ -30,8 +30,6 @@ public class AddzyswsnjService implements IAddzyswsnjService {
 	@Override
 	public Map<String, Object> addZyswsnjb (Map<String, Object> obj) throws Exception {
 		
-		
-		
 		Map<String,Object> map = new LinkedHashMap<String,Object>();
 		String rs =iaddzyswsnjdao.addZyswsnjb(obj);
 		map.put("id", rs);

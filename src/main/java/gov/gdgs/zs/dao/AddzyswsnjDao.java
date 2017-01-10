@@ -184,7 +184,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		if (count == 0) {
 			return null;
 		} else {
-			if(!"1".equals(obj.get("ztbj"))){
+			if(!"1".equals(obj.get("ztbj").toString())){
 			Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
 			spsq.put("sid", uuid);
 			if(this.jdbcTemplate.queryForList("select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",new Object[]{jgid}).size()==0){

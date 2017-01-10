@@ -95,6 +95,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("                     on jg.ID = zjg.PARENTJGID ");
 		sql.append("                    and zjg.YXBZ = '1' ");
 		sql.append("                  group by jg.ID) sl ");
+		
 		sql.append(condition.getSql());
 		sql.append("            and a.ZSJG_ID = c.ID ");
 		sql.append("            and c.ID = sl.id ");
@@ -201,7 +202,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		StringBuffer sql = new StringBuffer(" SELECT c.dwmc, ");
 		sql.append("        c.JGZCH AS zsbh, ");
 		sql.append("        d.mc AS jgxz, ");
-		sql.append("        c.yzbm, ");
+		sql.append("        c.yzbm,DATE_FORMAT(max(g.SPSJ), '%Y-%m-%d') AS SPSJ,g.SPYJ,g.SPRNAME, ");
 		sql.append("        c.DZHI AS bgdz, ");
 		sql.append("        c.DHUA AS dhhm, ");
 		sql.append("        a.ID,");
@@ -256,7 +257,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("        sl.zyrs dqzyrs, ");
 		sql.append("        sl.zrs dqzrs, ");
 		sql.append("        sl.fss dqfss ");
-		sql.append("   FROM zs_jg_njb a, ");
+		sql.append("   FROM  ");
 		sql.append("        zs_jg c, ");
 		sql.append("        dm_jgxz d, ");
 		sql.append("        (SELECT jg.ID, ");
@@ -280,7 +281,11 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sql.append("           left join zs_jg zjg ");
 		sql.append("             on zjg.PARENTJGID = jg.ID ");
 		sql.append("            and zjg.YZBM = '1' ");
-		sql.append("          group by jg.ID) sl ");
+		sql.append("          group by jg.ID) sl, ");
+		sql.append("  	zs_jg_njb a ");
+		sql.append("  	LEFT JOIN (select e.SPSJ,e.SPYJ,e.SPRNAME,b.SJID from zs_spzx ");
+		sql.append("  			b,zs_spxx e where  b.ID=e.SPID and b.LCBZID='40288087233c611801234b6fac3c01b4' ) as g ");
+		sql.append("  			on g.SJID = a.ID");
 		sql.append("  WHERE 1 = 1 ");
 		sql.append("    AND d.ID = c.JGXZ_DM ");
 		sql.append("    AND a.ZSJG_ID = c.ID ");
@@ -302,15 +307,14 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 		sb.append(" ( ZSJG_ID, ND,ZSJGXZ_ID,ZJWGDM, NJZJ, SZ, ZCZJ, ZRS, ZYRS, YJYRS, SJJYRS, WJYRS,ZJ, FZR, ZCSWSBZJ, ZCSWSBJS,BAFS, FSS,ZDSJ,ZJSJ,ztdm,GDBDQKZJ,GDBDQKJS,FZRSJ) "
 				+ "VALUES (:jg_id,:nd,:xz,:wg,:NJZJ, :sz, :zczj, :zrs, :zyrs, :yjyrs, :sjjyrs, :wjyrs, :ZJ, :FZR, :ZCSWSBZJ,:ZCSWSBJS,:bndbafs,:FSS,now(),now(),:ztdm,:GDBDQKZJ,:GDBDQKJS,:qzrq ) ");
 		Number njid = this.insertAndGetKeyByNamedJdbc(sb.toString(), obj,
-				new String[] { "id" });
+				new String[] { "ID" });
 		if (null == njid) {
 			return null;
 		} else {
-			if ("2".equals(obj.get("ztbj"))) {
+			if ("2".equals(obj.get("ztdm").toString())) {
 				Map<String, Object> spsq = new HashMap<>();// 设置生成审批表方法参数
 				spsq.put("sid", njid);
-				if (this.jdbcTemplate
-						.queryForList(
+				if (this.jdbcTemplate.queryForList(
 								"select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",
 								new Object[] { jgid }).size() == 0) {
 					spsq.put("lclx", "40288087233c611801234b6fac3c01b3");
@@ -344,7 +348,7 @@ public class AddswsnjDao extends BaseJdbcDao implements IAddswsnjDao {
 				jdbcTemplate.getDataSource());
 		int count=named.update(sb.toString(), obj);
 		if(count==1){
-		if ("2".equals(obj.get("ztbj"))) {
+		if ("2".equals(obj.get("ztdm").toString())) {
 			Map<String, Object> spsq = new HashMap<>();// 设置生成审批表方法参数
 			spsq.put("sid", njid);
 			if (this.jdbcTemplate
