@@ -12,6 +12,8 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.gdky.restfull.utils.Common;
+
 @Service
 @Transactional
 public class GzApiService {
@@ -109,7 +111,11 @@ public class GzApiService {
 	 * @param type 1 - 增加 ；2 - 修改；0 - 删除
 	 */
 	public void insertYWBB(Number ywId,Integer type){
-		
+		Map<String,Object> yw = gzApiDao.getYwbbSource(ywId);
+		yw.put("ztbj", type);
+		yw.put("addtime",Common.getCurrentTime2MysqlDateTime());
+		gzApiDao.insertZSXY(yw);
+		gzApiDao.insertYWBA(yw);
 	}
 
 }

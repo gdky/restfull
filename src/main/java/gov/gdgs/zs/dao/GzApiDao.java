@@ -1,8 +1,12 @@
 package gov.gdgs.zs.dao;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.gdky.restfull.dao.BaseJdbcDao;
@@ -10,17 +14,21 @@ import com.gdky.restfull.dao.BaseJdbcDao;
 @Repository
 public class GzApiDao extends BaseJdbcDao {
 
-	public List<Map<String, Object>> getSws(String year, String month, String day,
-			String hour) {
+	public List<Map<String, Object>> getSws(String year, String month,
+			String day, String hour) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select ID,XM,XB,SFZH,SWSSWSXLH,CS,MZ,XL,ZZMM,ZYZGZH,ZYZCHM,YZBM,DH,YDDH,ZW,SFSC,SFCZR,SFFQR,SJZT, ");
 		sb.append(" DATE_FORMAT(CSNY,'%Y-%m-%d') AS CSNY, ");
 		sb.append(" DATE_FORMAT(ZYZGZQFRQ,'%Y-%m-%d') AS ZYZGZQFRQ, ");
 		sb.append(" DATE_FORMAT(ZYZCRQ,'%Y-%m-%d') AS ZYZCRQ ");
 		sb.append(" FROM gzapi_data_sws where addtime between  ? and ?");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),
-				new Object[]{year+"-"+month+"-"+day+" "+hour+":00:00",
-			year+"-"+month+"-"+day+" "+hour+":59:59"});
+		List<Map<String, Object>> ls = this.jdbcTemplate
+				.queryForList(sb.toString(),
+						new Object[] {
+								year + "-" + month + "-" + day + " " + hour
+										+ ":00:00",
+								year + "-" + month + "-" + day + " " + hour
+										+ ":59:59" });
 		return ls;
 	}
 
@@ -35,20 +43,25 @@ public class GzApiDao extends BaseJdbcDao {
 		sb.append(" DATE_FORMAT(SENDTIME,'%Y-%m-%d') AS  SENDTIME ");
 		sb.append(" from gzapi_data_ywba ");
 		sb.append(" where addtime between ? and ? ");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{start , end});
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sb.toString(), new Object[] { start, end });
 		return ls;
 	}
 
-	public List<Map<String, Object>> getSwsjg(String year, String month, String day,
-			String hour) {
+	public List<Map<String, Object>> getSwsjg(String year, String month,
+			String day, String hour) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select SWSSWSXLH,SWDJZHM,DWMC,SZCS,FRDB,DZ,SWJG_DM,ZJPZWH,YZBM,DH,CZ,JGXZ,ZSBH,ZCZJ,JYFW,DZYJ,KHH,KHHZH,ZXYY,SJZT,PARENTJGID, ");
 		sb.append(" DATE_FORMAT(ZJPZSJ,'%Y-%m-%d') AS ZJPZSJ, ");
 		sb.append(" DATE_FORMAT(ZXSJ,'%Y-%m-%d') AS ZXSJ ");
 		sb.append(" from gzapi_data_swsjg  where addtime between  ? and ?");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),
-				new Object[]{year+"-"+month+"-"+day+" "+hour+":00:00",
-			year+"-"+month+"-"+day+" "+hour+":59:59"});
+		List<Map<String, Object>> ls = this.jdbcTemplate
+				.queryForList(sb.toString(),
+						new Object[] {
+								year + "-" + month + "-" + day + " " + hour
+										+ ":00:00",
+								year + "-" + month + "-" + day + " " + hour
+										+ ":59:59" });
 		return ls;
 	}
 
@@ -61,11 +74,12 @@ public class GzApiDao extends BaseJdbcDao {
 		sb.append(" DATE_FORMAT(EDITDATE,'%Y-%m-%d') AS  EDITDATE ");
 		sb.append(" FROM gzapi_data_zsxy ");
 		sb.append(" where addtime between ? and ? ");
-		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),new Object[]{start,end});
+		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
+				sb.toString(), new Object[] { start, end });
 		return ls;
 	}
-	
-	public void addJG(int jgid){//机构
+
+	public void addJG(int jgid) {// 机构
 		StringBuffer sb = new StringBuffer();
 		sb.append("insert into gzapi_data_swsjg (SWSSWSXLH,SWDJZHM,DWMC,SZCS,FRDB,DZ,SWJG_DM,ZJPZWH,ZJPZSJ,YZBM,");
 		sb.append("DH,CZ,JGXZ,ZSBH,ZCZJ,JYFW,DZYJ,KHH,KHHZH,ZXSJ,ZXYY,PARENTJGID,SJZT,ADDTIME) select a.id,a.SWDJHM,a.DWMC,");
@@ -73,9 +87,10 @@ public class GzApiDao extends BaseJdbcDao {
 		sb.append("a.FDDBR,a.DZHI,");
 		sb.append(" concat((select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ),'国税局') as swjg_dm,");
 		sb.append("a.ZJPZWH,a.ZJPZSJ,a.YZBM,a.DHUA,a.CZHEN,a.JGXZ_DM,a.JGZCH,a.ZCZJ,a.JYFW,a.DZYJ,a.KHH,a.KHHZH,null as ZXSJ,null as ZXYY,a.PARENTJGID,'1' as SJZT,sysdate()  from zs_jg a where a.id=?");
-		this.jdbcTemplate.update(sb.toString(),new Object[]{jgid});
+		this.jdbcTemplate.update(sb.toString(), new Object[] { jgid });
 	}
-	public void changedJG(int jgid){
+
+	public void changedJG(int jgid) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("insert into gzapi_data_swsjg (SWSSWSXLH,SWDJZHM,DWMC,SZCS,FRDB,DZ,SWJG_DM,ZJPZWH,ZJPZSJ,YZBM,");
 		sb.append("DH,CZ,JGXZ,ZSBH,ZCZJ,JYFW,DZYJ,KHH,KHHZH,ZXSJ,ZXYY,PARENTJGID,SJZT,ADDTIME) select a.id,a.SWDJHM,a.DWMC,");
@@ -83,9 +98,10 @@ public class GzApiDao extends BaseJdbcDao {
 		sb.append("a.FDDBR,a.DZHI,");
 		sb.append(" concat((select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ),'国税局') as swjg_dm,");
 		sb.append("a.ZJPZWH,a.ZJPZSJ,a.YZBM,a.DHUA,a.CZHEN,a.JGXZ_DM,a.JGZCH,a.ZCZJ,a.JYFW,a.DZYJ,a.KHH,a.KHHZH,null as ZXSJ,null as ZXYY,a.PARENTJGID,'2' as SJZT,sysdate()  from zs_jg a where a.id=?");
-		this.jdbcTemplate.update(sb.toString(),new Object[]{jgid});
+		this.jdbcTemplate.update(sb.toString(), new Object[] { jgid });
 	}
-	public void delJG(int jgid){
+
+	public void delJG(int jgid) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("insert into gzapi_data_swsjg (SWSSWSXLH,SWDJZHM,DWMC,SZCS,FRDB,DZ,SWJG_DM,ZJPZWH,ZJPZSJ,YZBM,");
 		sb.append("DH,CZ,JGXZ,ZSBH,ZCZJ,JYFW,DZYJ,KHH,KHHZH,ZXSJ,ZXYY,PARENTJGID,SJZT,ADDTIME) select a.id,a.SWDJHM,a.DWMC,");
@@ -94,10 +110,10 @@ public class GzApiDao extends BaseJdbcDao {
 		sb.append(" concat((select (case  parent_id when 0  then  z.mc else  (select t.mc from dm_cs t where t.id=z.parent_id) end) from dm_cs z where z.id=a.cs_dm ),'国税局') as swjg_dm,");
 		sb.append("a.ZJPZWH,a.ZJPZSJ,a.YZBM,a.DHUA,a.CZHEN,a.JGXZ_DM,a.JGZCH,a.ZCZJ,a.JYFW,a.DZYJ,a.KHH,a.KHHZH,b.ZXRQ,");
 		sb.append("(select l.mc from dm_jgzxyy l where l.id=b.ZXYY_ID ) as ZXYY,a.PARENTJGID,'0' as SJZT,sysdate()  from zs_jg a,zs_jgzx b where a.id=? and a.id=b.jg_id");
-		this.jdbcTemplate.update(sb.toString(),new Object[]{jgid});
+		this.jdbcTemplate.update(sb.toString(), new Object[] { jgid });
 	}
 
-	public void insertSWS(int zyid,int way){//税务师
+	public void insertSWS(int zyid, int way) {// 税务师
 		StringBuffer sb = new StringBuffer();
 		sb.append("insert into gzapi_data_sws (ID,XM,XB,CSNY,SFZH,SWSSWSXLH,CS,MZ,XL,ZZMM,");
 		sb.append("ZYZGZH,ZYZGZQFRQ,ZYZCHM,ZYZCRQ,YZBM,DH,YDDH,ZW,SFSC,SFCZR,SFFQR,SJZT,ADDTIME) select a.id,b.XMING,");
@@ -111,8 +127,74 @@ public class GzApiDao extends BaseJdbcDao {
 		sb.append("case a.SZ_DM when 1 then \"是\"  when 2 then \"否\" else null end as sz,");
 		sb.append("case a.CZR_DM when 1 then \"是\"  when 2 then \"否\" else null end as czr,");
 		sb.append("case a.FQR_DM when 1 then \"是\"  when 2 then \"否\" else null end as fqr,");
-		sb.append("'"+way+"' as SJZT,sysdate()  from zs_zysws a,zs_ryjbxx b where a.id=? and a.ry_id=b.id");
-		this.jdbcTemplate.update(sb.toString(),new Object[]{zyid});
+		sb.append("'"
+				+ way
+				+ "' as SJZT,sysdate()  from zs_zysws a,zs_ryjbxx b where a.id=? and a.ry_id=b.id");
+		this.jdbcTemplate.update(sb.toString(), new Object[] { zyid });
 	}
-	
+
+	public Map<String, Object> getYwbbSource(Number ywId) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select y.*,lx.mc as YWLX from zs_ywbb y,dm_ywlx lx  ");
+		sb.append(" where y.id = ? ");
+		sb.append(" and y.ywlx_dm = lx.id ");
+		this.jdbcTemplate.query(sb.toString(), new Object[] { ywId },
+				new RowMapper<Map<String, Object>>() {
+					public Map<String, Object> mapRow(ResultSet rs, int arg1)
+							throws SQLException {
+						java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(
+								"yyyy-MM-dd HH:mm:ss");
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("ID", rs.getObject("ID"));
+						map.put("ZSXYID", rs.getObject("ID"));
+						map.put("BBHM", rs.getObject("BBHM"));
+						map.put("BBRQ", rs.getObject("BBRQ"));
+						map.put("ND", rs.getObject("ND"));
+						map.put("BGWH", rs.getObject("BGWH"));
+						map.put("BGRQ", rs.getObject("BGRQ"));
+						map.put("YZM", rs.getObject("YZM"));
+						map.put("SFJE", rs.getObject("SFJE"));
+						map.put("SWSSWSXLH", rs.getObject("JG_ID"));
+						map.put("SWSMC", rs.getObject("SWSMC"));
+						map.put("SWSSWDJZH", rs.getObject("SWSSWDJZH"));
+						map.put("WTDW", rs.getObject("WTDW"));
+						map.put("WTDWNSRSBH", rs.getObject("WTDWNSRSBH"));
+						map.put("XYH", rs.getObject("XYH"));
+						map.put("YJFH", rs.getObject("YJFH"));
+						map.put("RJFH", rs.getObject("RJFH"));
+						map.put("SJFH", rs.getObject("SJFH"));
+						map.put("QZSWS", rs.getObject("QZSWS"));
+						map.put("TXDZ", rs.getObject("TXDZ"));
+						map.put("SWSDZYJ", rs.getObject("SWSDZYJ"));
+						map.put("SWSWZ", rs.getObject("SWSWZ"));
+						map.put("YWLX", rs.getObject("YWLX"));
+						map.put("JTXM", rs.getObject("JTXM"));
+						map.put("ZBRQ", rs.getObject("ZBRQ"));
+						map.put("VALUE1", rs.getObject("TZVALUE1"));
+						map.put("VALUE2", rs.getObject("TJVALUE2"));
+						map.put("WTDW", rs.getObject("WTDW"));
+						map.put("WTDW", rs.getObject("WTDW"));
+						map.put("WTDW", rs.getObject("WTDW"));
+						map.put("WTDW", rs.getObject("WTDW"));
+						map.put("WTDW", rs.getObject("WTDW"));
+						map.put("WTDW", rs.getObject("WTDW"));
+						map.put("create_time",
+								sdf.format(rs.getTimestamp("create_time")));
+
+						return map;
+					}
+				});
+		return null;
+	}
+
+	public void insertZSXY(Map<String, Object> yw) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void insertYWBA(Map<String, Object> yw) {
+		// TODO Auto-generated method stub
+
+	}
+
 }

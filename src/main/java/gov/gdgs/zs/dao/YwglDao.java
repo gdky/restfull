@@ -97,7 +97,7 @@ public class YwglDao extends BaseJdbcDao {
 		return ls;
 	}
 
-	public void addYwbb(HashMap<String, Object> o) {
+	public Number addYwbb(HashMap<String, Object> o) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" insert into zs_ywbb ");
 		sb.append(" (ND,BBRQ,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
@@ -110,7 +110,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
 		sb.append(" :YZM,:BBHM,:IS_YD,:ZT,:XYZT_DM) ");
-		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+		return this.insertAndGetKeyByNamedJdbc(sb.toString(), o, new String[]{"id"});
 	}
 
 	public int getXyhNum(String xyh, Integer jgId) {
@@ -1834,7 +1834,7 @@ public class YwglDao extends BaseJdbcDao {
 		return this.jdbcTemplate.queryForList(sql, new Object[]{nd,ywlx,customer});
 	}
 
-	public void addSaveYwbb(HashMap<String, Object> o) {
+	public Number addSaveYwbb(HashMap<String, Object> o) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" insert into zs_ywbb ");
 		sb.append(" (ND,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
@@ -1847,7 +1847,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
 		sb.append(" :ZT,:XYZT_DM) ");
-		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+		return this.insertAndGetKeyByNamedJdbc(sb.toString(), o, new String[]{"id"});
 	}
 
 	public Integer delYwbb(Long id, User user) {
