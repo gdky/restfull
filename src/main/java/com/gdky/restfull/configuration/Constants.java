@@ -28,9 +28,9 @@ public final class Constants {
 	
 	public static final int MESSAGE_VALID_DAYRANGE = 180;
 	
-	//public  static final String UPLOAD_LOCATION="/upload"; //win
+	public  static final String UPLOAD_LOCATION="/upload"; //win
 	
-	public  static final String UPLOAD_LOCATION="/usr/local/upload"; //linux
+//	public  static final String UPLOAD_LOCATION="/usr/local/upload"; //linux
 	
 	public static final String BARCODE_LOCATION = UPLOAD_LOCATION + "/barcode";
 }
