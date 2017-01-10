@@ -27,13 +27,15 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 			Map<String, Object> where) {
 
 		Condition condition = new Condition();
-		condition.add("a.ND", "FUZZY", where.get("nd"));
+		condition.add("a.ND", Condition.EQUAL, where.get("nd"));
 		// condition.add("b.dwmc",Condition.FUZZY,where.get("dwmc"));
 		// condition.add("a.ZTDM", Condition.EQUAL, where.get("ZTDM"));
 		StringBuffer sb = new StringBuffer();
 		sb.append(" SELECT  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',t.*");
 		sb.append(" from  ( select a.id,a.ND,c.XMING,b.dwmc,");
 		sb.append(" CASE a.ZTDM WHEN 0 THEN '退回' WHEN 1 THEN '保存' WHEN 2 THEN '自检' WHEN 3 THEN '年检' ELSE NULL END AS ZTDM,");
+		sb.append(" dm.mc as NJCL");
+		/*
 		sb.append(" CASE a.WGCL_DM WHEN a.ZTDM=0 THEN NULL WHEN a.ZTDM=1 THEN '年检报告待提交' WHEN a.ZTDM=2 THEN '等待年检' WHEN 1 THEN  '年检予以通过' WHEN 2 THEN '年检不予通过，责令2个月整改，整改期间不得对外行使注册税务师签字权，如整改期满仍达不到要求，注销执业证书'  ");
 		sb.append(" WHEN 3 THEN '年检不予通过，不得继续执业，注销执业证书' ");
 		sb.append(" WHEN 4 THEN '违反《注册税务师管理暂行办法》第二十五条、第二十六条所列行为2次以上处罚记录的，年检不予通过，注销执业证书'");
@@ -41,11 +43,14 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		sb.append(" WHEN 6 THEN '违反《注册税务师管理暂行办法》第四十五条所列行政处罚情节严重，注销执业证书并向社会公告'");
 		sb.append(" WHEN 7 THEN '年检不予通过'");
 		sb.append(" WHEN 8 THEN '资料填写有误，请重新填写' END AS NJCL");
+		*/
 		sb.append(" from " + Config.PROJECT_SCHEMA
-				+ "zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d ");
-		sb.append("  " + condition.getSql() + " "); // 相当元 where x.xx like '%%'
-		sb.append(" and a.ZSJG_ID=? and a.ZSJG_ID=b.ID and a.SWS_ID=d.ID and c.ID=d.RY_ID order by a.ND desc) as t,(SELECT @rownum:=?) temp");
-		sb.append("    LIMIT ?, ? ");
+				+ " (zs_zcswsnj a,zs_jg b,zs_ryjbxx c, zs_zysws d) left join dm_rywgcl dm ");
+		sb.append(" on a.WGCL_DM = dm.id "); 
+		sb.append("  " + condition.getSql() + " "); 
+		sb.append(" and a.ZSJG_ID=? and a.ZSJG_ID=b.ID and a.SWS_ID=d.ID and c.ID=d.RY_ID order by a.ND desc) as t, ");
+		sb.append(" (SELECT @rownum:=?) temp ");
+		sb.append(" LIMIT ?, ? ");
 		// 装嵌传值数组
 		int startIndex = pageSize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
@@ -163,11 +168,7 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 	@Override
 	public String addZyswsnjb(Map<String, Object> obj) throws Exception {
 		Integer jgid= (Integer) obj.get("jg_id");
-		String uuid = UUID.randomUUID().toString().replace("-", "");
-		obj.put("id", uuid);
-		String sql = "select max(a.ID)+1 from zs_zcswsnj a";
-		String id1 = this.jdbcTemplate.queryForObject(sql, String.class);
-		obj.put("id1", id1);
+
 
 		// String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
 		// String xz =this.jdbcTemplate.queryForObject(sql,new
@@ -175,18 +176,12 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		// obj.put("xz", xz);
 		final StringBuffer sb = new StringBuffer("insert into "
 				+ Config.PROJECT_SCHEMA + "zs_zcswsnj");
-		sb.append(" (ZSJG_ID,ID,ND,SWS_ID,ZJWGDM,NJZJ,SWSFZRYJ,SWSFZRSJ,SWSFZR,ZDSJ,ZTDM,CZBL,BAFS) "
-				+ "VALUES (:jg_id,:id1,:ND,:sws_id,:wg,:NJZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),:ztdm,:czbl,:bndbafs) ");
-		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
-				jdbcTemplate.getDataSource());
-		int count = named.update(sb.toString(), obj);
-
-		if (count == 0) {
-			return null;
-		} else {
-			if(!"1".equals(obj.get("ztbj"))){
+		sb.append(" (ZSJG_ID,ND,SWS_ID,ZJWGDM,ZJ,SWSFZRYJ,SWSFZRSJ,SWSFZR,ZDSJ,ZTDM,CZBL,BAFS) "
+				+ "VALUES (:jg_id,:ND,:sws_id,:wg,:ZJ,:SWSFZRYJ,:SWSFZRSJ,:SWSFZR,now(),:ztdm,:czbl,:bndbafs) ");
+		Number njid = this.insertAndGetKeyByNamedJdbc(sb.toString(), obj, new String[]{"id"});
+		if(((Integer)obj.get("ztdm"))!=1){
 			Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
-			spsq.put("sid", uuid);
+			spsq.put("sid", njid);
 			if(this.jdbcTemplate.queryForList("select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",new Object[]{jgid}).size()==0){
 				spsq.put("lclx", "40288087233c611801234b748bac01bb");
 			}else{
@@ -196,14 +191,13 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 			spsq.put("jgid", jgid);
 			spDao.swsSPqq(spsq);//生成审批表记录
 			}
-			return uuid;
-		}
 		// 更新执业税务师年检表
+		return njid+"";
 	}
 	
 	@Override
 	public void updateZyswsnjb(Map<String, Object> obj) throws Exception {
-		Integer uuid=(Integer) obj.get("id");
+		Integer njid=(Integer) obj.get("id");
 		Integer jgid=(Integer) obj.get("jg_id");
 		// String sql = "select jg.JGXZ_DM from zs_jg jg where jg.ID=? ";
 		// String xz =this.jdbcTemplate.queryForObject(sql,new
@@ -215,14 +209,12 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 		StringBuffer sb = new StringBuffer("update " + Config.PROJECT_SCHEMA
 				+ "zs_zcswsnj ");
 
-		sb.append(" set ZSJG_ID=:jg_id,ND=:nd,SWS_ID=:sws_id,ZJWGDM=:wg,NJZJ=:NJZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM=:ztdm where id=:id ");
+		sb.append(" set ZSJG_ID=:jg_id,ND=:nd,SWS_ID=:sws_id,ZJWGDM=:wg,ZJ=:ZJ,SWSFZRYJ=:SWSFZRYJ,SWSFZRSJ=:SWSFZRSJ,SWSFZR=:SWSFZR,ZDSJ=(date_format(now(),'%Y.%m.%d %h:%i:%s')),ZTDM=:ztdm where id=:id ");
 
-		NamedParameterJdbcTemplate named = new NamedParameterJdbcTemplate(
-				jdbcTemplate.getDataSource());
-		named.update(sb.toString(), obj);
-		if(!"1".equals(obj.get("ztbj"))){
+		this.namedParameterJdbcTemplate.update(sb.toString(), obj);
+		if(((Integer)obj.get("ztdm"))==2){
 			Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
-			spsq.put("sid", uuid);
+			spsq.put("sid", njid);
 			if(this.jdbcTemplate.queryForList("select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",new Object[]{jgid}).size()==0){
 				spsq.put("lclx", "40288087233c611801234b748bac01bb");
 			}else{
