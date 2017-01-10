@@ -172,9 +172,9 @@ public class GzApiDao extends BaseJdbcDao {
 						map.put("ZBRQ", rs.getObject("ZBRQ"));
 						map.put("VALUE1", rs.getObject("TZVALUE1"));
 						map.put("VALUE2", rs.getObject("TJVALUE2"));
-						map.put("WTDW", rs.getObject("WTDW"));
-						map.put("WTDW", rs.getObject("WTDW"));
-						map.put("WTDW", rs.getObject("WTDW"));
+						map.put("SSTARTTIME", rs.getObject("SSTARTTIME"));
+						map.put("SENDTIME", rs.getObject("SENDTIME"));
+						map.put("NSRXZ", rs.getObject("NSRXZ"));
 						map.put("WTDW", rs.getObject("WTDW"));
 						map.put("WTDW", rs.getObject("WTDW"));
 						map.put("WTDW", rs.getObject("WTDW"));
