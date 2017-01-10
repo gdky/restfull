@@ -102,5 +102,14 @@ public class GzApiService {
 		}
 		gzApiDao.insertSWS(zyid, way);
 	}
+	
+	/**
+	 *  为广州接口数据池添加业务和协议变更的记录
+	 * @param ywId 业务报备Id
+	 * @param type 1 - 增加 ；2 - 修改；0 - 删除
+	 */
+	public void insertYWBB(Number ywId,Integer type){
+		
+	}
 
 }

@@ -42,6 +42,9 @@ public class YwglService {
 	
 	@Autowired
 	private BarcodeEncoder barcode;
+	
+	@Autowired
+	private GzApiService gzapiService;
 
 	public Map<String, Object> getYwbb(int page, int pageSize, String whereParam) {
 		HashMap<String, Object> where = new HashMap<String, Object>();
@@ -135,7 +138,7 @@ public class YwglService {
 		if(zzglService.isJgLocked(user)){
 			throw new YwbbException("不具备业务上报资质或上报业务资质目前被锁，请联系中心解锁");
 		}
-		//TODO 判断是否在审批中
+		//TODO 判断是否在审批中,当事务所进行变更，且变更项需要管理中心审批时，事务所业务报备功能会被锁定
 
 		// 整理业务记录
 		HashMap<String, Object> o = new HashMap<String, Object>();
@@ -316,6 +319,7 @@ public class YwglService {
 			this.sentBackYw(id, data);
 		} else if (lx != null && lx == 6) {
 			this.ywglDao.updateYwbbZT(id, 5, 0);
+			gzapiService.insertYWBB(id, 2);
 		} else if (lx != null && lx == 7) {
 			this.ywglDao.updateYwbbZT(id, 1, 3);
 		} else if (lx != null && lx == 9) {
@@ -455,7 +459,7 @@ public class YwglService {
 		if(zzglService.isJgLocked(user)){
 			throw new YwbbException("不具备业务上报资质或上报业务资质目前被锁，请联系中心解锁");
 		}
-		//TODO 判断是否在审批中
+		//TODO 判断是否在审批中,当事务所进行变更，且变更项需要管理中心审批时，事务所业务报备功能会被锁定
 
 		// 整理业务记录
 		HashMap<String, Object> o = new HashMap<String, Object>();
@@ -578,7 +582,8 @@ public class YwglService {
 		o.put("ZT", 1);
 		o.put("XYZT_DM", 3);
 		o.put("ID", id);
-		ywglDao.handleYwBB(o);
+	    ywglDao.handleYwBB(o);
+	    gzapiService.insertYWBB(id, 2);
 		Map<String,Object> resp = new HashMap<String,Object>();
 		resp.put("yzm", yzm);
 		resp.put("bbhm", bbhm);
@@ -589,13 +594,13 @@ public class YwglService {
 		data.put("id", id);
 		data.put("zt", 8);
 		ywglDao.handleYwQY(id, data);
+		gzapiService.insertYWBB(id, 2);
 		
 	}
 
 	private void handleYwTH(Long id, Map<String, Object> data) {
 		data.put("id", id);
 		data.put("zt", 6);
-		ywglDao.handleYwTH(id, data);
 	}
 
 	private void handleYwSF(Long id, Map<String, Object> data) {
@@ -620,9 +625,10 @@ public class YwglService {
 		bbhm.delete(10, 17);
 		// 生成一条新记录
 		Number newId = this.ywglDao.newRecordFromId(id, bbhm.toString(), yzm);
+		gzapiService.insertYWBB(newId, 1);
 		// 将原记录置为作废
 		this.ywglDao.updateYwbbZT(id, 4, 0);
-
+		gzapiService.insertYWBB(id, 0);
 	}
 
 	/*
@@ -632,6 +638,7 @@ public class YwglService {
 		data.put("zt", 0);
 		data.put("xyzt_dm", 1);
 		this.ywglDao.sentBack(id, data);
+		gzapiService.insertYWBB(id, 2);
 	}
 
 	public Map<String, Object> getYwbbSFJEYJ(int page, int pagesize,
