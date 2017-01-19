@@ -1201,4 +1201,9 @@ public class YwglService {
 		List<Map<String,Object>> ls = ywglDao.getAllBbhm();
 		barcode.reGenGroupBarcode(ls);		
 	}
+
+	public Map<String, Object> batchTH(List<String> values, User user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
