@@ -149,7 +149,10 @@ public class JDJCDao extends BaseDao{
 		arr.add("zs_cwbb_xjll");
 		arr.add("zs_cwbb_zcmx");
 		Condition condition = new Condition();
+		Condition condition2 = new Condition();
 		condition.add("d.dwmc",Condition.FUZZY,where.get("dwmc"));
+		condition2.add("nd",Condition.EQUAL,where.get("nd"));
+		condition2.add("timevalue",Condition.EQUAL,where.get("timevalue"));
 		StringBuffer sb = new StringBuffer();
 		sb.append(" 	SELECT sql_calc_found_rows	 @rownum:=@rownum+1 as 'key','"+where.get("nd")+"' as nd,'未上报' as sbzt,d.id,d.dwmc,");
 		sb.append(" 	d.JGZCH as zsbh,c.mc as cs, d.DHUA as dhhm,d.TXYXMING as txyxm,d.XTYPHONE as txyyddh");
@@ -157,14 +160,14 @@ public class JDJCDao extends BaseDao{
 		sb.append(" 	FROM zs_jg d,dm_cs c,(SELECT @rownum:=?) temp");
 		sb.append(condition.getSql());//相当元 where x.xx like '%%'
 		sb.append("     AND d.CS_DM=c.ID  ");
-		sb.append(" 	AND d.ID not in(select a.JG_ID from "+arr.get(Integer.parseInt(where.get("bblx").toString()))+" a where a.nd = ? AND a.ZTBJ=1)");
+		sb.append(" 	AND d.ID not in(select JG_ID from "+arr.get(Integer.parseInt(where.get("bblx").toString()))+condition2.getSql()+" AND ZTBJ=1)");
 		sb.append(" 	and d.YXBZ=1");
 		sb.append("    LIMIT ?, ? ");
 		// 装嵌传值数组
 		int startIndex = pageSize * (page - 1);
 		ArrayList<Object> params = condition.getParams();
 		params.add(0, pageSize * (page - 1));
-		params.add(where.get("nd"));
+		params.addAll(condition2.getParams());
 		params.add(startIndex);
 		params.add(pageSize);
 
