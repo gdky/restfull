@@ -464,6 +464,11 @@ public class CWBBDao extends BaseJdbcDao{
 			 
 			 return ob;
 		}
+	public void rjLrb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_lrgd set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+	}
       
 
 }

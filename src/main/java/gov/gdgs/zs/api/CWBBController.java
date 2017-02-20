@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.gdky.restfull.entity.ResponseMessage;
+
 @RestController
 @RequestMapping(value = Config.URL_PROJECT)
 public class CWBBController {
@@ -147,6 +149,12 @@ public class CWBBController {
 			@PathVariable("Id") String id) {
 		Map<String, Object> obj = cwbbService.getJygmtjbById(id);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/rjlrb/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> rjLrb(@PathVariable("id") String id){
+		cwbbService.rjLrb(id);
+		return new ResponseEntity<>(ResponseMessage.success("reject success"),HttpStatus.OK);
 	}
 
 }
