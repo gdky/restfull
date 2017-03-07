@@ -94,19 +94,24 @@ public class PXMKDao extends BaseDao{
 	}
 	public List<Map<String,Object>> pxtjbmList(String pxid){
 		StringBuffer sb = new StringBuffer();
-		sb.append("	select b.DWMC,a.XMING,a.XB,");
+		sb.append("	select b.DWMC,a.XMING,a.XB,a.BMSJ,");
 		sb.append("	a.ZW,a.YDDH,");
 		sb.append("	case a.FJLX when 1 then '单' when 2 then '双' else null end as DF,");
+		sb.append("	case a.FJLX when 1 then '是' else null end as DRJ,");
+		sb.append("	case a.FJLX when 2 then '是' else null end as SRJ,");
 		sb.append("	a.RZSJ,a.LKSJ,");
-		sb.append("	concat((case a.ZAOC when 1 then '早餐' else '' end),");
-		sb.append("	(case a.WUC when a.ZAOC=1 and a.WUC=1 and a.WANC=1 then '，午餐，' ");
-		sb.append("	when a.ZAOC=0 and a.WUC=1 and a.WANC=1 then '午餐，'");
-		sb.append("	when a.ZAOC=0 and a.WUC=1 and a.WANC=0 then '午餐' ");
-		sb.append("	when a.ZAOC=1 and a.WUC=1 and a.WANC=0 then '，午餐' ");
-		sb.append("	when a.ZAOC=1 and a.WUC=0 and a.WANC=1 then '，'");
-		sb.append("	 else '' end),");
-		sb.append("	(case a.WANC when 1 then '晚餐' else ''end)) as DCQK,a.BZ");
-		sb.append("	 from zs_pxqkbmb a,zs_jg b where a.JG_ID=b.ID and a.pxid=?");
+		sb.append("	case a.ZAOC when 1 then '是' else null end as ZAOC,");
+		sb.append("	case a.WUC when 1 then '是' else null end as WUC,");
+		sb.append("	case a.WANC when 1 then '是' else null end as WANC,");
+//		sb.append("	concat((case a.ZAOC when 1 then '早餐' else '' end),");
+//		sb.append("	(case a.WUC when a.ZAOC=1 and a.WUC=1 and a.WANC=1 then '，午餐，' ");
+//		sb.append("	when a.ZAOC=0 and a.WUC=1 and a.WANC=1 then '午餐，'");
+//		sb.append("	when a.ZAOC=0 and a.WUC=1 and a.WANC=0 then '午餐' ");
+//		sb.append("	when a.ZAOC=1 and a.WUC=1 and a.WANC=0 then '，午餐' ");
+//		sb.append("	when a.ZAOC=1 and a.WUC=0 and a.WANC=1 then '，'");
+//		sb.append("	 else '' end),");
+//		sb.append("	(case a.WANC when 1 then '晚餐' else ''end)) as DCQK,");
+		sb.append("	a.BZ from zs_pxqkbmb a,zs_jg b where a.JG_ID=b.ID and a.pxid=? order by a.bmsj desc");
 		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{pxid});
 	}
 	public Map<String, Object> getPxxx(int page, int pagesize,

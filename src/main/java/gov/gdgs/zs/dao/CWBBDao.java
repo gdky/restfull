@@ -148,6 +148,7 @@ public class CWBBDao extends BaseJdbcDao{
 		// 子查询，用于拼接查询条件和返回起止区间
 		Condition condition = new Condition();
 		condition.add("t.nd", Condition.EQUAL, where.get("nd"));
+		condition.add("t.timevalue", Condition.EQUAL, where.get("timevalue"));
 		condition.add("j.dwmc",Condition.FUZZY,where.get("swsmc"));
 		condition.add("j.cs_dm",Condition.EQUAL,where.get("cs"));
 		condition.add(" AND t.ztbj = 1 ");
@@ -160,7 +161,7 @@ public class CWBBDao extends BaseJdbcDao{
 		sb.append("    (SELECT  ");
 		sb.append("        t.id, ");
 		sb.append("            j.dwmc, ");
-		sb.append("            t.nd, ");
+		sb.append("            t.nd,t.timevalue, ");
 		sb.append("            if(t.TIMEVALUE = 0,'半年','全年') as tjsjd, ");
 		sb.append("            ds.MC AS cs, ");
 		sb.append("            t.zgywsr, ");
@@ -463,6 +464,11 @@ public class CWBBDao extends BaseJdbcDao{
 			 
 			 return ob;
 		}
+	public void rjLrb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_lrgd set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+	}
       
 
 }

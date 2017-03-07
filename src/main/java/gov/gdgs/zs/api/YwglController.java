@@ -104,13 +104,13 @@ public class YwglController {
 	 * 修改业务报备信息
 	 */
 	@RequestMapping(value = "/ywbb/{hash}", method = RequestMethod.PUT)
-	public ResponseEntity<?> getYwbb(@RequestBody Map<String, Object> values,
+	public ResponseEntity<?> updateYwbb(@RequestBody Map<String, Object> values,
 			@PathVariable String hash) {
 		User user = accountService.getUserFromHeaderToken(request); 
 		Map<String,Object> rs = ywglService.updateYwbb(hash, values, user);
 		return new ResponseEntity<>(rs, HttpStatus.OK);
 	}
-
+	
 	/*
 	 * 获取业务报备细节信息
 	 */
@@ -406,5 +406,16 @@ public class YwglController {
 	public ResponseEntity<?> reGenBarcode() {
 		ywglService.reGenBarcode();
 		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+	
+	/*
+	 * 批量退回审批
+	 */
+	@RequestMapping(value = "/ywbb/batchth/", method = RequestMethod.PUT)
+	public ResponseEntity<?> batchTH(
+			@RequestBody List<String> values) {
+		User user = accountService.getUserFromHeaderToken(request); 
+		Map<String,Object> rs = ywglService.batchTH( values, user);
+		return new ResponseEntity<>(rs, HttpStatus.OK);
 	}
 }

@@ -261,7 +261,8 @@ public class YwglService {
 		o.put("YZM", yzm);
 		o.put("ZT", 1);
 		o.put("XYZT_DM", 3);
-		ywglDao.addYwbb(o);
+		Number id = ywglDao.addYwbb(o);
+		gzapiService.insertYWBB(id, 1);
 
 		Map<String,Object> resp = new HashMap<String,Object>();
 		resp.put("yzm", yzm);
@@ -317,29 +318,44 @@ public class YwglService {
 		resp.put("code", 200);
 		if (lx != null && lx == 2) {
 			this.sentBackYw(id, data);
+			gzapiService.insertYWBB(id, 2);
+			
 		} else if (lx != null && lx == 6) {
 			this.ywglDao.updateYwbbZT(id, 5, 0);
-			gzapiService.insertYWBB(id, 2);
+			gzapiService.insertYWBB(id, 0);
+			
 		} else if (lx != null && lx == 7) {
 			this.ywglDao.updateYwbbZT(id, 1, 3);
+			
 		} else if (lx != null && lx == 9) {
 			this.ywglDao.updateYwbbZT(id, 1, 3);
+			
 		} else if (lx != null && lx == 11) {
 			this.passQY(id);
+			
 		} else if (lx != null && lx == 12) {
 			this.ywglDao.updateYwbbZT(id, 5, 0);
+			
 		} else if (lx != null && lx == 3) {
 			resp.put("data", this.handleYwBB(id, data,user)) ;
+			gzapiService.insertYWBB(id, 2);
+			
 		} else if (lx != null && lx == 4) {
 			this.handleYwSF(id,data);
+			gzapiService.insertYWBB(id, 2);
+			
 		} else if (lx != null && lx == 8) {
 			this.handleYwTH(id,data);
+			
 		} else if (lx != null && lx == 5) {
 			this.ywglDao.updateYwbbZT(id, 7);
+			
 		} else if (lx != null && lx == 10 ){
 			this.handleYwQY(id,data);
+			
 		} else if (lx != null && lx == 1){
 			this.updateYwbbMx(id,data,user);
+			gzapiService.insertYWBB(id, 2);
 		}
 		return resp;
 	}
@@ -638,7 +654,6 @@ public class YwglService {
 		data.put("zt", 0);
 		data.put("xyzt_dm", 1);
 		this.ywglDao.sentBack(id, data);
-		gzapiService.insertYWBB(id, 2);
 	}
 
 	public Map<String, Object> getYwbbSFJEYJ(int page, int pagesize,
@@ -1150,7 +1165,8 @@ public class YwglService {
 		o.put("XYJE", formValue.get("XYJE"));
 		o.put("ZT", 0);
 		o.put("XYZT_DM", 1);
-		ywglDao.addSaveYwbb(o);
+		Number id = ywglDao.addSaveYwbb(o);
+		gzapiService.insertYWBB(id, 1);
 
 		Map<String,Object> resp = new HashMap<String,Object>();
 		return resp;
@@ -1184,5 +1200,10 @@ public class YwglService {
 	public void reGenBarcode() {
 		List<Map<String,Object>> ls = ywglDao.getAllBbhm();
 		barcode.reGenGroupBarcode(ls);		
+	}
+
+	public Map<String, Object> batchTH(List<String> values, User user) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

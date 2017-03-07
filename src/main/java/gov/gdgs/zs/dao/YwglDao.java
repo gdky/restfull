@@ -97,7 +97,7 @@ public class YwglDao extends BaseJdbcDao {
 		return ls;
 	}
 
-	public void addYwbb(HashMap<String, Object> o) {
+	public Number addYwbb(HashMap<String, Object> o) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" insert into zs_ywbb ");
 		sb.append(" (ND,BBRQ,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
@@ -110,7 +110,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
 		sb.append(" :YZM,:BBHM,:IS_YD,:ZT,:XYZT_DM) ");
-		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+		return this.insertAndGetKeyByNamedJdbc(sb.toString(), o, new String[]{"id"});
 	}
 
 	public int getXyhNum(String xyh, Integer jgId) {
@@ -186,9 +186,9 @@ public class YwglDao extends BaseJdbcDao {
 						}
 						if (rs.getString("ISWS") == null
 								|| rs.getString("ISWS").equals("N")) {
-							map.put("zsfs", "广东省");
+							map.put("isws", "广东省");
 						} else {
-							map.put("zsfs", "外省");
+							map.put("isws", "外省");
 						}
 						if (rs.getInt("SB_DM") == 1) {
 							map.put("sb", "国税");
@@ -253,7 +253,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" FPHM,XYJE,SJSQJE,XYZT_DM,MEMO,USER_ID,ZGSWJG,QMSWSID,SWSDH,SWSCZ,IS_YD, ");
 		sb.append(" CUSTOMER_ID,SQTHYY,SQQYLY,THYY,ZT,YDSPZT,SWBZ,YXBZ,CITY) ");
 		sb.append(" select ?,BBRQ,ND,BGWH,BGRQ,ZBRQ,?,SFJE,JG_ID,SWSMC, ");
-		sb.append(" SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH,QZSWS,TXDZ,SWSDZYJ,SWSWZ, ");
+		sb.append(" SWSSWDJZH,WTDW,WTDWNSRSBH,null,YJFH,RJFH,SJFH,QZSWS,TXDZ,SWSDZYJ,SWSWZ, ");
 		sb.append(" YWLX_DM,JTXM,TZVALUE1,TJVALUE2,SSTARTTIME,SENDTIME,NSRXZ,HY_ID,ZSFS_DM, ");
 		sb.append(" ISWS,SB_DM,CS_DM,QX_DM,WTDWXZ_DM,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,WTDXLXDZ, ");
 		sb.append(" FPHM,XYJE,SJSQJE,XYZT_DM,MEMO,USER_ID,ZGSWJG,QMSWSID,SWSDH,SWSCZ,IS_YD, ");
@@ -1834,7 +1834,7 @@ public class YwglDao extends BaseJdbcDao {
 		return this.jdbcTemplate.queryForList(sql, new Object[]{nd,ywlx,customer});
 	}
 
-	public void addSaveYwbb(HashMap<String, Object> o) {
+	public Number addSaveYwbb(HashMap<String, Object> o) {
 		StringBuffer sb = new StringBuffer();
 		sb.append(" insert into zs_ywbb ");
 		sb.append(" (ND,BGWH,BGRQ,SFJE,JG_ID,SWSMC,SWSSWDJZH,WTDW,WTDWNSRSBH,XYH,YJFH,RJFH,SJFH, ");
@@ -1847,7 +1847,7 @@ public class YwglDao extends BaseJdbcDao {
 		sb.append(" :SENDTIME,:SSTARTTIME,:MEMO,:NSRXZ,:HY_ID,:ZSFS_DM,:ISWS,:SB_DM,:CS_DM,:QX_DM,:CITY, ");
 		sb.append(" :WTDWXZ_DM,:WTDWNSRSBHDF,:WTDWLXR,:WTDWLXDH,:WTDXLXDZ,:XYJE,:CUSTOMER_ID,:TZVALUE1,:TJVALUE2, ");
 		sb.append(" :ZT,:XYZT_DM) ");
-		this.namedParameterJdbcTemplate.update(sb.toString(), o);
+		return this.insertAndGetKeyByNamedJdbc(sb.toString(), o, new String[]{"id"});
 	}
 
 	public Integer delYwbb(Long id, User user) {
