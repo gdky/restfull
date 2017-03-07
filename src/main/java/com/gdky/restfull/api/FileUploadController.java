@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,36 @@ public class FileUploadController {
 			String name = file.getOriginalFilename();
 			String ext = FilenameUtils.getExtension(name);
 			String uploadDir = "/xpian/";
+			File path = new File(Constants.UPLOAD_LOCATION + uploadDir);
+			if (!path.exists()) {
+				path.mkdir();
+			}
+			String filename = uploadDir
+					+ Hashing.crc32().hashBytes(file.getBytes()) + "." + ext;
+			File to = new File(Constants.UPLOAD_LOCATION + filename);
+			ResponseMessage rm = new ResponseMessage(
+					ResponseMessage.Type.success, "201", filename);
+			try {
+				Files.write(file.getBytes(), to);
+				return new ResponseEntity<>(rm, HttpStatus.CREATED);
+			} catch (Exception e) {
+				rm = new ResponseMessage(ResponseMessage.Type.danger, "400",
+						"上传失败:" + e.getMessage());
+				return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+			}
+		} else {
+			ResponseMessage rm = new ResponseMessage(
+					ResponseMessage.Type.danger, "400", "文件为空");
+			return new ResponseEntity<>(rm, HttpStatus.BAD_REQUEST);
+		}
+	}
+	@RequestMapping(value = "/upload/{folderName}", method = RequestMethod.POST)
+	public ResponseEntity<?> handleMuildFileUpload(@PathVariable(value = "folderName") String folderName,
+			@RequestParam("file") MultipartFile file) throws IOException {
+		if (!file.isEmpty()) {
+			String name = file.getOriginalFilename();
+			String ext = FilenameUtils.getExtension(name);
+			String uploadDir = "/"+folderName+"/";
 			File path = new File(Constants.UPLOAD_LOCATION + uploadDir);
 			if (!path.exists()) {
 				path.mkdir();
