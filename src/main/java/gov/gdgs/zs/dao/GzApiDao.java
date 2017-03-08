@@ -267,4 +267,50 @@ public class GzApiDao extends BaseJdbcDao {
 		this.namedParameterJdbcTemplate.update(sb.toString(), yw);
 	}
 
+	public void batchInsertZSXY(List<Object[]> batchArgs) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into gzapi_data_zsxy ");
+		sb.append(" (ID,XYH,YWLXNAME,XYKSSJ,XYJSSJ,WTFMC,DJHM_GS,DJHM_DS,JFLXR,JFTELEPHONE, ");
+		sb.append(" JFADDRESS,JG_ID,SWSMC,EDITDATE,FPHM,XYJE,SSJE,XYZT,MEMO,ZTBJ,ADDTIME) ");
+		sb.append(" SELECT y.ID,y.XYH,l.mc AS YWLX,SSTARTTIME,SENDTIME,WTDW,WTDWNSRSBH,WTDWNSRSBHDF,WTDWLXR,WTDWLXDH,  ");
+		sb.append(" WTDXLXDZ,JG_ID,SWSMC,ZBRQ,FPHM,XYJE,SJSQJE,xy.MC AS XYZT,MEMO,2, NOW() ");
+		sb.append(" FROM (zs_ywbb Y,zs_jg j) ");
+		sb.append(" LEFT JOIN dm_hy AS hy ON y.hy_id = hy.id ");
+		sb.append(" LEFT JOIN dm_cs AS cs ON y.cs_dm = cs.id ");
+		sb.append(" LEFT JOIN dm_cs AS qx ON y.qx_dm = qx.id ");
+		sb.append(" LEFT JOIN dm_ywlx AS l ON y.ywlx_dm = l.id ");
+		sb.append(" LEFT JOIN dm_xyzt AS xy ON y.xyzt_dm = xy.ID ");
+		sb.append(" WHERE y.ID = ? AND y.jg_id = j.id ");
+		this.jdbcTemplate.batchUpdate(sb.toString(), batchArgs);
+		
+	}
+
+	public void batchInsertYWBB(List<Object[]> batchArgs) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" insert into gzapi_data_ywba  ");
+		sb.append("  (ID,BBHM,BBRQ,ND,BGWH,BGRQ,YZM,SFJE,SWSSWSXLH,SWSMC,SWSSWDJZH,WTDW,WTDWSWDJZH,XYH,  ");
+		sb.append("  YJFH,RJFH,SJFH,QZSWS,TXDZ,SWSDZYJ,SWSWZ,YWLX,JTXM,ZBRQ,VALUE1,VALUE2,ZSXYID,  ");
+		sb.append("  SSTARTTIME,SENDTIME,NSRXZ,HYLX,ZSFS,ISWS,SB,CITY,QX,WTDWXZ,ZTBJ,ADDTIME)  ");
+		sb.append(" SELECT y.ID,y.BBHM,y.BBRQ,y.ND,y.BGWH,y.BGRQ,y.YZM,y.SFJE,y.JG_ID,y.SWSMC,y.SWSSWDJZH,y.WTDW,y.WTDWNSRSBH,y.XYH,  ");
+		sb.append("  y.YJFH,y.RJFH,y.SJFH,y.QZSWS,y.TXDZ,y.SWSDZYJ,y.SWSWZ,l.mc AS YWLX,y.JTXM,y.ZBRQ,y.TZVALUE1,y.TJVALUE2,y.ID,  ");
+		sb.append(" y.SSTARTTIME,y.SENDTIME,  ");
+		sb.append(" CASE WHEN y.NSRXZ=0 THEN '一般纳税人' WHEN y.nsrxz = 1 THEN '小规模纳税人' ELSE '非增值税纳税人' END, ");
+		sb.append(" hy.mc AS HYLX,  ");
+		sb.append(" CASE WHEN y.zsfs_dm = 0 THEN '查账征收' ELSE '核定征收' END,  ");
+		sb.append(" CASE WHEN y.ISWS IS NULL THEN '广东省' WHEN y.isws ='N' THEN '广东省' ELSE '外省' END,  ");
+		sb.append(" CASE WHEN y.SB_DM = 1 THEN '国税' ELSE '地税' END, ");
+		sb.append(" y.CITY,qx.mc AS QX,  ");
+		sb.append(" CASE WHEN y.WTDWXZ_DM =0 THEN '居民企业' ELSE '非居民企业' END, ");
+		sb.append(" 2, NOW() ");
+		sb.append(" FROM (zs_ywbb Y,zs_jg j) ");
+		sb.append(" LEFT JOIN dm_hy AS hy ON y.hy_id = hy.id ");
+		sb.append(" LEFT JOIN dm_cs AS cs ON y.cs_dm = cs.id ");
+		sb.append(" LEFT JOIN dm_cs AS qx ON y.qx_dm = qx.id ");
+		sb.append(" LEFT JOIN dm_ywlx AS l ON y.ywlx_dm = l.id ");
+		sb.append(" LEFT JOIN dm_xyzt AS xy ON y.xyzt_dm = xy.ID ");
+		sb.append(" WHERE y.ID = ? AND y.jg_id = j.id ");
+		this.jdbcTemplate.batchUpdate(sb.toString(), batchArgs);
+		
+	}
+
 }

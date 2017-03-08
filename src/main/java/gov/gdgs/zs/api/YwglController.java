@@ -415,7 +415,7 @@ public class YwglController {
 	public ResponseEntity<?> batchTH(
 			@RequestBody List<String> values) {
 		User user = accountService.getUserFromHeaderToken(request); 
-		Map<String,Object> rs = ywglService.batchTH( values, user);
-		return new ResponseEntity<>(rs, HttpStatus.OK);
+	    ywglService.batchTH( values, user);
+		return new ResponseEntity<>(ResponseMessage.success("success"), HttpStatus.OK);
 	}
 }
