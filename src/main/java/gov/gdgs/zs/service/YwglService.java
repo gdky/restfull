@@ -1,5 +1,6 @@
 package gov.gdgs.zs.service;
 
+import gov.gdgs.zs.dao.GzApiDao;
 import gov.gdgs.zs.dao.SWSDao;
 import gov.gdgs.zs.dao.YwglDao;
 import gov.gdgs.zs.untils.Condition;
@@ -7,6 +8,7 @@ import gov.gdgs.zs.untils.Condition;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -1202,8 +1204,18 @@ public class YwglService {
 		barcode.reGenGroupBarcode(ls);		
 	}
 
-	public Map<String, Object> batchTH(List<String> values, User user) {
-		// TODO Auto-generated method stub
-		return null;
+	public void batchTH(List<String> values, User user) {
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		Iterator<String> iterator = values.iterator();
+		while(iterator.hasNext()) {
+			String hashid = iterator.next();
+			Long id = HashIdUtil.decode(hashid);
+			batchArgs.add(new Object[]{id});
+			this.sentBackYw(id,null);
+			gzapiService.insertYWBB(id, 2);
+			
+		}
+		ywglDao.batchTH(batchArgs);
+		gzapiService.batchTH(batchArgs);
 	}
 }

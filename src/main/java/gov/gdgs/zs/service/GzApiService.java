@@ -126,4 +126,10 @@ public class GzApiService {
 		
 	}
 
+	public void batchTH(List<Object[]> batchArgs) {
+		gzApiDao.batchInsertZSXY(batchArgs);
+		gzApiDao.batchInsertYWBB(batchArgs);
+		
+	}
+
 }

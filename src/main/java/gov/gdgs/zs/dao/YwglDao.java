@@ -1883,4 +1883,10 @@ public class YwglDao extends BaseJdbcDao {
 		String sql = "select bbhm from zs_ywbb where yxbz = 1 and (zt = 1 || zt = 3) ";
 		return this.jdbcTemplate.queryForList(sql);
 	}
+
+	public void batchTH(List<Object[]> batchArgs) {
+		String sql = "update zs_ywbb set thyy = sqthyy,zt=0, xyzt_dm=1  where id = ? ";
+		this.jdbcTemplate.batchUpdate(sql, batchArgs);
+		
+	}
 }
