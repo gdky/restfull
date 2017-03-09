@@ -35,7 +35,7 @@ public class PXMKDao extends BaseDao{
 		params.add(ps);
 		StringBuffer sb = new StringBuffer();
 		sb.append("		SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key',a.id as pxid,a.BT,a.PXDZ as PXDD,a.QS,a.PXDDDH,a.PXNR,a.PXKSSJ,a.PXJSSJ,a.BMJZSJ,a.PXLXR,"); 
-		sb.append("	a.ZYSX,a.ZAOC,a.WUC,a.WANC,a.DRJ,a.SRJ,a.BGDH as BGZJ,a.HWWZFJH as HWZDHHM,"); 
+		sb.append("	a.ZYSX,a.ZAOC,a.WUC,a.WANC,a.DRJ,a.SRJ,a.BGDH as BGZJ,a.HWWZFJH as HWZDHHM,a.FJ,"); 
 		sb.append("	 a.FBZT as fbzt,"); 
 		sb.append("	 (select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.YXBZ=1 )as bmrs,");
 		sb.append("		(select count(b.id) from zs_pxqkbmb b WHERE a.ID=b.PXID and b.FJLX in (1,2) and b.YXBZ=1 )as zszrs,"); 
@@ -66,21 +66,21 @@ public class PXMKDao extends BaseDao{
 	}
 	
 	public void pxxxfb(Map<String, Object> sqxx) throws Exception {
-		String sql ="insert into zs_pxqkb (ID,BT,PXDZ,QS,PXKSSJ,PXJSSJ,BMJZSJ,PXDDDH,PXLXR,PXNR,ZYSX,SRJ,DRJ,ZAOC,WUC,WANC,BGDH,HWWZFJH,FBZT,LRRQ,YXBZ) values(replace(uuid(),'-',''),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'0',sysdate(),'1')";
+		String sql ="insert into zs_pxqkb (ID,BT,PXDZ,QS,PXKSSJ,PXJSSJ,BMJZSJ,PXDDDH,PXLXR,PXNR,ZYSX,SRJ,DRJ,ZAOC,WUC,WANC,BGDH,HWWZFJH,FJ,FBZT,LRRQ,YXBZ) values(replace(uuid(),'-',''),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'0',sysdate(),'1')";
 		this.jdbcTemplate.update(sql, new Object[]{sqxx.get("BT"),sqxx.get("PXDD"),
 				sqxx.get("QS"),sqxx.get("PXKSSJ"),sqxx.get("PXJSSJ"),sqxx.get("BMJZSJ"),
 				sqxx.get("PXDDDH"),sqxx.get("PXLXR"),sqxx.get("PXNR"),sqxx.get("ZYSX"),
 				sqxx.get("SRJ"),sqxx.get("DRJ"),sqxx.get("ZAOC"),sqxx.get("WUC"),
-				sqxx.get("WANC"),sqxx.get("BGZJ"),sqxx.get("HWZDHHM")});
+				sqxx.get("WANC"),sqxx.get("BGZJ"),sqxx.get("HWZDHHM"),sqxx.get("fjurl")});
 	}
 	
 	public void pxxxxg(Map<String, Object> sqxx) throws Exception {
-		String sql ="update zs_pxqkb set BT=?,PXDZ=?,QS=?,PXKSSJ=?,PXJSSJ=?,BMJZSJ=?,PXDDDH=?,PXLXR=?,PXNR=?,ZYSX=?,SRJ=?,DRJ=?,ZAOC=?,WUC=?,WANC=?,BGDH=?,HWWZFJH=?,FBZT='0' where ID=?";
+		String sql ="update zs_pxqkb set BT=?,PXDZ=?,QS=?,PXKSSJ=?,PXJSSJ=?,BMJZSJ=?,PXDDDH=?,PXLXR=?,PXNR=?,ZYSX=?,SRJ=?,DRJ=?,ZAOC=?,WUC=?,WANC=?,BGDH=?,HWWZFJH=?,FJ=?,FBZT='0' where ID=?";
 		this.jdbcTemplate.update(sql, new Object[]{sqxx.get("BT"),sqxx.get("PXDD"),
 				sqxx.get("QS"),sqxx.get("PXKSSJ"),sqxx.get("PXJSSJ"),sqxx.get("BMJZSJ"),
 				sqxx.get("PXDDDH"),sqxx.get("PXLXR"),sqxx.get("PXNR"),sqxx.get("ZYSX"),
 				sqxx.get("SRJ"),sqxx.get("DRJ"),sqxx.get("ZAOC"),sqxx.get("WUC"),
-				sqxx.get("WANC"),sqxx.get("BGZJ"),sqxx.get("HWZDHHM"),sqxx.get("pxid")});
+				sqxx.get("WANC"),sqxx.get("BGZJ"),sqxx.get("HWZDHHM"),sqxx.get("fjurl"),sqxx.get("pxid")});
 	}
 	
 	public void pxxxsc(Map<String, Object> sqxx) throws Exception {
@@ -154,7 +154,7 @@ public class PXMKDao extends BaseDao{
 	}
 
 	public Map<String, Object> getPxnr(String id) {
-		String sql = " select bt,pxkssj,pxjssj,pxlxr,pxnr,zysx from zs_pxqkb where id = ? ";
+		String sql = " select bt,pxkssj,pxjssj,pxlxr,pxnr,zysx,fj as fjUrl,(select FILENAME from fw_filename_url where url=fj and yxbz=1) as fjName from zs_pxqkb where id = ? ";
 		List<Map<String,Object>> ls =  this.jdbcTemplate.queryForList(sql,new Object[]{id});
 		if (ls.size()>0){
 			return ls.get(0);
@@ -234,4 +234,10 @@ public class PXMKDao extends BaseDao{
 		String sql = " delete from zs_pxqkbmb where pxid=? and jg_id=? ";
 		return this.jdbcTemplate.update(sql, new Object[]{pxid,user.getJgId()});
 	}
+	
+	public String getpxqkbFJURL(Object pxid){
+		return this.jdbcTemplate.queryForObject("select case t.fj when t.fj is not null then t.fj else '' end as fj from zs_pxqkb t where id='"+pxid+"'", String.class);
+	}
+	
+	
 }
