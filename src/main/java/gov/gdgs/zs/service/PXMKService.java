@@ -11,19 +11,26 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.dao.UploadDao;
 import com.gdky.restfull.entity.User;
+import com.gdky.restfull.service.UploadService;
 import com.gdky.restfull.utils.Common;
+import com.google.common.base.Objects;
 
 @Service
 @Transactional
 public class PXMKService {
 	@Resource
 	private PXMKDao pxmkDao;
+	
+	@Autowired
+	private UploadDao uploadDao;
 	
 	@Resource
 	private SWSDao swsDao;
@@ -45,6 +52,23 @@ public class PXMKService {
 		
 	}
 	public void fspsq(Map<String,Object> ptxm,String splx)throws Exception {
+		Object fjurl=null; 
+		if(ptxm.containsKey("FJ")&&(splx.equals("pxxxfb")||splx.equals("pxxxxg"))){
+			Map<String,Object> fj=(Map<String, Object>) ptxm.get("FJ");
+			//有记录且记录相同
+			if(ptxm.containsKey("pxid")&&!Objects.equal(ptxm.get("pxid"), "")&&(this.pxmkDao.getpxqkbFJURL(ptxm.get("pxid")).equals(fj.get("uploadUrl").toString()))){
+				fjurl=fj.get("uploadUrl");
+			//无记录或发布
+			}else if(splx.equals("pxxxfb")||this.pxmkDao.getpxqkbFJURL(ptxm.get("pxid")).equals("")){
+				fjurl=fj.get("uploadUrl");
+				this.uploadDao.insertfile(fj);
+			}else if(ptxm.containsKey("pxid")){
+				fjurl=fj.get("uploadUrl");
+				this.uploadDao.insertfile(fj);
+				this.uploadDao.delfile(this.pxmkDao.getpxqkbFJURL(ptxm.get("pxid")));
+			}
+		}
+		ptxm.put("fjurl", fjurl);
 		 switch (splx) {
 			case "pxxxfb"://培训信息发布
 				this.pxmkDao.pxxxfb(ptxm);break;
