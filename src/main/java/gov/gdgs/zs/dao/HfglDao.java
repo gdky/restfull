@@ -57,8 +57,69 @@ public class HfglDao extends BaseDao{
 		 ArrayList<Object> params = condition.getParams();
 		params.add((pn-1)*ps);
 		params.add(ps);
+		StringBuffer ub = new StringBuffer();
+			ub.append("		select  null as 'key','dqytjkey' as 'jgid','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
+			ub.append("		sum(h.yftt) as yftt,sum(h.qjtt) as qjtt,sum(h.yjgr) as yjgr,sum(h.yfgr) as yfgr,");
+			ub.append("		sum(h.qjgr) as qjgr,'1' as issd from (select g.* from (select   b.dwmc,'"+lyear+"' as nd,");
+			ub.append("			(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
+			ub.append("			f_yjtt(b.id, '"+lyear+"')+");
+			ub.append("			(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1 ");
+			ub.append("			and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ) as yjz,");
+			ub.append("			f_yjtt(b.id, '"+lyear+"') as yjtt,");
+			ub.append("			(select sum(e.YJTTHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yftt,");
+			ub.append("			f_qjtt(f_yjtt(b.id, '"+lyear+"'),b.id,'"+lyear+"') as qjtt,");
+			ub.append("			(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1 ");
+			ub.append("			and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') )as yjgr,");
+			ub.append("			(select sum(e.YJGRHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yfgr,");
+			ub.append("			f_qjgr((select count(c.RY_ID)*800 as yjgr from zs_zysws c where");
+			ub.append("					c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ),b.id,'"+lyear+"') as qjgr ");
+			ub.append("			from zs_jg b");
+			ub.append("		"+condition.getSql()+"	and b.yxbz=1) as g  where 1=1 ");
+			if(qury.containsKey("jnqk")){
+			switch((String)qury.get("jnqk")){
+			case "tt":ub.append(" and g.qjtt>0");break;
+			case "gr":ub.append(" and g.qjgr>0");break;
+			case "wcw":ub.append(" and g.jyzsr is not null");break;
+			}}
+			if(qury.containsKey("sorder")){
+				Boolean asc = qury.get("sorder").toString().equals("ascend");
+				switch (qury.get("sfield").toString()) {
+				case "dwmc":
+					if(asc){
+						ub.append("		    order by convert( g.dwmc USING gbk) COLLATE gbk_chinese_ci ");
+					}else{
+						ub.append("		    order by convert( g.dwmc USING gbk) COLLATE gbk_chinese_ci desc");
+					}
+					break;
+				case "jyzsr":
+					if(asc){
+						ub.append("		    order by g.jyzsr ");
+					}else{
+						ub.append("		    order by g.jyzsr desc");
+					}
+					break;
+				case "qjtt":
+					if(asc){
+						ub.append("		    order by g.qjtt ");
+					}else{
+						ub.append("		    order by g.qjtt desc");
+					}
+					break;
+				case "qjgr":
+					if(asc){
+						ub.append("		    order by g.qjgr ");
+					}else{
+						ub.append("		    order by g.qjgr desc");
+					}
+					break;
+				}
+			}
+			ub.append("		    LIMIT ?, ? ) h");
+		Map<String, Object> tj = this.jdbcTemplate.queryForMap(ub.toString(),params.toArray());
+		
+		params.add(params.size()-2,(pn-1)*ps);
 		StringBuffer sb = new StringBuffer();
-		sb.append("		select  SQL_CALC_FOUND_ROWS g.* from (select   @rownum:=@rownum+1 as 'key',b.dwmc,'"+lyear+"' as nd,b.id,");
+		sb.append("		select  SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 AS 'key',g.* from (select   b.dwmc,'"+lyear+"' as nd,b.id,");
 		sb.append("		(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
 		sb.append("		f_yjtt(b.id, '"+lyear+"')+");
 		sb.append("		(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ) as yjz,");
@@ -69,8 +130,8 @@ public class HfglDao extends BaseDao{
 		sb.append("		(select sum(e.YJGRHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yfgr,");
 		sb.append("		f_qjgr((select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ),b.id,'"+lyear+"') as qjgr");
 		sb.append("		,(select v.id from zs_sdjl_jg v where v.jg_id=b.id and v.lx=2 and v.yxbz=1 limit 1) as issd ");
-		sb.append("		from zs_jg b,(select @rownum:=0) zs_ry ");
-		sb.append("	"+condition.getSql()+"	and b.yxbz=1 ) g where 1=1 ");
+		sb.append("		from zs_jg b ");
+		sb.append("	"+condition.getSql()+"	and b.yxbz=1 ) g,(select @rownum:=?) zs_ry where 1=1 ");
 		if(qury.containsKey("jnqk")){
 		switch((String)qury.get("jnqk")){
 		case "tt":sb.append(" and g.qjtt>0");break;
@@ -133,66 +194,8 @@ public class HfglDao extends BaseDao{
 				return map;
 			}
 		});
-	     int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
-		StringBuffer ub = new StringBuffer();
-		ub.append("		select  null as 'key','dqytjkey' as 'jgid','当前页统计：' as dwmc,h.nd,'0' as id,sum(h.jyzsr) as jyzsr,sum(h.yjz) as yjz,sum(h.yjtt) as yjtt,");
-		ub.append("		sum(h.yftt) as yftt,sum(h.qjtt) as qjtt,sum(h.yjgr) as yjgr,sum(h.yfgr) as yfgr,");
-		ub.append("		sum(h.qjgr) as qjgr,'1' as issd from (select g.* from (select   b.dwmc,'"+lyear+"' as nd,");
-		ub.append("			(select a.ZGYWSR from zs_cwbb_lrgd a where a.jg_id=b.id and a.nd='"+lyear+"' and a.ztbj=1 order by a.TIMEVALUE desc limit 1) as jyzsr,");
-		ub.append("			f_yjtt(b.id, '"+lyear+"')+");
-		ub.append("			(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1 ");
-		ub.append("			and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ) as yjz,");
-		ub.append("			f_yjtt(b.id, '"+lyear+"') as yjtt,");
-		ub.append("			(select sum(e.YJTTHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yftt,");
-		ub.append("			f_qjtt(f_yjtt(b.id, '"+lyear+"'),b.id,'"+lyear+"') as qjtt,");
-		ub.append("			(select count(c.RY_ID)*800 as yjgr from zs_zysws c where c.JG_ID=b.id  and c.YXBZ=1 ");
-		ub.append("			and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') )as yjgr,");
-		ub.append("			(select sum(e.YJGRHF) from zs_hyhfjnqk e where e.JG_ID=b.id and e.ND='"+lyear+"' and e.yxbz=1) as yfgr,");
-		ub.append("			f_qjgr((select count(c.RY_ID)*800 as yjgr from zs_zysws c where");
-		ub.append("					c.JG_ID=b.id  and c.YXBZ=1  and c.ry_id not in (select d.RY_ID from zs_hyhfjfryls d where d.nd='"+lyear+"') ),b.id,'"+lyear+"') as qjgr ");
-		ub.append("			from zs_jg b");
-		ub.append("		"+condition.getSql()+"	and b.yxbz=1) as g  where 1=1 ");
-		if(qury.containsKey("jnqk")){
-		switch((String)qury.get("jnqk")){
-		case "tt":ub.append(" and g.qjtt>0");break;
-		case "gr":ub.append(" and g.qjgr>0");break;
-		case "wcw":ub.append(" and g.jyzsr is not null");break;
-		}}
-		if(qury.containsKey("sorder")){
-			Boolean asc = qury.get("sorder").toString().equals("ascend");
-			switch (qury.get("sfield").toString()) {
-			case "dwmc":
-				if(asc){
-					ub.append("		    order by convert( g.dwmc USING gbk) COLLATE gbk_chinese_ci ");
-				}else{
-					ub.append("		    order by convert( g.dwmc USING gbk) COLLATE gbk_chinese_ci desc");
-				}
-				break;
-			case "jyzsr":
-				if(asc){
-					ub.append("		    order by g.jyzsr ");
-				}else{
-					ub.append("		    order by g.jyzsr desc");
-				}
-				break;
-			case "qjtt":
-				if(asc){
-					ub.append("		    order by g.qjtt ");
-				}else{
-					ub.append("		    order by g.qjtt desc");
-				}
-				break;
-			case "qjgr":
-				if(asc){
-					ub.append("		    order by g.qjgr ");
-				}else{
-					ub.append("		    order by g.qjgr desc");
-				}
-				break;
-			}
-		}
-		ub.append("		    LIMIT ?, ? ) h");
-		Map<String, Object> tj = this.jdbcTemplate.queryForMap(ub.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+	    
 		ls.add(tj);
 		Map<String,Object> ob = new HashMap<>();
 		ob.put("data", ls);
