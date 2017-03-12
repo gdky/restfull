@@ -619,6 +619,8 @@ public class YwglService {
 	private void handleYwTH(Long id, Map<String, Object> data) {
 		data.put("id", id);
 		data.put("zt", 6);
+		ywglDao.handleYwTH(id,data);
+		gzapiService.insertYWBB(id, 2);
 	}
 
 	private void handleYwSF(Long id, Map<String, Object> data) {
@@ -1211,8 +1213,6 @@ public class YwglService {
 			String hashid = iterator.next();
 			Long id = HashIdUtil.decode(hashid);
 			batchArgs.add(new Object[]{id});
-			this.sentBackYw(id,null);
-			gzapiService.insertYWBB(id, 2);
 			
 		}
 		ywglDao.batchTH(batchArgs);
