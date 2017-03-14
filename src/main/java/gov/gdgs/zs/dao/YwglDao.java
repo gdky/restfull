@@ -229,7 +229,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	public void sentBack(Long id, Map<String, Object> data) {
-		String sql = "update zs_ywbb set thyy = ?,zt=?, xyzt_dm=?  where id = ? ";
+		String sql = "update zs_ywbb set thyy = ?,zt=?, xyzt_dm=?, zbrq=now()  where id = ? ";
 		this.jdbcTemplate.update(sql,
 				new Object[] { data.get("thyy"), data.get("zt"),data.get("xyzt_dm"), id });
 	}
@@ -1682,7 +1682,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 	
 	public void handleYwTH (Long id,Map<String,Object> data ){
-		String sql  = "update zs_ywbb set sqthyy=:sqthyy, zt=:zt where id = :id";
+		String sql  = "update zs_ywbb set sqthyy=:sqthyy, zt=:zt, zbrq = now(), bbrq = null where id = :id";
 		this.namedParameterJdbcTemplate.update(sql, data);
 	}
 
@@ -1885,7 +1885,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	public void batchTH(List<Object[]> batchArgs) {
-		String sql = "update zs_ywbb set thyy = sqthyy,zt=0, xyzt_dm=1  where id = ? ";
+		String sql = "update zs_ywbb set thyy = sqthyy,zt=0, xyzt_dm=1,bbrq =null  where id = ? ";
 		this.jdbcTemplate.batchUpdate(sql, batchArgs);
 		
 	}
