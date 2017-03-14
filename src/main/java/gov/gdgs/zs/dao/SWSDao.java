@@ -472,4 +472,60 @@ public class SWSDao extends BaseDao{
 		
 		return obj;
 	}
+	
+	public Map<String,Object> swsbgqktj(int pn,int ps,Map<String, Object> qury) {
+		Condition condition = new Condition();
+		condition.add("DATE_FORMAT(g.SPSJ,'%Y')", Condition.EQUAL, qury.get("YEAR"));
+		if(qury.containsKey("MON")){
+			condition.add("DATE_FORMAT(g.SPSJ,'%m')", Condition.EQUAL, qury.get("MON"));
+		}
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', g.*,DATE_FORMAT(g.SPSJ,'%Y-%m-%d') AS SJ from (SELECT b.SPSJ,c.JGZCH,c.DWMC, CONCAT(c.DZHI,' 邮编',c.YZBM) AS YBDZ, DATE_FORMAT(c.SBCLSJ,'%Y-%m-%d') AS SLSJ,c.FDDBR,c.DHUA,'事务所设立' AS BGSZ,'' AS BGNR");
+		sb.append("				FROM ");
+		sb.append("				zs_spzx a,zs_spxx b,zs_jg c");
+		sb.append("				WHERE a.ID=b.SPID AND a.SJID=c.ID AND a.LCBZID='402882891f4b1acc011f546cf7d10091'");
+		sb.append("				 AND a.ZTBJ='N' AND b.ISPASS='Y' AND c.TGZT_DM IN (6,7) ");
+		sb.append("				union ");
+		sb.append("				SELECT b.SPSJ,c.JGZCH,c.DWMC, CONCAT(c.DZHI,' 邮编',c.YZBM) AS YBDZ, DATE_FORMAT(c.SBCLSJ,'%Y-%m-%d') AS SLSJ,c.FDDBR,c.DHUA,'事务所分所设立' AS BGSZ,'' AS BGNR");
+		sb.append("				FROM ");
+		sb.append("				zs_spzx a,zs_spxx b,zs_jg c");
+		sb.append("				WHERE a.ID=b.SPID AND a.SJID=c.ID AND a.LCBZID='4028808722837891012283900818002e' AND b.LCBZID='4028808722837891012283900818002e'");
+		sb.append("				 AND a.ZTBJ='N' AND b.ISPASS='Y' AND c.TGZT_DM IN (6,7) ");
+		sb.append("				union");
+		sb.append("				SELECT b.SPSJ,c.JGZCH,c.DWMC, CONCAT(c.DZHI,' 邮编',c.YZBM) AS YBDZ, DATE_FORMAT(c.SBCLSJ,'%Y-%m-%d') AS SLSJ,c.FDDBR,c.DHUA,'此所已注销' AS BGSZ,'' AS BGNR");
+		sb.append("				FROM ");
+		sb.append("				zs_spzx a,zs_spxx b,zs_jg c,zs_jgzx d");
+		sb.append("				WHERE a.ID=b.SPID AND a.SJID=d.ID AND a.LCBZID='402881831be2e6af011be3adc72c0013'");
+		sb.append("				 AND a.ZTBJ='N' AND b.ISPASS='Y' and d.JG_ID=c.ID and d.SPZT=2");
+		sb.append("				union");
+		sb.append("				SELECT b.SPSJ,c.JGZCH,c.DWMC, CONCAT(c.DZHI,' 邮编',c.YZBM) AS YBDZ, DATE_FORMAT(c.SBCLSJ,'%Y-%m-%d') AS SLSJ,c.FDDBR,c.DHUA,e.MC AS BGSZ,");
+		sb.append("				concat(e.MC,' 由 ',ifnull(e.JZHI,'无内容'),' 变为 ',e.XZHI) AS BGNR");
+		sb.append("				FROM ");
+		sb.append("				zs_spzx a,zs_spxx b,zs_jg c,zs_jgbgspb d,zs_jgbgxxb e");
+		sb.append("				WHERE a.ID=b.SPID AND a.SJID=d.ID AND a.LCBZID='402881831be2e6af011be3ab8b84000d'");
+		sb.append("				 AND a.ZTBJ='N' AND b.ISPASS='Y' and d.JG_ID=c.ID and d.SPZT_DM=8 and e.JGBGSPB_ID=d.ID");
+		sb.append("				union");
+		sb.append("				SELECT b.SPSJ,c.JGZCH,c.DWMC, CONCAT(c.DZHI,' 邮编',c.YZBM) AS YBDZ, DATE_FORMAT(c.SBCLSJ,'%Y-%m-%d') AS SLSJ,c.FDDBR,c.DHUA,e.MC AS BGSZ,");
+		sb.append("				concat(e.MC,' 由 ',ifnull(e.JZHI,'无内容'),' 变为 ',e.XZHI) AS BGNR");
+		sb.append("				FROM ");
+		sb.append("				zs_spzx a,zs_spxx b,zs_jg c,zs_jgbgspb d,zs_jgbgxxb e");
+		sb.append("				WHERE a.ID=b.SPID AND a.SJID=d.ID AND a.LCBZID='40288087228378910122838ecac50023' AND b.LCBZID='40288087228378910122838ecac50023'");
+		sb.append("				 AND a.ZTBJ='N' AND b.ISPASS='Y' and d.JG_ID=c.ID and d.SPZT_DM=8 and e.JGBGSPB_ID=d.ID ) as g,(select @rownum:=?) zs_ry ");
+		sb.append("				 "+condition.getSql()+"  ");
+		sb.append("				order by g.jgzch,g.spsj desc LIMIT ?, ?");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		ob.put("page", meta);
+		return ob;
+	}
 }
