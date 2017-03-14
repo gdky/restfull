@@ -36,6 +36,7 @@ public class SwsService {
 		}
 		return swsDao.swscx(pn, ps, map);
 	}
+	
 	public Map<String, Object> swsslspcx(int pn, int ps, String where) {
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		if (where != null) {
@@ -115,5 +116,20 @@ public class SwsService {
 	
 	public Map<String, Object> getSumCyry(Long jgId, int page, int pagesize) {
 		return swsDao.getSumCyry(jgId,page,pagesize);
+	}
+	public Map<String, Object> swsbgqk(int pn, int ps, String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return swsDao.swsbgqktj(pn, ps, map);
 	}
 }
