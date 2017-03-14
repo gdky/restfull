@@ -1,5 +1,6 @@
 package gov.gdgs.zs.service;
 
+import gov.gdgs.zs.dao.GzApiDao;
 import gov.gdgs.zs.dao.SWSDao;
 import gov.gdgs.zs.dao.YwglDao;
 import gov.gdgs.zs.untils.Condition;
@@ -7,6 +8,7 @@ import gov.gdgs.zs.untils.Condition;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -617,6 +619,8 @@ public class YwglService {
 	private void handleYwTH(Long id, Map<String, Object> data) {
 		data.put("id", id);
 		data.put("zt", 6);
+		ywglDao.handleYwTH(id,data);
+		gzapiService.insertYWBB(id, 2);
 	}
 
 	private void handleYwSF(Long id, Map<String, Object> data) {
@@ -1202,8 +1206,16 @@ public class YwglService {
 		barcode.reGenGroupBarcode(ls);		
 	}
 
-	public Map<String, Object> batchTH(List<String> values, User user) {
-		// TODO Auto-generated method stub
-		return null;
+	public void batchTH(List<String> values, User user) {
+		List<Object[]> batchArgs = new ArrayList<Object[]>();
+		Iterator<String> iterator = values.iterator();
+		while(iterator.hasNext()) {
+			String hashid = iterator.next();
+			Long id = HashIdUtil.decode(hashid);
+			batchArgs.add(new Object[]{id});
+			
+		}
+		ywglDao.batchTH(batchArgs);
+		gzapiService.batchTH(batchArgs);
 	}
 }
