@@ -22,7 +22,7 @@ public class ZzglDao extends BaseDao {
 			Condition condition, String sortField,String sortOrder) {
 		Map<String,String> sf = new HashMap<String,String>();
 		sf.put("sdtime", "jl.sdtime");
-		sf.put("swsmc", "j.dwmc");
+		sf.put("swsmc", "convert(j.dwmc using gbk)");
 		
 		Map<String,String> so = new HashMap<String,String>();
 		so.put("ascend", " asc");
@@ -257,7 +257,7 @@ public class ZzglDao extends BaseDao {
 			Condition condition, String sortField, String sortOrder) {
 		Map<String,String> sf = new HashMap<String,String>();
 		sf.put("sdtime", "s.sdtime");
-		sf.put("xming", "r.xming");
+		sf.put("xming", "convert(r.xming using gbk)");
 		
 		Map<String,String> so = new HashMap<String,String>();
 		so.put("ascend", " asc");
