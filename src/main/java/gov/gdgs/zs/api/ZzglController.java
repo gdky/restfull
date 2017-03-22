@@ -46,9 +46,11 @@ public class ZzglController {
 	public ResponseEntity<Map<String, Object>> getJgZzsd(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pagesize,
-			@RequestParam(value = "where", required = false) String where) {
+			@RequestParam(value = "where", required = false) String where,
+			@RequestParam(value = "sortField",required = false) String sortField,
+			@RequestParam(value = "sortOrder", required= false) String sortOrder) {
 
-		Map<String, Object> obj = zzsdService.getJgZzsd(page, pagesize, where);
+		Map<String, Object> obj = zzsdService.getJgZzsd(page, pagesize, where,sortField,sortOrder);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 
@@ -141,15 +143,17 @@ public class ZzglController {
 	}
 	
 	/**
-	 * 获取资质被锁税务师名单
+	 * 获取资质被锁税务师名单,
 	 */
 	@RequestMapping(value = "/swszzsdjl", method = RequestMethod.GET)
 	public ResponseEntity<Map<String, Object>> getSWSsdjl(
 			@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "pagesize", required = true) int pagesize,
-			@RequestParam(value = "where", required = false) String where) {
+			@RequestParam(value = "where", required = false) String where,
+			@RequestParam(value="sortField",required = false) String sortField,
+			@RequestParam(value="sortOrder",required = false) String sortOrder ) {
 
-		Map<String, Object> obj = zzsdService.getSWSsdjl(page, pagesize, where);
+		Map<String, Object> obj = zzsdService.getSWSsdjl(page, pagesize, where,sortField,sortOrder);
 		return new ResponseEntity<>(obj, HttpStatus.OK);
 	}
 	

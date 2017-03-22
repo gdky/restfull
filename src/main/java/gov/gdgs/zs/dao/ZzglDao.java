@@ -19,7 +19,20 @@ import org.springframework.stereotype.Repository;
 public class ZzglDao extends BaseDao {
 
 	public Map<String, Object> getJgZzsd(int page, int pagesize,
-			Condition condition) {
+			Condition condition, String sortField,String sortOrder) {
+		Map<String,String> sf = new HashMap<String,String>();
+		sf.put("sdtime", "jl.sdtime");
+		sf.put("swsmc", "convert(j.dwmc using gbk)");
+		
+		Map<String,String> so = new HashMap<String,String>();
+		so.put("ascend", " asc");
+		so.put("descend", " desc");
+		
+		String orderBySql = "jl.sdtime desc";
+		if (null != sortField && !sortField.isEmpty()){
+			orderBySql = sf.get(sortField)+so.get(sortOrder);
+		}
+		
 		condition.add(" AND jl.jg_id = j.id ");
 		condition.add(" AND jl.yxbz = 1 ");
 		StringBuffer sb = new StringBuffer();
@@ -30,13 +43,13 @@ public class ZzglDao extends BaseDao {
 		// <=== 查询条件集合
 		sb.append(" ( "
 				+ condition.getSelectSql("zs_sdjl_jg as jl, zs_jg as j", "jl.id"));
-		sb.append("    ORDER BY j.id ");
+		sb.append("    ORDER BY "+ orderBySql + ", j.id ");
 		sb.append("    LIMIT ? , ?) sub ");
 		// ===> 插入查询条件集合结束
 		
 		sb.append(" WHERE v.id = sub.id  ");
 		sb.append(" AND v.jg_id = j.id  ");
-		sb.append(" ORDER BY v.sdtime desc) as t, ");
+		sb.append(" ) as t, ");
 		sb.append(" (SELECT @rownum:=?) tmp ");
 
 		// 装嵌传值数组
@@ -241,14 +254,26 @@ public class ZzglDao extends BaseDao {
 	}
 
 	public Map<String, Object> getSWSsdjl(int page, int pagesize,
-			Condition condition) {
+			Condition condition, String sortField, String sortOrder) {
+		Map<String,String> sf = new HashMap<String,String>();
+		sf.put("sdtime", "s.sdtime");
+		sf.put("xming", "convert(r.xming using gbk)");
+		
+		Map<String,String> so = new HashMap<String,String>();
+		so.put("ascend", " asc");
+		so.put("descend", " desc");
+		
+		String orderBySql = "s.sdtime desc";
+		if (null != sortField){
+			orderBySql = sf.get(sortField)+so.get(sortOrder);
+		}
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select SQL_CALC_FOUND_ROWS s.id,s.sdyy,s.sdr,s.sdr_role,s.sdtime,s.jsr,s.jsr_role,s.jstime,s.yxbz, ");
 		sb.append(" r.XMING from zs_sdjl_zysws s,zs_zysws z,zs_ryjbxx r ");
 		sb.append(condition.getSql());
 		sb.append(" and s.ZYSWS_ID = z.ID ");
 		sb.append(" and z.RY_ID = r.ID ");
-		sb.append(" order by s.yxbz desc, s.sdtime desc ");
+		sb.append(" order by s.yxbz desc, "+orderBySql);
 		sb.append(" limit ?,? ");
 		
 		int startIndex = pagesize * (page - 1);
