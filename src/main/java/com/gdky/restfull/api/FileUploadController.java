@@ -76,9 +76,9 @@ public class FileUploadController {
 			if (!path.exists()) {
 				path.mkdir();
 			}
-			String filename = uploadDir
+			String filename = Constants.UPLOAD_LOCATION + uploadDir
 					+ Hashing.crc32().hashBytes(file.getBytes()) + "." + ext;
-			File to = new File(Constants.UPLOAD_LOCATION + filename);
+			File to = new File(filename);
 			ResponseMessage rm = new ResponseMessage(
 					ResponseMessage.Type.success, "201", filename);
 			try {

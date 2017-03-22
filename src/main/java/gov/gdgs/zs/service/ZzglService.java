@@ -34,7 +34,7 @@ public class ZzglService {
 	private AuthDao authDao;
 
 	public Map<String, Object> getJgZzsd(int page, int pagesize,
-			String whereParam) {
+			String whereParam, String sortField,String sortOrder) {
 		HashMap<String, Object> where = new HashMap<String, Object>();
 		if (whereParam != null) {
 			try {
@@ -57,7 +57,7 @@ public class ZzglService {
 		condition.add("jl.jstime", "DATE_BETWEEN", where.get("jstime"));
 		condition.add("j.dwmc", "FUZZY", where.get("swsmc"));
 
-		Map<String, Object> rs = zzglDao.getJgZzsd(page, pagesize, condition);
+		Map<String, Object> rs = zzglDao.getJgZzsd(page, pagesize, condition,sortField,sortOrder);
 		return rs;
 	}
 
@@ -219,7 +219,7 @@ public class ZzglService {
 		
 	}
 
-	public Map<String, Object> getSWSsdjl(int page, int pagesize, String whereParam) {
+	public Map<String, Object> getSWSsdjl(int page, int pagesize, String whereParam, String sortField, String sortOrder) {
 		HashMap<String, Object> where = new HashMap<String, Object>();
 		if (whereParam != null) {
 			try {
@@ -242,7 +242,7 @@ public class ZzglService {
 		condition.add("s.jstime", "DATE_BETWEEN", where.get("jstime"));
 		condition.add("r.xming", "FUZZY", where.get("xming"));
 
-		Map<String, Object> rs = zzglDao.getSWSsdjl(page, pagesize, condition);
+		Map<String, Object> rs = zzglDao.getSWSsdjl(page, pagesize, condition,sortField,sortOrder);
 		return rs;
 	}
 
