@@ -209,7 +209,7 @@ public class PXMKDao extends BaseDao{
 
 	public List<Map<String, Object>> getPxbmRy(User user, String id) {
 		String sql = " select xming,xb,zw,yddh,dhhm,nl,email,fjlx,zaoc,wuc,wanc,rzsj,lksj,bz "
-				+ "from zs_pxqkbmb where pxid = ? and jg_id= ? and yxbz =1 ";
+				+ "from zs_pxqkbmb where pxid = ? and jg_id= ? and yxbz =1 order by bmsj asc";
 		return   this.jdbcTemplate.queryForList(sql,new Object[]{id,user.getJgId()});
 	}
 
@@ -226,8 +226,8 @@ public class PXMKDao extends BaseDao{
 	
 	public int[] addPxbm (Map<String, Object>[] values){
 		StringBuffer sb = new StringBuffer();
-		sb.append(" insert into zs_pxqkbmb (ID,PXID,JG_ID,XMING,XB,ZW,YDDH,DHHM,NL,EMAIL,FJLX,ZAOC,WUC,WANC,RZSJ,LKSJ,BMSJ,BZ,YXBZ) ");
-		sb.append(" values(:id,:pxid,:jg_id,:xming,:xb,:zw,:yddh,:dhhm,:nl,:email,:fjlx,:zaoc,:wuc,:wanc,:rzsj,:lksj,:bmsj,:bz,1) ");
+		sb.append(" insert into zs_pxqkbmb (ID,PXID,JG_ID,XMING,XB,ZW,YDDH, NL,FJLX,ZAOC,WUC,WANC,RZSJ,LKSJ,BMSJ,BZ,YXBZ) ");
+		sb.append(" values(:id,:pxid,:jg_id,:xming,:xb,:zw,:yddh,:nl,:fjlx,:zaoc,:wuc,:wanc,:rzsj,:lksj,:bmsj,:bz,1) ");
 		return this.namedParameterJdbcTemplate.batchUpdate(sb.toString(), values);
 	}
 	public int delRyByPxidAndUser(User user, String pxid){
