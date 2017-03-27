@@ -196,18 +196,18 @@ public class MessageDao extends BaseJdbcDao {
 	}
 
 	public void groupSend(User sender, String title, String content,
-			Integer type, List<String> recivers, String reciverDes, String exp_time) {
+			Integer type, List<String> recivers, String reciverDes, String exp_time,Object file) {
 		String cre_time = Common.getCurrentTime2MysqlDateTime();
 		StringBuffer sb = new StringBuffer();
 		// 先添加消息本体
 		sb.append(" insert into fw_msg_text ");
-		sb.append(" (id,title,content,senderid,role,reciver,type,create_time,expired_time) ");
-		sb.append(" values(?,?,?,?,?,?,?,?,?) ");
+		sb.append(" (id,title,content,senderid,role,reciver,type,create_time,expired_time,file) ");
+		sb.append(" values(?,?,?,?,?,?,?,?,?,?) ");
 		List<Object[]> batchArgs = new ArrayList<>();
 		for (int i = 0; i < recivers.size(); i++) {
 			String uuid_text = Common.newUUID();
 			batchArgs.add(new Object[] {uuid_text, title, content, sender.getId(), recivers.get(i),reciverDes, type, cre_time,
-					exp_time });
+					exp_time,file });
 		}
 		this.jdbcTemplate.batchUpdate(sb.toString(), batchArgs);
 
@@ -215,7 +215,7 @@ public class MessageDao extends BaseJdbcDao {
 	}
 
 	public Map<String, Object> getMsg(String id) {
-		String sql = " select title,content,DATE_FORMAT(create_time,'%Y-%m-%d %T') as create_time from fw_msg_text where id = ? ";
+		String sql = " select title,file,(select a.FILENAME from fw_filename_url a  where a.url=file and a.yxbz=1) as fjName,content,DATE_FORMAT(create_time,'%Y-%m-%d %T') as create_time from fw_msg_text where id = ? ";
 		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql,new Object[]{id});
 		if(ls.size()>0){
 			return ls.get(0);
@@ -227,18 +227,18 @@ public class MessageDao extends BaseJdbcDao {
 	 * 发送至未缴费会员信息
 	 */
 	public void sendToWJF(User sender, String title, String content,
-			Integer type, String label, String exp_time, String year) {
+			Integer type, String label, String exp_time, String year,Object file) {
 		String uuid = Common.newUUID();
 		String cre_time = Common.getCurrentTime2MysqlDateTime();
 		
 		StringBuffer sb = new StringBuffer();
 		// 先添加消息本体
 		sb.append(" insert into fw_msg_text ");
-		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time) ");
-		sb.append(" values(?,?,?,?,?,?,?,?) ");
+		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time,file) ");
+		sb.append(" values(?,?,?,?,?,?,?,?,?) ");
 		this.jdbcTemplate.update(sb.toString(), new Object[] { uuid,
 				title, content, sender.getId(), label, type, cre_time,
-				exp_time });
+				exp_time,file });
 		//再添加接收人记录
 		sb.setLength(0);
 		sb.append(" insert into fw_msg_log (reciid,sendid,textid,zt) ");
@@ -264,18 +264,18 @@ public class MessageDao extends BaseJdbcDao {
 	 * 发送至未交财务报表会员
 	 */
 	public void sendToWSBCWBB(User sender, String title, String content,
-			Integer type, String label, String exp_time, String year) {
+			Integer type, String label, String exp_time, String year,Object file) {
 		String uuid = Common.newUUID();
 		String cre_time = Common.getCurrentTime2MysqlDateTime();
 		
 		StringBuffer sb = new StringBuffer();
 		// 先添加消息本体
 		sb.append(" insert into fw_msg_text ");
-		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time) ");
-		sb.append(" values(?,?,?,?,?,?,?,?) ");
+		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time,file) ");
+		sb.append(" values(?,?,?,?,?,?,?,?,?) ");
 		this.jdbcTemplate.update(sb.toString(), new Object[] { uuid,
 				title, content, sender.getId(), label, type, cre_time,
-				exp_time });
+				exp_time,file });
 		//再添加接收人记录
 		sb.setLength(0);
 		sb.append(" insert into fw_msg_log (reciid,sendid,textid,zt) ");
@@ -297,18 +297,18 @@ public class MessageDao extends BaseJdbcDao {
 	 * 发送至未上报报表事务所
 	 */
 	public void sendToWSBHYBB(User sender, String title, String content,
-			Integer type, String label, String exp_time, String year) {
+			Integer type, String label, String exp_time, String year,Object file) {
 		String uuid = Common.newUUID();
 		String cre_time = Common.getCurrentTime2MysqlDateTime();
 		
 		StringBuffer sb = new StringBuffer();
 		// 先添加消息本体
 		sb.append(" insert into fw_msg_text ");
-		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time) ");
+		sb.append(" (id,title,content,senderid,reciver,type,create_time,expired_time,file) ");
 		sb.append(" values(?,?,?,?,?,?,?,?) ");
 		this.jdbcTemplate.update(sb.toString(), new Object[] { uuid,
 				title, content, sender.getId(), label, type, cre_time,
-				exp_time });
+				exp_time,file });
 		//再添加接收人记录
 		sb.setLength(0);
 		sb.append(" insert into fw_msg_log (reciid,sendid,textid,zt) ");

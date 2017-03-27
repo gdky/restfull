@@ -106,7 +106,7 @@ public class FileUploadController {
 	@RequestMapping(value = "/delfile", method = RequestMethod.DELETE)
 	public ResponseEntity<?> handleDelFile(@RequestBody Object url) throws IOException {
 			String uploadDir = url.toString();
-			File path = new File(Constants.UPLOAD_LOCATION + uploadDir);
+			File path = new File(uploadDir);
 			ResponseMessage rm = new ResponseMessage(
 					ResponseMessage.Type.success, "201", "文件删除成功");
 			if (path.isFile() && path.exists()) {

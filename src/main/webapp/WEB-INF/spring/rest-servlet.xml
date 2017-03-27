@@ -10,7 +10,7 @@
         http://www.springframework.org/schema/mvc   
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 	<mvc:default-servlet-handler />  
-    <mvc:resources mapping="/files/**" location="file:E:/upload/files/"/> 
+    <mvc:resources mapping="/upload/files/**" location="file:E:/upload/files/"/> 
 
 	<bean
 		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
