@@ -49,6 +49,7 @@ public class MessageService {
 		String year =(String)message.get("year");
 		String title = (String) message.get("title");
 		String content = (String) message.get("content");
+		Object file =  message.get("file").toString().equals("false")?null:message.get("file").toString();
 		Integer type = (Integer) message.get("type");
 		//群组发送的消息设置180天的有效期
 		Calendar cal = Calendar.getInstance();
@@ -60,20 +61,20 @@ public class MessageService {
 		if("3".equals(key)){ 
 			//1表示省内事务所
 			recivers.add("3");
-			messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
+			messageDao.groupSend(sender,title,content,type,recivers,label,exp_time,file);
 		
 		}else if ("114".equals(key)){
 			//114表示外省事务所
 			recivers.add("114");
-			messageDao.groupSend(sender,title,content,type,recivers,label,exp_time);
+			messageDao.groupSend(sender,title,content,type,recivers,label,exp_time,file);
 			
 		}else if ("211".equals(key)){
 			String reciverDes = year + label;
-			messageDao.sendToWJF(sender,title,content,type,reciverDes,exp_time,year);
+			messageDao.sendToWJF(sender,title,content,type,reciverDes,exp_time,year,file);
 		}else if ("212".equals(key)){
-			messageDao.sendToWSBCWBB(sender,title,content,type,label,exp_time,year);
+			messageDao.sendToWSBCWBB(sender,title,content,type,label,exp_time,year,file);
 		}else if ("213".equals(key)){
-			messageDao.sendToWSBHYBB(sender,title,content,type,label,exp_time,year);
+			messageDao.sendToWSBHYBB(sender,title,content,type,label,exp_time,year,file);
 		}
 		return null;
 	}
