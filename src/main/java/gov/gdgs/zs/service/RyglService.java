@@ -212,4 +212,19 @@ public class RyglService {
 		int ryid = (int)hashids.decode(gid)[0];
 		return ryglDao.swsbarslx(ryid);
 	}
+	public Map<String, Object> swsbdtj(int pn, int ps, String where) {
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return ryglDao.swsbdtj(pn, ps, map);
+	}
 }
