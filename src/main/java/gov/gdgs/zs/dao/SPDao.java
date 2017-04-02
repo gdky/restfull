@@ -516,7 +516,7 @@ public class SPDao extends BaseDao{
 					 gzApiService.insertSWS(getSWSID("zs_fzyzzy",(String)mp.get("SJID")), 1);
 					 break;
 				 case 14:
-					 this.jdbcTemplate.update("update zs_fzyswszj a,zs_fzysws b,zs_ryjbxx c set a.RYSPZT_DM='1',c.RYZT_DM='6',c.YXBZ='0',b.FZYZT_DM='6',b.RYSPGCZT_DM='1',b.YXBZ='0' where a.id =? and a.FZY_ID=b.id and b.ry_id=c.id",
+					 this.jdbcTemplate.update("update zs_fzyswszj a,zs_fzysws b,zs_ryjbxx c set a.RYSPZT_DM='2',c.RYZT_DM='6',c.YXBZ='0',b.FZYZT_DM='6',b.RYSPGCZT_DM='1',b.YXBZ='0' where a.id =? and a.FZY_ID=b.id and b.ry_id=c.id",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 15:
@@ -618,7 +618,7 @@ public class SPDao extends BaseDao{
 							 new Object[]{spsq.get("spyj"),spsq.get("uname"),mp.get("SJID")});
 					 break;
 				 case 14:
-					 this.jdbcTemplate.update("update zs_fzyswszj a,zs_fzysws b set a.RYSPZT_DM='2',b.RYSPGCZT_DM='1' where a.id =? and a.FZY_ID=b.id ",
+					 this.jdbcTemplate.update("update zs_fzyswszj a,zs_fzysws b set a.RYSPZT_DM='1',b.RYSPGCZT_DM='1' where a.id =? and a.FZY_ID=b.id ",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 15:
