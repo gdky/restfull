@@ -238,6 +238,12 @@ public class PXMKDao extends BaseDao{
 	public String getpxqkbFJURL(Object pxid){
 		return this.jdbcTemplate.queryForObject("select case t.fj when t.fj is not null then t.fj else '' end as fj from zs_pxqkb t where id='"+pxid+"'", String.class);
 	}
+
+	public List<Integer> makeBHs(Integer size) {
+		String sql = "insert into zs_keypool (text) values(?)";
+		return this.getKeysFromKeyPool(sql, size);
+		
+	}
 	
 	
 }

@@ -132,8 +132,7 @@ public class PubApiController {
 		
 		return new ResponseEntity<>(pxmkService.getPxxx(page, pagesize, whereparam),HttpStatus.OK);
 	}
-	
-	
+
 
 	
 }
