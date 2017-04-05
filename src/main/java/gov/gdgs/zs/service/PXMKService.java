@@ -125,11 +125,13 @@ public class PXMKService {
 		return rs;
 	}
 	public void addPxbm(User user, String pxid, List<Map<String, Object>> values) {
+		List<Integer> ls = pxmkDao.makeBHs(values.size());
 		for (Map<String,Object> item : values){
 			item.put("id", Common.newUUID());
 			item.put("pxid", pxid);
 			item.put("jg_id", user.getJgId());
 			item.put("bmsj", Common.getCurrentTime2MysqlDateTime());
+			item.put("bh", "PX");
 		}
 		pxmkDao.addPxbm(values.toArray(new HashMap[values.size()]));
 		
@@ -145,5 +147,6 @@ public class PXMKService {
 		pxmkDao.delRyByPxidAndUser(user, pxid);
 		pxmkDao.addPxbm(values.toArray(new HashMap[values.size()]));
 	}
+
 	
 }
