@@ -45,6 +45,22 @@ public class RyglController {
 		
 	}
 	/**
+	 * 税务师变动情况统计
+	 * @param pn
+	 * @param ps
+	 * @param where
+	 * @return
+	 */
+	@RequestMapping(value = "/rygl/swsbdtj", method = { RequestMethod.GET })
+	public ResponseEntity<Map<String, Object>> swsbgqk(
+			@RequestParam(value = "pagenum", required = true) int pn,
+			@RequestParam(value = "pagesize", required = true) int ps,
+			@RequestParam(value="where", required=false) String where)  {
+		
+		return new ResponseEntity<>(ryglService.swsbdtj(pn, ps, where),HttpStatus.OK);
+		
+	}
+	/**
 	 * 事物所端人员查询
 	 * @param pn
 	 * @param ps

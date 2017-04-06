@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.management.Query;
 
 import org.hashids.Hashids;
@@ -1143,6 +1144,40 @@ public class RyglDao extends BaseDao{
 	public Map<String, Object> swsbarslx(int ryid) {
 		return this.jdbcTemplate.queryForMap("select ZYRYBALB_DM as rslb,DCS,YJGMC,YJGDH from zs_zyrybayyb where ZYSWS_ID=? limit 1",new Object[]{ryid});
 	}
-	
+	/**
+	 * 税务师变动统计
+	 * @param pn
+	 * @param ps
+	 * @param qury
+	 * @return
+	 */
+	public Map<String,Object> swsbdtj(int pn,int ps,Map<String, Object> qury) {
+		Condition condition = new Condition();
+		condition.add("DATE_FORMAT(g.SPSJ,'%Y')", Condition.EQUAL, qury.get("YEAR"));
+		if(qury.containsKey("MON")){
+			condition.add("DATE_FORMAT(g.SPSJ,'%m')", Condition.EQUAL, qury.get("MON"));
+		}
+		condition.add("g.XMING", Condition.EQUAL, qury.get("xm"));
+		condition.add("g.BD_DM", Condition.EQUAL, qury.get("spsx"));
+		ArrayList<Object> params = condition.getParams();
+		params.add(0,(pn-1)*ps);
+		params.add((pn-1)*ps);
+		params.add(ps);
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select SQL_CALC_FOUND_ROWS @rownum:=@rownum+1 as 'key', g.*,DATE_FORMAT(g.SPSJ,'%Y-%m-%d %H-%i-%s') AS SJ ");
+		sb.append("				FROM v_zs_rysptj g,(select @rownum:=?) zs_ry ");
+		sb.append("				 "+condition.getSql()+"  ");
+		sb.append("				order by g.spsj desc LIMIT ?, ?");
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sb.toString(),params.toArray());
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String,Object> ob = new HashMap<>();
+		ob.put("data", ls);
+		Map<String, Object> meta = new HashMap<>();
+		meta.put("pageNum", pn);
+		meta.put("pageSize", ps);
+		meta.put("pageTotal",total);
+		ob.put("page", meta);
+		return ob;
+	}
 }
 
