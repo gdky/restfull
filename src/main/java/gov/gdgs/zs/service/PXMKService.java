@@ -4,6 +4,7 @@ import gov.gdgs.zs.dao.PXMKDao;
 import gov.gdgs.zs.dao.SWSDao;
 import gov.gdgs.zs.untils.Condition;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdky.restfull.dao.UploadDao;
 import com.gdky.restfull.entity.User;
-import com.gdky.restfull.service.UploadService;
 import com.gdky.restfull.utils.Common;
 import com.google.common.base.Objects;
 
@@ -126,23 +126,35 @@ public class PXMKService {
 	}
 	public void addPxbm(User user, String pxid, List<Map<String, Object>> values) {
 		List<Integer> ls = pxmkDao.makeBHs(values.size());
+		Calendar calendar = Calendar.getInstance();
+		int year =  (calendar.get(Calendar.YEAR)%100);
+		String month = Common.addZero(calendar.get(Calendar.MONTH)+1, 2);
+		int i = 0;
 		for (Map<String,Object> item : values){
 			item.put("id", Common.newUUID());
 			item.put("pxid", pxid);
 			item.put("jg_id", user.getJgId());
 			item.put("bmsj", Common.getCurrentTime2MysqlDateTime());
-			item.put("bh", "PX");
+			item.put("bh", "PX"+year+month+Common.addZero((int)ls.get(i), 4));
+			i++;
 		}
 		pxmkDao.addPxbm(values.toArray(new HashMap[values.size()]));
 		
 	}
 	public void updatePxbm(User user, String pxid,
 			List<Map<String, Object>> values) {
+		List<Integer> ls = pxmkDao.makeBHs(values.size());
+		Calendar calendar = Calendar.getInstance();
+		int year =  (calendar.get(Calendar.YEAR)%100);
+		String month = Common.addZero(calendar.get(Calendar.MONTH)+1, 2);
+		int i = 0;
 		for (Map<String,Object> item : values){
 			item.put("id", Common.newUUID());
 			item.put("pxid", pxid);
 			item.put("jg_id", user.getJgId());
 			item.put("bmsj", Common.getCurrentTime2MysqlDateTime());
+			item.put("bh", "PX"+year+month+Common.addZero((int)ls.get(i), 4));
+			i++;
 		}
 		pxmkDao.delRyByPxidAndUser(user, pxid);
 		pxmkDao.addPxbm(values.toArray(new HashMap[values.size()]));
