@@ -94,7 +94,7 @@ public class PXMKDao extends BaseDao{
 	}
 	public List<Map<String,Object>> pxtjbmList(String pxid){
 		StringBuffer sb = new StringBuffer();
-		sb.append("	select b.DWMC,a.XMING,a.XB,a.BMSJ,");
+		sb.append("	select a.BH,b.DWMC,a.XMING,a.XB,a.BMSJ,");
 		sb.append("	a.ZW,a.YDDH,");
 		sb.append("	case a.FJLX when 1 then '单' when 2 then '双' else null end as DF,");
 		sb.append("	case a.FJLX when 1 then '是' else null end as DRJ,");
