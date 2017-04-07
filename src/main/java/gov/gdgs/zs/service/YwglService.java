@@ -113,6 +113,7 @@ public class YwglService {
 			condition.add("zsfs_dm", "EQUAL", where.get("zsfs_dm"));
 			condition.add("is_yd", "EQUAL", where.get("is_yd"));
 			condition.add("swbz", "EQUAL", where.get("swbz"));
+			condition.add("wtdwnsrsbh",Condition.EQUAL,where.get("wtdwnsrsbh"));
 		}
 		condition.add(" AND yxbz = 1 ");		
 		
@@ -1217,5 +1218,19 @@ public class YwglService {
 		}
 		ywglDao.batchTH(batchArgs);
 		gzapiService.batchTH(batchArgs);
+	}
+
+	public Map<String, Object> getYwbbByNsrsbh(String wtdwnsrsbh, String ywlx,
+			String nd, String swsswdjzh) {
+		if (StringUtils.isBlank(wtdwnsrsbh)|| StringUtils.isBlank(swsswdjzh)) {
+			throw new YwbbException("报备号码或者验证码不能为空");
+		}
+		wtdwnsrsbh = wtdwnsrsbh.trim();
+		swsswdjzh = swsswdjzh.trim();
+		Map<String, Object> rs = ywglDao.getYwbbByNsrsbh(wtdwnsrsbh, ywlx,nd,swsswdjzh);
+		if(rs == null) {
+			throw new YwbbException("无法查询到相应的业务信息，请提供有效的报备号码和验证码。");
+		}
+		return rs;
 	}
 }
