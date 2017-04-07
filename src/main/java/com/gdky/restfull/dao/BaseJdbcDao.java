@@ -2,14 +2,19 @@ package com.gdky.restfull.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;  
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -70,5 +75,44 @@ public class BaseJdbcDao {
 		SqlParameterSource ps=new MapSqlParameterSource(paramObj);
 		namedParameterJdbcTemplate.update(sqlStatement,ps,keyHolder,idColumnName);
 		return keyHolder.getKey();
+	}
+	
+	/**
+	 * 单纯批量插入数行，然后获取新增的id
+	 * @param sql
+	 * @param rowCounts
+	 * @return
+	 */
+	public List<Integer> getKeysFromKeyPool (final String sql, final int rowCounts){
+
+		return (List<Integer>)jdbcTemplate.execute(new PreparedStatementCreator() {
+			
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con)
+					throws SQLException {
+				con.setAutoCommit(false);  
+				PreparedStatement pst = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+				for (int i = 0; i<rowCounts; i++){
+					pst.setObject(1, 1);
+					pst.addBatch();
+				}
+				pst.executeBatch();
+				con.commit();
+				return pst;
+			}
+		},new PreparedStatementCallback<List<Integer>>() {
+
+			@Override
+			public List<Integer> doInPreparedStatement(PreparedStatement ps)
+					throws SQLException, DataAccessException {
+				ResultSet rs = ps.getGeneratedKeys();
+				List<Integer> list = new ArrayList<Integer>();   
+			       while(rs.next()) {  
+			           list.add(rs.getInt(1));//取得ID  
+			       }  
+				rs.close(); 
+				return list;
+			}
+		});
 	}
 }

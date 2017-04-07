@@ -94,7 +94,7 @@ public class PXMKDao extends BaseDao{
 	}
 	public List<Map<String,Object>> pxtjbmList(String pxid){
 		StringBuffer sb = new StringBuffer();
-		sb.append("	select b.DWMC,a.XMING,a.XB,a.BMSJ,");
+		sb.append("	select a.BH,b.DWMC,a.XMING,a.XB,a.BMSJ,");
 		sb.append("	a.ZW,a.YDDH,");
 		sb.append("	case a.FJLX when 1 then '单' when 2 then '双' else null end as DF,");
 		sb.append("	case a.FJLX when 1 then '是' else null end as DRJ,");
@@ -208,7 +208,7 @@ public class PXMKDao extends BaseDao{
 	}
 
 	public List<Map<String, Object>> getPxbmRy(User user, String id) {
-		String sql = " select xming,xb,zw,yddh,dhhm,nl,email,fjlx,zaoc,wuc,wanc,rzsj,lksj,bz "
+		String sql = " select xming,xb,zw,yddh,dhhm,nl,email,fjlx,zaoc,wuc,wanc,rzsj,lksj,bz,bh "
 				+ "from zs_pxqkbmb where pxid = ? and jg_id= ? and yxbz =1 order by bmsj asc";
 		return   this.jdbcTemplate.queryForList(sql,new Object[]{id,user.getJgId()});
 	}
@@ -226,8 +226,8 @@ public class PXMKDao extends BaseDao{
 	
 	public int[] addPxbm (Map<String, Object>[] values){
 		StringBuffer sb = new StringBuffer();
-		sb.append(" insert into zs_pxqkbmb (ID,PXID,JG_ID,XMING,XB,ZW,YDDH, NL,FJLX,ZAOC,WUC,WANC,RZSJ,LKSJ,BMSJ,BZ,YXBZ) ");
-		sb.append(" values(:id,:pxid,:jg_id,:xming,:xb,:zw,:yddh,:nl,:fjlx,:zaoc,:wuc,:wanc,:rzsj,:lksj,:bmsj,:bz,1) ");
+		sb.append(" insert into zs_pxqkbmb (ID,PXID,JG_ID,XMING,XB,ZW,YDDH, NL,FJLX,ZAOC,WUC,WANC,RZSJ,LKSJ,BMSJ,BZ,BH,YXBZ) ");
+		sb.append(" values(:id,:pxid,:jg_id,:xming,:xb,:zw,:yddh,:nl,:fjlx,:zaoc,:wuc,:wanc,:rzsj,:lksj,:bmsj,:bz,:bh,1) ");
 		return this.namedParameterJdbcTemplate.batchUpdate(sb.toString(), values);
 	}
 	public int delRyByPxidAndUser(User user, String pxid){
@@ -237,6 +237,12 @@ public class PXMKDao extends BaseDao{
 	
 	public String getpxqkbFJURL(Object pxid){
 		return this.jdbcTemplate.queryForObject("select case t.fj when t.fj is not null then t.fj else '' end as fj from zs_pxqkb t where id='"+pxid+"'", String.class);
+	}
+
+	public List<Integer> makeBHs(Integer size) {
+		String sql = "insert into zs_keypool (text) values(?)";
+		return this.getKeysFromKeyPool(sql, size);
+		
 	}
 	
 	

@@ -120,6 +120,17 @@ public class PubApiController {
 		
 		return  ResponseEntity.ok(rs);
 	}
+	//报备按纳税人识别号和类型查询
+		@RequestMapping(value = "/ywbb/lxsbh", method = RequestMethod.GET)
+		public ResponseEntity<?> getYwbbByNsrsbh (
+				@RequestParam String wtdwnsrsbh,
+				@RequestParam String ywlx,
+				@RequestParam String nd,
+				@RequestParam String swsswdjzh) throws Exception{
+			Map<String,Object> rs = ywglService.getYwbbByNsrsbh(wtdwnsrsbh,ywlx,nd,swsswdjzh);
+			
+			return  ResponseEntity.ok(rs);
+		}
 	
 	/*
 	 * 门户网站用培训信息列表
@@ -132,8 +143,7 @@ public class PubApiController {
 		
 		return new ResponseEntity<>(pxmkService.getPxxx(page, pagesize, whereparam),HttpStatus.OK);
 	}
-	
-	
+
 
 	
 }
