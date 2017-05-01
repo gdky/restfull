@@ -55,4 +55,22 @@ public class CustomerService {
 		customerDao.delCustomer(id);
 	}
 
+	public Map<String, Object> searchCustomers(int page, int pageSize,
+			String jgid, String where) {
+		Long jid = HashIdUtil.decode(jgid);
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (where != null) {
+			try {
+				where = java.net.URLDecoder.decode(where, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(where,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return customerDao.searchCustomers(page,pageSize,jid,map);
+	}
+
 }

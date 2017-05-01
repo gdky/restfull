@@ -84,13 +84,13 @@ public class YwglDao extends BaseJdbcDao {
 
 	public List<Map<String, Object>> getZyswsByJg(Integer id) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select r.XMING,z.ID as ZYSWS_ID ");
+		sb.append(" select r.XMING,r.ID as ZYSWS_ID ");
 		sb.append(" from zs_jg j,zs_ryjbxx r,zs_zysws z ");
 		sb.append(" where j.id = z.JG_ID ");
 		sb.append(" and z.RY_ID = r.ID ");
 		sb.append(" and j.ID=? ");
 		sb.append(" and z.RYSPGCZT_DM = 1 ");
-		sb.append("  and z.ID not in (select zysws_id from zs_sdjl_zysws where yxbz = 1) ");
+		sb.append("  and r.ID not in (select zysws_id from zs_sdjl_zysws where yxbz = 1) ");
 		sb.append(" and z.YXBZ=1 ");
 		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
 				sb.toString(), new Object[] { id });
