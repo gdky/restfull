@@ -226,7 +226,7 @@ public class ZzglDao extends BaseDao {
 		sb.append(" and z.JG_ID = j.ID ");
 		sb.append(" and z.YXBZ =1  ");
 		sb.append(" and z.ZYZT_DM = 1 ");
-		sb.append(" order by islock desc, id desc ");
+		sb.append(" order by islock desc, ry_id desc ");
 		sb.append(" limit ?,? ");
 		
 		int startIndex = pagesize * (page - 1);
