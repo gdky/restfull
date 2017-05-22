@@ -1991,4 +1991,41 @@ public class YwglDao extends BaseJdbcDao {
 			return null;
 		}
 	}
+
+	public Map<String, Object> getYwlx(int page, int pagesize) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT SQL_CALC_FOUND_ROWS * from dm_ywlx where yxbz = 1");
+		sb.append(" order by id asc ");
+		sb.append(" limit ?,? ");		
+
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		ArrayList<Object> params = new ArrayList<Object>();
+		params.add(startIndex);
+		params.add(pagesize);
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+
+		// 获取符合条件的记录数
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+		return obj;
+	}
+
+	public Map<String, Object> newYwlx(Map<String, Object> body) {
+		return null;
+	}
+
+	public void editYwlx(Map<String, Object> body) {
+		String sql=" update dm_ywlx set mc = ?,isqy=? where id = ?  ";
+		this.jdbcTemplate.update(sql,
+				new Object[] { body.get("MC"), body.get("ISQY"),body.get("ID")});
+		
+	}
 }

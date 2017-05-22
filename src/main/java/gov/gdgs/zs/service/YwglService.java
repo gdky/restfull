@@ -1233,4 +1233,23 @@ public class YwglService {
 		}
 		return rs;
 	}
+
+	public Map<String, Object> getYwlx(int page, int pagesize) {
+		Map<String, Object> obj = ywglDao.getYwlx(page, pagesize);
+		return obj;
+	}
+
+	public Map<String, Object> newYwlx(Map<String,Object> body) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void editYwlx(Map<String,Object> body) {
+		 ywglDao.editYwlx(body);
+	}
+
+	public Map<String, Object> delYwlx() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
