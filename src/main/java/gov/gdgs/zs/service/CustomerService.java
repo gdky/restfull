@@ -48,6 +48,10 @@ public class CustomerService {
 	}
 
 	public void updateCustomer(String id, Map<String,Object> obj) {
+		Map<String,Object> source = customerDao.getNsrsbhAndJgid(id);
+		
+		if(this.isNsrsbhChanged(source,obj)){
+		}
 		customerDao.updateCustomer(id,obj);
 	}
 

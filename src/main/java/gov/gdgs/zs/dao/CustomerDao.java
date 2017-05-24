@@ -132,4 +132,10 @@ public class CustomerDao extends BaseJdbcDao{
 		
 	}
 
+	public Map<String, Object> getNsrsbhAndJgid(String id) {
+		String sql = "select jg_id as jgid ,nsrsbh,nsrsbhdf from zs_customer where id = ?";
+		Map<String,Object> rs = this.jdbcTemplate.queryForMap(sql, id);
+		return rs;
+	}
+
 }
