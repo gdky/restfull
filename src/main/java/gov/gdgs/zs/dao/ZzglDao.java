@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -216,16 +217,16 @@ public class ZzglDao extends BaseDao {
 	public Map<String, Object> getSWSzzzt(int page, int pagesize,
 			Condition condition) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select SQL_CALC_FOUND_ROWS z.id,r.xming,z.zyzgzsbh, j.dwmc as swsmc ,!isnull(s.ID) as islock ");
+		sb.append(" select SQL_CALC_FOUND_ROWS z.ry_id,r.xming,z.zyzgzsbh, j.dwmc as swsmc ,!isnull(s.ID) as islock ");
 		sb.append(" from (zs_zysws z, zs_ryjbxx r , zs_jg j) ");
 		sb.append(" left join (select id,zysws_id from zs_sdjl_zysws where yxbz = 1) as s ");
-		sb.append(" on z.id = s.ZYSWS_ID ");
+		sb.append(" on z.ry_id = s.ZYSWS_ID ");
 		sb.append(condition.getSql());
 		sb.append(" and z.RY_ID = r.ID ");
 		sb.append(" and z.JG_ID = j.ID ");
 		sb.append(" and z.YXBZ =1  ");
 		sb.append(" and z.ZYZT_DM = 1 ");
-		sb.append(" order by islock desc, id desc ");
+		sb.append(" order by islock desc, ry_id desc ");
 		sb.append(" limit ?,? ");
 		
 		int startIndex = pagesize * (page - 1);
@@ -264,14 +265,14 @@ public class ZzglDao extends BaseDao {
 		so.put("descend", " desc");
 		
 		String orderBySql = "s.sdtime desc";
-		if (null != sortField){
+		if (!StringUtils.isEmpty(sortField)){
 			orderBySql = sf.get(sortField)+so.get(sortOrder);
 		}
 		StringBuffer sb = new StringBuffer();
 		sb.append(" select SQL_CALC_FOUND_ROWS s.id,s.sdyy,s.sdr,s.sdr_role,s.sdtime,s.jsr,s.jsr_role,s.jstime,s.yxbz, ");
 		sb.append(" r.XMING from zs_sdjl_zysws s,zs_zysws z,zs_ryjbxx r ");
 		sb.append(condition.getSql());
-		sb.append(" and s.ZYSWS_ID = z.ID ");
+		sb.append(" and s.ZYSWS_ID = z.RY_ID ");
 		sb.append(" and z.RY_ID = r.ID ");
 		sb.append(" order by s.yxbz desc, "+orderBySql);
 		sb.append(" limit ?,? ");

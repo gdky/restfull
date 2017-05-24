@@ -111,7 +111,7 @@ public class PXMKDao extends BaseDao{
 //		sb.append("	when a.ZAOC=1 and a.WUC=0 and a.WANC=1 then '，'");
 //		sb.append("	 else '' end),");
 //		sb.append("	(case a.WANC when 1 then '晚餐' else ''end)) as DCQK,");
-		sb.append("	a.BZ from zs_pxqkbmb a,zs_jg b where a.JG_ID=b.ID and a.pxid=? order by a.bmsj desc");
+		sb.append("	a.BZ from zs_pxqkbmb a,zs_jg b where a.JG_ID=b.ID and a.pxid=? order by a.bmsj asc");
 		return this.jdbcTemplate.queryForList(sb.toString(),new Object[]{pxid});
 	}
 	public Map<String, Object> getPxxx(int page, int pagesize,
