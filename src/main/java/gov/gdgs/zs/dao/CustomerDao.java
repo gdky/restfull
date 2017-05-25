@@ -138,4 +138,10 @@ public class CustomerDao extends BaseJdbcDao{
 		return rs;
 	}
 
+	public List<Map<String, Object>> getNsrWithYwbb(Integer jgid,
+			String nsrsbh, String nsrsbhdf) {
+		String sql = "select id from zs_ywbb t where ";
+		return null;
+	}
+
 }

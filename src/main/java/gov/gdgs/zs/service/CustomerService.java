@@ -4,6 +4,7 @@ import gov.gdgs.zs.dao.CustomerDao;
 import gov.gdgs.zs.untils.Common;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -49,9 +50,14 @@ public class CustomerService {
 
 	public void updateCustomer(String id, Map<String,Object> obj) {
 		Map<String,Object> source = customerDao.getNsrsbhAndJgid(id);
+		String nsrsbh = (String)source.get("nsrsbh");
+		String nsrsbhdf = (String)source.get("nsrsbhdf");
+		Integer jgid = (Integer)source.get("jgid"); 
 		
-		if(this.isNsrsbhChanged(source,obj)){
+		if(!nsrsbh.equals((String)obj.get("NSRSBH")) || !nsrsbhdf.equals((String)obj.get("NSRSBHDF"))){
+			List<Map<String,Object>> ls = customerDao.getNsrWithYwbb(jgid,nsrsbh,nsrsbhdf);
 		}
+
 		customerDao.updateCustomer(id,obj);
 	}
 
