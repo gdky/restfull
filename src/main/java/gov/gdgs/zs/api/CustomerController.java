@@ -78,8 +78,8 @@ public class CustomerController {
 	@RequestMapping(value = "/customers/{id}", method = RequestMethod.PUT)
 	public  ResponseEntity<?> updateCustomer(@PathVariable String id,@RequestBody Map<String,Object> obj){ 
 
-		customService.updateCustomer(id,obj);
-		return new ResponseEntity<>(ResponseMessage.success("修改成功"),HttpStatus.OK);
+		ResponseMessage rm = customService.updateCustomer(id,obj);
+		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
 	
 	/**
