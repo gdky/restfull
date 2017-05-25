@@ -229,7 +229,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	public void sentBack(Long id, Map<String, Object> data) {
-		String sql = "update zs_ywbb set thyy = ?,zt=?, xyzt_dm=?, zbrq=now()  where id = ? ";
+		String sql = "update zs_ywbb set thyy = ?,zt=?, xyzt_dm=?, zbrq=now(),fphm=null,fpje=null  where id = ? ";
 		this.jdbcTemplate.update(sql,
 				new Object[] { data.get("thyy"), data.get("zt"),data.get("xyzt_dm"), id });
 	}

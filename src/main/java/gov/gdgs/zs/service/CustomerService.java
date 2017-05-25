@@ -4,6 +4,7 @@ import gov.gdgs.zs.dao.CustomerDao;
 import gov.gdgs.zs.untils.Common;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gdky.restfull.entity.ResponseMessage;
+import com.gdky.restfull.entity.ResponseMessage.Type;
 import com.gdky.restfull.utils.HashIdUtil;
 
 @Service
@@ -47,8 +50,20 @@ public class CustomerService {
 		customerDao.addCustomer(obj);
 	}
 
-	public void updateCustomer(String id, Map<String,Object> obj) {
+	public ResponseMessage updateCustomer(String id, Map<String,Object> obj) {
+		Map<String,Object> source = customerDao.getNsrsbhAndJgid(id);
+		String nsrsbh = (String)source.get("nsrsbh");
+		String nsrsbhdf = (String)source.get("nsrsbhdf");
+		
+		if(!nsrsbh.equals((String)obj.get("NSRSBH")) || !nsrsbhdf.equals((String)obj.get("NSRSBHDF"))){
+			List<Map<String,Object>> ls = customerDao.getCustomerInYwbb(id);
+			if (ls.size()>0){
+				return new ResponseMessage(Type.warning, "500", "该委托企业已有报备记录，不能修改税务登记证号，若要修改委托企业税务登记证号，需退回业务报备后才能进行修改");
+			}
+		}
+
 		customerDao.updateCustomer(id,obj);
+		return new ResponseMessage(Type.warning, "200", "修改成功");
 	}
 
 	public void delCustomer(String id) {

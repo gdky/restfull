@@ -78,12 +78,12 @@ public class CustomerController {
 	@RequestMapping(value = "/customers/{id}", method = RequestMethod.PUT)
 	public  ResponseEntity<?> updateCustomer(@PathVariable String id,@RequestBody Map<String,Object> obj){ 
 
-		customService.updateCustomer(id,obj);
-		return new ResponseEntity<>(ResponseMessage.success("修改成功"),HttpStatus.OK);
+		ResponseMessage rm = customService.updateCustomer(id,obj);
+		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
 	
 	/**
-	 * 修改客户信息
+	 * 删除客户信息
 	 * @para
 	 *
 	 */
@@ -91,6 +91,6 @@ public class CustomerController {
 	public  ResponseEntity<?> delCustomer(@PathVariable String id){ 
 
 		customService.delCustomer(id);
-		return new ResponseEntity<>(ResponseMessage.success("修改成功"),HttpStatus.OK);
+		return new ResponseEntity<>(ResponseMessage.success("删除成功"),HttpStatus.OK);
 	}
 }

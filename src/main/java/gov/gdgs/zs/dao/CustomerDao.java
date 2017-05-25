@@ -132,4 +132,21 @@ public class CustomerDao extends BaseJdbcDao{
 		
 	}
 
+	public Map<String, Object> getNsrsbhAndJgid(String id) {
+		String sql = "select jg_id as jgid ,nsrsbh,nsrsbhdf from zs_customer where id = ?";
+		Map<String,Object> rs = this.jdbcTemplate.queryForMap(sql, id);
+		return rs;
+	}
+
+	public List<Map<String, Object>> getCustomerInYwbb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select c.id  ");
+		sb.append(" from zs_customer c, zs_ywbb y  ");
+		sb.append(" where c.ID = y.CUSTOMER_ID  ");
+		sb.append(" and c.ID = ? ");
+		sb.append(" and (y.ZT != 0 and y.zt != 5 and y.zt != 4) ");
+		
+		return this.jdbcTemplate.queryForList(sb.toString(), id);
+	}
+
 }
