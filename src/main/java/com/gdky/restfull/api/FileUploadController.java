@@ -50,7 +50,7 @@ public class FileUploadController {
 					+ Hashing.crc32().hashBytes(file.getBytes()) + "." + ext;
 			File to = new File(Constants.UPLOAD_LOCATION + filename);
 			ResponseMessage rm = new ResponseMessage(
-					ResponseMessage.Type.success, "201", filename);
+					ResponseMessage.Type.success, "201", "upload/"+filename);
 			try {
 				Files.write(file.getBytes(), to);
 				return new ResponseEntity<>(rm, HttpStatus.CREATED);
