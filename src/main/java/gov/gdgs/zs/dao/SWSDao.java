@@ -33,10 +33,6 @@ public class SWSDao extends BaseDao{
 		condition.add("a.zczj", Condition.LESS_EQUAL, qury.get("zczj2"));
 		condition.add("a.cs_dm", Condition.EQUAL, qury.get("cs"));
 		condition.add("a.JGXZ_DM", Condition.EQUAL, qury.get("swsxz"));
-		condition.add("b.zrs", Condition.GREATER_EQUAL, qury.get("zrs"));
-		condition.add("b.zrs", Condition.LESS_EQUAL, qury.get("zrs2"));
-		condition.add("b.zyrs", Condition.GREATER_EQUAL, qury.get("zyrs"));
-		condition.add("b.zyrs", Condition.LESS_EQUAL, qury.get("zyrs2"));
 		condition.add("a.swszsclsj", Condition.GREATER_EQUAL, qury.get("clsj"));
 		condition.add("a.swszsclsj", Condition.LESS_EQUAL, qury.get("clsj2"));
 		StringBuffer sb = new StringBuffer();
@@ -46,7 +42,7 @@ public class SWSDao extends BaseDao{
 		sb.append("		a.fddbr,a.JGZCH as zsbh,");
 		sb.append("		d.mc AS swsxz,c.mc AS cs,");
 		sb.append("		(select count(id) from zs_zysws where jg_id=a.id and ZYZT_DM=1) as zyrs,");
-		sb.append("		(select count(id) from zs_zysws where jg_id=a.id)+");
+		sb.append("		(select count(id) from zs_zysws where jg_id=a.id AND ZYZT_DM=1)+");
 		sb.append("(select count(id) from zs_cyry where jg_id=a.id and CYRYZT_DM=1) as zrs,");
 		sb.append("		DATE_FORMAT(a.swszsclsj,'%Y-%m-%d') AS clsj");
 		sb.append("		,(select v.id from zs_sdjl_jg v where v.jg_id=a.id and v.lx=1 and v.yxbz=1 limit 1) as issd");
@@ -55,6 +51,38 @@ public class SWSDao extends BaseDao{
 		sb.append("		and a.jgxz_dm = d.id ");
 		sb.append("		AND a.cs_dm = c.id ");
 		sb.append("		AND a.YXBZ = '1'");
+		if(qury.containsKey("zyrs")){
+			sb.append("		and a.id in (SELECT jg_id");
+			sb.append("				FROM zs_zysws");
+			sb.append("				WHERE  ZYZT_DM=1 group by jg_id having count(jg_id)>="+qury.get("zyrs")+")");
+		}
+		if(qury.containsKey("zyrs2")){
+			sb.append("		and a.id in (SELECT jg_id");
+			sb.append("				FROM zs_zysws");
+			sb.append("				WHERE  ZYZT_DM=1 group by jg_id having count(jg_id)<="+qury.get("zyrs2")+")");
+		}
+		if(qury.containsKey("zrs")){
+			sb.append("		and a.id in (select f.id from (SELECT ID,ifnull(b.b,0)+ifnull(e.c,0) zrs");
+			sb.append("				FROM zs_jg left join (");
+			sb.append("				SELECT jg_id, COUNT(jg_id) b");
+			sb.append("				FROM zs_zysws where ZYZT_DM=1");
+			sb.append("				GROUP BY jg_id) b on(zs_jg.ID=b.jg_id)");
+			sb.append("				left join (");
+			sb.append("				SELECT jg_id, COUNT(jg_id) c");
+			sb.append("				FROM zs_cyry where CYRYZT_DM=1");
+			sb.append("				GROUP BY jg_id) e on zs_jg.ID=e.jg_id) f where f.zrs>="+qury.get("zrs")+")");
+		}
+		if(qury.containsKey("zrs2")){
+			sb.append("		and a.id in (select f.id from (SELECT ID,ifnull(b.b,0)+ifnull(e.c,0) zrs");
+			sb.append("				FROM zs_jg left join (");
+			sb.append("				SELECT jg_id, COUNT(jg_id) b");
+			sb.append("				FROM zs_zysws where ZYZT_DM=1");
+			sb.append("				GROUP BY jg_id) b on(zs_jg.ID=b.jg_id)");
+			sb.append("				left join (");
+			sb.append("				SELECT jg_id, COUNT(jg_id) c");
+			sb.append("				FROM zs_cyry where CYRYZT_DM=1");
+			sb.append("				GROUP BY jg_id) e on zs_jg.ID=e.jg_id) f where f.zrs<="+qury.get("zrs2")+")");
+		}
 		if(qury.containsKey("sorder")){
 			Boolean asc = qury.get("sorder").toString().equals("ascend");
 			switch (qury.get("sfield").toString()) {
