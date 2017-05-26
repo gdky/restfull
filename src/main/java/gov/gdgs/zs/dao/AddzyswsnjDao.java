@@ -149,11 +149,11 @@ public class AddzyswsnjDao extends BaseJdbcDao implements IAddzyswsnjDao {
 
 		sb.append(" select count(b.ID) bndbafs  ");
 		sb.append(" from zs_zysws z, zs_ywbb b  ");
-		sb.append(" 		  where (locate(concat(',', z.id, ','), b.qmswsid) > 0 or  ");
-		sb.append(" 		        locate(concat(z.id, ','), b.qmswsid) = 1 or  ");
-		sb.append(" 		        (locate(concat(',', z.id), b.qmswsid) > 0 and  ");
-		sb.append(" 		        locate(concat(',', z.id), b.qmswsid) =  ");
-		sb.append(" 		        length(b.qmswsid) - length(z.id)))  ");
+		sb.append(" 		  where (locate(concat(',', z.ry_id, ','), b.qmswsid) > 0 or  ");
+		sb.append(" 		        locate(concat(z.ry_id, ','), b.qmswsid) = 1 or  ");
+		sb.append(" 		        (locate(concat(',', z.ry_id), b.qmswsid) > 0 and  ");
+		sb.append(" 		        locate(concat(',', z.ry_id), b.qmswsid) =  ");
+		sb.append(" 		        length(b.qmswsid) - length(z.ry_id)))  ");
 		sb.append(" 		    and year(b.BBRQ) = ?  ");
 		sb.append(" 		    and z.ID=? ");
 

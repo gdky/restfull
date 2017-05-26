@@ -84,13 +84,13 @@ public class YwglDao extends BaseJdbcDao {
 
 	public List<Map<String, Object>> getZyswsByJg(Integer id) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" select r.XMING,z.ID as ZYSWS_ID ");
+		sb.append(" select r.XMING,r.ID as ZYSWS_ID ");
 		sb.append(" from zs_jg j,zs_ryjbxx r,zs_zysws z ");
 		sb.append(" where j.id = z.JG_ID ");
 		sb.append(" and z.RY_ID = r.ID ");
 		sb.append(" and j.ID=? ");
 		sb.append(" and z.RYSPGCZT_DM = 1 ");
-		sb.append("  and z.ID not in (select zysws_id from zs_sdjl_zysws where yxbz = 1) ");
+		sb.append("  and r.ID not in (select zysws_id from zs_sdjl_zysws where yxbz = 1) ");
 		sb.append(" and z.YXBZ=1 ");
 		List<Map<String, Object>> ls = this.jdbcTemplate.queryForList(
 				sb.toString(), new Object[] { id });
@@ -229,7 +229,7 @@ public class YwglDao extends BaseJdbcDao {
 	}
 
 	public void sentBack(Long id, Map<String, Object> data) {
-		String sql = "update zs_ywbb set thyy = ?,zt=?, xyzt_dm=?, zbrq=now()  where id = ? ";
+		String sql = "update zs_ywbb set thyy = ?,zt=?, xyzt_dm=?, zbrq=now(),fphm=null,fpje=null  where id = ? ";
 		this.jdbcTemplate.update(sql,
 				new Object[] { data.get("thyy"), data.get("zt"),data.get("xyzt_dm"), id });
 	}
@@ -1299,11 +1299,11 @@ public class YwglDao extends BaseJdbcDao {
 		sql.append("   from zs_ryjbxx r, zs_zysws z, zs_ywbb b ");
 		sql.append("  where r.id = z.ry_id ");
 		sql.append("    and z.jg_id = b.jg_id ");
-		sql.append("    and (locate(concat(',', z.id, ','), b.qmswsid) > 0 or ");
-		sql.append("        locate(concat(z.id, ','), b.qmswsid) = 1 or ");
-		sql.append("        (locate(concat(',', z.id), b.qmswsid) > 0 and ");
-		sql.append("        locate(concat(',', z.id), b.qmswsid) = ");
-		sql.append("        length(b.qmswsid) - length(z.id))) ");
+		sql.append("    and (locate(concat(',', z.ry_id, ','), b.qmswsid) > 0 or ");
+		sql.append("        locate(concat(z.ry_id, ','), b.qmswsid) = 1 or ");
+		sql.append("        (locate(concat(',', z.ry_id), b.qmswsid) > 0 and ");
+		sql.append("        locate(concat(',', z.ry_id), b.qmswsid) = ");
+		sql.append("        length(b.qmswsid) - length(z.ry_id))) ");
 		sql.append("    and year(b.bbrq) = ? ");
 		sql.append("    and z.jg_id = ? ");
 		sql.append("    and z.yxbz='1' ");
@@ -1339,11 +1339,11 @@ public class YwglDao extends BaseJdbcDao {
 		sql.append("        sum(if(b.ywlx_dm = '10', 1, 0)) grhsqj ");
 		sql.append("   from zs_ryjbxx r, zs_zysws z ");
 		sql.append("   left join zs_ywbb b ");
-		sql.append("     on (locate(concat(',', z.id, ','), b.qmswsid) > 0 or ");
-		sql.append("        locate(concat(z.id, ','), b.qmswsid) = 1 or ");
-		sql.append("        (locate(concat(',', z.id), b.qmswsid) > 0 and ");
-		sql.append("        locate(concat(',', z.id), b.qmswsid) = ");
-		sql.append("        length(b.qmswsid) - length(z.id))) ");
+		sql.append("     on (locate(concat(',', z.ry_id, ','), b.qmswsid) > 0 or ");
+		sql.append("        locate(concat(z.ry_id, ','), b.qmswsid) = 1 or ");
+		sql.append("        (locate(concat(',', z.ry_id), b.qmswsid) > 0 and ");
+		sql.append("        locate(concat(',', z.ry_id), b.qmswsid) = ");
+		sql.append("        length(b.qmswsid) - length(z.ry_id))) ");
 		sql.append("    and z.jg_id = b.jg_id ");
 		sql.append("    and year(b.bbrq) = ? ");
 		sql.append("  where r.id = z.ry_id ");
@@ -1887,6 +1887,145 @@ public class YwglDao extends BaseJdbcDao {
 	public void batchTH(List<Object[]> batchArgs) {
 		String sql = "update zs_ywbb set thyy = sqthyy,zt=0, xyzt_dm=1,bbrq =null  where id = ? ";
 		this.jdbcTemplate.batchUpdate(sql, batchArgs);
+		
+	}
+
+	public Map<String, Object> getYwbbByNsrsbh(String wtdwnsrsbh, String ywlx,
+			String nd, String swsswdjzh) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select y.*,z.mc as ywzt,l.mc as ywlx,hy.mc as hy,cs.mc as cs, ");
+		sb.append(" qx.mc as qx ");
+		sb.append(" from zs_ywbb y,dm_ywbb_zt z,dm_ywlx l,dm_hy hy,dm_cs cs,dm_cs qx ");
+		sb.append(" where y.wtdwnsrsbh=? and y.swsswdjzh = ? and y.ywlx_dm=? and y.nd = ?");
+		sb.append(" and y.zt = z.id ");
+		sb.append(" and y.ywlx_dm = l.id ");
+		sb.append(" and y.hy_id = hy.id ");
+		sb.append(" and y.cs_dm = cs.id ");
+		sb.append(" and y.qx_dm = qx.id ");
+		sb.append(" and (y.zt = 1 or y.zt = 3) ");
+		sb.append(" and y.yxbz = 1 ");
+		List<Map<String, Object>> ls = jdbcTemplate.query(sb.toString(),
+				new Object[] { wtdwnsrsbh, swsswdjzh,ywlx,nd },
+				new RowMapper<Map<String, Object>>() {
+					public Map<String, Object> mapRow(ResultSet rs, int arg1)
+							throws SQLException {
+						Map<String, Object> map = new HashMap<String, Object>();
+						map.put("nd", rs.getObject("nd"));
+						map.put("bbhm", rs.getObject("bbhm"));
+						map.put("bbrq", rs.getDate("bbrq"));
+						map.put("bgrq", rs.getDate("bgrq"));
+						map.put("bgwh", rs.getString("bgwh"));
+						map.put("zbrq", rs.getDate("zbrq"));
+						map.put("yzm", rs.getString("yzm"));
+						map.put("sfje", rs.getBigDecimal("sfje"));
+						map.put("swsmc", rs.getString("swsmc"));
+						map.put("swsswdjzh", rs.getString("swsswdjzh"));
+						map.put("wtdw", rs.getString("wtdw"));
+						map.put("wtdwnsrsbh", rs.getString("wtdwnsrsbh"));
+						map.put("xyh", rs.getString("xyh"));
+						map.put("yjfh", rs.getString("yjfh"));
+						map.put("rjfh", rs.getString("rjfh"));
+						map.put("sjfh", rs.getString("sjfh"));
+						map.put("qzsws", rs.getString("qzsws"));
+						map.put("txdz", rs.getString("txdz"));
+						map.put("swsdzyj", rs.getString("swsdzyj"));
+						map.put("swswz", rs.getString("swswz"));
+						map.put("ywlx_dm", rs.getInt("ywlx_dm"));
+						map.put("ywlx", rs.getString("ywlx"));
+						map.put("jtxm", rs.getString("jtxm"));
+						map.put("tzvalue1", rs.getBigDecimal("tzvalue1"));
+						map.put("tjvalue2", rs.getBigDecimal("tjvalue2"));
+						map.put("sstarttime", rs.getDate("sstarttime"));
+						map.put("sendtime", rs.getDate("sendtime"));
+						if (rs.getInt("nsrxz") == 0) {
+							map.put("nsrxz", "一般纳税人");
+						} else if (rs.getInt("nsrxz") == 1) {
+							map.put("nsrxz", "小规模纳税人");
+						} else {
+							map.put("nsrxz", "非增值税纳税人");
+						}
+						if (rs.getInt("zsfs_dm") == 0) {
+							map.put("zsfs", "查账征收");
+						} else {
+							map.put("zsfs", "核定征收");
+						}
+						if (rs.getString("ISWS") == null
+								|| rs.getString("ISWS").equals("N")) {
+							map.put("isws", "广东省");
+						} else {
+							map.put("isws", "外省");
+						}
+						if (rs.getInt("SB_DM") == 1) {
+							map.put("sb", "国税");
+						} else {
+							map.put("sb", "地税");
+						}
+						map.put("hy", rs.getString("hy"));
+						map.put("cs", rs.getString("cs"));
+						map.put("qx", rs.getString("qx"));
+						if (rs.getInt("WTDWXZ_DM") == 0) {
+							map.put("wtdwxz", "居民企业");
+						} else {
+							map.put("wtdwxz", "非居民企业税");
+						}
+						map.put("wtdwnsrsbhdf", rs.getString("WTDWNSRSBHDF"));
+						map.put("wtdwlxr", rs.getString("WTDWLXR"));
+						map.put("wtdwlxdh", rs.getString("WTDWLXDH"));
+						map.put("wtdxlxdz", rs.getString("WTDXLXDZ"));
+						map.put("fphm", rs.getString("FPHM"));
+						map.put("xyje", rs.getBigDecimal("XYJE"));
+						map.put("sjsqje", rs.getBigDecimal("SJSQJE"));
+						map.put("fpje", rs.getBigDecimal("FPJE"));
+						map.put("memo", rs.getString("MEMO"));
+						map.put("zgswjg", rs.getString("ZGSWJG"));
+						map.put("swsdh", rs.getString("SWSDH"));
+						map.put("swscz", rs.getString("SWSCZ"));
+						map.put("ywzt", rs.getString("ywzt"));
+
+						return map;
+					}
+				});
+		if (ls.size() > 0) {
+			return ls.get(0);
+		} else {
+			return null;
+		}
+	}
+
+	public Map<String, Object> getYwlx(int page, int pagesize) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT SQL_CALC_FOUND_ROWS * from dm_ywlx where yxbz = 1");
+		sb.append(" order by id asc ");
+		sb.append(" limit ?,? ");		
+
+		// 装嵌传值数组
+		int startIndex = pagesize * (page - 1);
+		ArrayList<Object> params = new ArrayList<Object>();
+		params.add(startIndex);
+		params.add(pagesize);
+
+		// 获取符合条件的记录
+		List<Map<String, Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+
+		// 获取符合条件的记录数
+		int total = this.jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", int.class);
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pagesize", pagesize);
+		obj.put("current", page);
+		return obj;
+	}
+
+	public Map<String, Object> newYwlx(Map<String, Object> body) {
+		return null;
+	}
+
+	public void editYwlx(Map<String, Object> body) {
+		String sql=" update dm_ywlx set mc = ?,isqy=? where id = ?  ";
+		this.jdbcTemplate.update(sql,
+				new Object[] { body.get("MC"), body.get("ISQY"),body.get("ID")});
 		
 	}
 }

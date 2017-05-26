@@ -73,7 +73,12 @@ public class Common {
 		return d;
 	}
 
-	// 数字补零兼转换字符串 
+	/**
+	 * 数字补零兼转换字符串 
+	 * @param num 待补零的数字
+	 * @param len 总长度
+	 * @return
+	 */
     public static String addZero(int num,int len){  
         StringBuffer s = new StringBuffer() ;  
         s.append(num) ;  

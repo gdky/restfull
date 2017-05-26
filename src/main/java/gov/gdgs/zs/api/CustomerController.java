@@ -44,6 +44,17 @@ public class CustomerController {
 		Map<String,Object> obj = customService.getCustomers(page,pageSize,jgid,where);
 		return new ResponseEntity<>(obj,HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/search/customers", method = RequestMethod.GET)
+	public  ResponseEntity<?> searchCustomers(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pageSize", required = true) int pageSize,
+			@RequestParam(value="jid", required=true) String jgid,
+			@RequestParam(value="where", required=false) String where){ 
+
+		Map<String,Object> obj = customService.searchCustomers(page,pageSize,jgid,where);
+		return new ResponseEntity<>(obj,HttpStatus.OK);
+	}
 
 	
 	/**
@@ -67,12 +78,12 @@ public class CustomerController {
 	@RequestMapping(value = "/customers/{id}", method = RequestMethod.PUT)
 	public  ResponseEntity<?> updateCustomer(@PathVariable String id,@RequestBody Map<String,Object> obj){ 
 
-		customService.updateCustomer(id,obj);
-		return new ResponseEntity<>(ResponseMessage.success("修改成功"),HttpStatus.OK);
+		ResponseMessage rm = customService.updateCustomer(id,obj);
+		return new ResponseEntity<>(rm,HttpStatus.OK);
 	}
 	
 	/**
-	 * 修改客户信息
+	 * 删除客户信息
 	 * @para
 	 *
 	 */
@@ -80,6 +91,6 @@ public class CustomerController {
 	public  ResponseEntity<?> delCustomer(@PathVariable String id){ 
 
 		customService.delCustomer(id);
-		return new ResponseEntity<>(ResponseMessage.success("修改成功"),HttpStatus.OK);
+		return new ResponseEntity<>(ResponseMessage.success("删除成功"),HttpStatus.OK);
 	}
 }

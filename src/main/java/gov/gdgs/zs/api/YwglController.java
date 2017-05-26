@@ -418,4 +418,30 @@ public class YwglController {
 	    ywglService.batchTH( values, user);
 		return new ResponseEntity<>(ResponseMessage.success("success"), HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/ywlx", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwlx(
+			@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "pagesize", required = true) int pagesize) {
+		Map<String, Object> map = ywglService.getYwlx( page, pagesize);
+		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/ywlx", method = RequestMethod.POST)
+	public ResponseEntity<?> newYwlx(
+			@RequestBody Map<String,Object> body) {
+		ywglService.newYwlx(body);
+		return new ResponseEntity<>(ResponseMessage.success("success"), HttpStatus.OK);
+	}
+	@RequestMapping(value = "/ywlx", method = RequestMethod.PUT)
+	public ResponseEntity<?> editYwlx(
+			@RequestBody Map<String,Object> body) {
+		ywglService.editYwlx(body);
+		return new ResponseEntity<>(ResponseMessage.success("success"), HttpStatus.OK);
+	}
+	@RequestMapping(value = "/ywlx/{id}", method = RequestMethod.DELETE)
+	public ResponseEntity<?> delYwlx(
+			@PathVariable String id) {
+		ywglService.delYwlx();
+		return new ResponseEntity<>(ResponseMessage.success("success"), HttpStatus.OK);
+	}
 }

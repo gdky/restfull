@@ -64,6 +64,7 @@ public class CustomerDao extends BaseJdbcDao{
 		obj.put("current", page);
 
 		return obj;
+		
 	}
 
 	public void addCustomer(Map<String, Object> obj) {
@@ -91,6 +92,61 @@ public class CustomerDao extends BaseJdbcDao{
 	public void delCustomer(String id) {
 		String sql = "delete from zs_customer where id = ?";
 		this.jdbcTemplate.update(sql, new Object[] { id });		
+	}
+
+	public Map<String, Object> searchCustomers(int page, int pageSize,
+			Long jid, HashMap<String, Object> where) {
+		
+		
+		String keyword = (String) where.get("keyword");
+
+		StringBuffer sb = new StringBuffer();
+		sb.append(" SELECT SQL_CALC_FOUND_ROWS @rownum:=@rownum + 1 AS 'key', c.* ");
+		sb.append(" FROM zs_customer c,(SELECT @rownum:=?) tmp ");
+		sb.append(" WHERE c.jg_id = ? and (c.DWMC like ? or c.NSRSBH like ?) ");
+		sb.append(" ORDER BY c.ADDDATE DESC ");
+		sb.append(" LIMIT ?, ? ");
+		// 装嵌传值数组
+		ArrayList<Object> params = new ArrayList<Object>();
+		int startIndex = pageSize * (page - 1);
+		params.add(startIndex);
+		params.add(jid);
+		params.add("%"+keyword+"%");
+		params.add("%"+keyword+"%");
+		params.add(startIndex);
+		params.add(pageSize);
+
+		// 获取符合条件的记录
+		List<Map<String,Object>> ls = jdbcTemplate.queryForList(sb.toString(),
+				params.toArray());
+
+		int total = jdbcTemplate.queryForObject("SELECT FOUND_ROWS()", Integer.class);
+		
+		Map<String, Object> obj = new HashMap<String, Object>();
+		obj.put("data", ls);
+		obj.put("total", total);
+		obj.put("pageSize", pageSize);
+		obj.put("current", page);
+
+		return obj;
+		
+	}
+
+	public Map<String, Object> getNsrsbhAndJgid(String id) {
+		String sql = "select jg_id as jgid ,nsrsbh,nsrsbhdf from zs_customer where id = ?";
+		Map<String,Object> rs = this.jdbcTemplate.queryForMap(sql, id);
+		return rs;
+	}
+
+	public List<Map<String, Object>> getCustomerInYwbb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" select c.id  ");
+		sb.append(" from zs_customer c, zs_ywbb y  ");
+		sb.append(" where c.ID = y.CUSTOMER_ID  ");
+		sb.append(" and c.ID = ? ");
+		sb.append(" and (y.ZT != 0 and y.zt != 5 and y.zt != 4) ");
+		
+		return this.jdbcTemplate.queryForList(sb.toString(), id);
 	}
 
 }
