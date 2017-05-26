@@ -614,11 +614,11 @@ public class SPDao extends BaseDao{
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 13:
-					 this.jdbcTemplate.update("update zs_fzyzzy a,zs_fzysws b set b.RYSPGCZT_DM=1,a.RYSPZT_DM=2,a.BDRQ=sysdate(),XDWYJ=?,LRR=? where a.FZY_ID=b.ID and a.id=?",
+					 this.jdbcTemplate.update("update zs_fzyzzy a,zs_fzysws b set b.RYSPGCZT_DM='1',a.RYSPZT=2,a.BDRQ=sysdate(),XDWYJ=?,LRR=? where a.FZY_ID=b.ID and a.id=?",
 							 new Object[]{spsq.get("spyj"),spsq.get("uname"),mp.get("SJID")});
 					 break;
 				 case 14:
-					 this.jdbcTemplate.update("update zs_fzyswszj a,zs_fzysws b set a.RYSPZT_DM='1',b.RYSPGCZT_DM='1' where a.id =? and a.FZY_ID=b.id ",
+					 this.jdbcTemplate.update("update zs_fzyswszj a,zs_fzysws b set a.RYSPZT='1',b.RYSPGCZT_DM='1' where a.id =? and a.FZY_ID=b.id ",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 15:
@@ -634,15 +634,15 @@ public class SPDao extends BaseDao{
 							 new Object[]{spsq.get("uid"),mp.get("SJID")});
 					 break;
 				 case 38:
-					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1' where a.id =?",
+					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='1' where a.id =?",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 39:
-					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPZT_DM='1',a.jg_id='-2' where a.id =?",
+					 this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='1',a.jg_id='-2' where a.id =?",
 							 new Object[]{mp.get("SJID")});
 					 break;
 				 case 46:
-					 this.jdbcTemplate.update("update zs_fzyzzy a,zs_fzysws b set b.RYSPGCZT_DM=1,a.RYSPZT_DM=1,a.BDRQ=sysdate(),XDWYJ=?,LRR=? where a.FZY_ID=b.ID and a.id=?",
+					 this.jdbcTemplate.update("update zs_fzyzzy a,zs_fzysws b set b.RYSPGCZT_DM=1,a.RYSPZT=1,a.BDRQ=sysdate(),XDWYJ=?,LRR=? where a.FZY_ID=b.ID and a.id=?",
 							 new Object[]{spsq.get("spyj"),spsq.get("uname"),mp.get("SJID")});
 					 break;
 				 }
@@ -1050,9 +1050,10 @@ public class SPDao extends BaseDao{
 	 */
 	public void zyzcsq(Map<String, Object> sqxm) throws Exception{
 		Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
-		this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='11' where a.id=?",hashids.decode((String)sqxm.get("zyswsid"))[0]);
+		Object zyid = hashids.decode((String)sqxm.get("zyswsid"))[0];
+		this.jdbcTemplate.update("update zs_zysws a set a.RYSPGCZT_DM='11' where a.id=?",new Object[]{zyid});
 		Map<String,Object> spsq=new HashMap<>();//设置生成审批表方法参数
-		spsq.put("sid", sqxm.get("zyswsid"));
+		spsq.put("sid", zyid);
 		if(this.jdbcTemplate.queryForList("select id from zs_jg where parentjgid is not null and parentjgid>0 and id=?",new Object[]{sqxm.get("jgid")}).size()==0){
 			spsq.put("lclx", "402882891d46ef7b011d470555220004");
 		}else{
@@ -1267,18 +1268,18 @@ public class SPDao extends BaseDao{
 				if(ptxm.containsKey("nbjgsz")){
 					List<List<String>> nb = (List<List<String>>) ptxm.remove("nbjgsz");
 					for(List<String> rec:nb){
-						String fir=rec.get(0)+"";
-						if(fir.equals("null")){
+						String nbid=rec.get(3)+"";
+						if(nbid.equals("null")){
 							continue;
 						}
-						String nbSql="update zs_nbjgsz set BMMC=?,JBZN=?,RS=? where JG_ID=?";
-						rec.add((String) ptxm.get("jgid"));
+						String nbSql="update zs_nbjgsz set BMMC=?,JBZN=?,RS=? where ID=?";
 						this.jdbcTemplate.update(nbSql,rec.toArray());
 					}
 				}
-				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
-				int jgid = (int)hashids.decode((String)ptxm.get("jgid"))[0];
-				ptxm.put("jgid", jgid);
+				ptxm.remove("uid");
+//				Hashids hashids = new Hashids(Config.HASHID_SALT,Config.HASHID_LEN);
+//				int jgid = (int)hashids.decode((ptxm.get("jgid")+""))[0];
+//				ptxm.put("jgid", jgid);
 				List<Object> listValue = new ArrayList<Object>();  //Map转List
 				Iterator<String> it = ptxm.keySet().iterator();  
 				while (it.hasNext()) {  
