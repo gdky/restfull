@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gdky.restfull.entity.ResponseMessage;
 import com.gdky.restfull.entity.ResponseMessage.Type;
 import com.gdky.restfull.utils.HashIdUtil;
+import com.google.common.base.Objects;
 
 @Service
 @Transactional
@@ -52,10 +53,10 @@ public class CustomerService {
 
 	public ResponseMessage updateCustomer(String id, Map<String,Object> obj) {
 		Map<String,Object> source = customerDao.getNsrsbhAndJgid(id);
-		String nsrsbh = (String)source.get("nsrsbh");
-		String nsrsbhdf = (String)source.get("nsrsbhdf");
+		Object nsrsbh = source.get("nsrsbh");
+		Object nsrsbhdf = source.get("nsrsbhdf");
 		
-		if(!nsrsbh.equals((String)obj.get("NSRSBH")) || !nsrsbhdf.equals((String)obj.get("NSRSBHDF"))){
+		if(Objects.equal(nsrsbh,obj.get("NSRSBH")) || Objects.equal(nsrsbhdf,obj.get("NSRSBHDF"))){
 			List<Map<String,Object>> ls = customerDao.getCustomerInYwbb(id);
 			if (ls.size()>0){
 				return new ResponseMessage(Type.warning, "500", "该委托企业已有报备记录，不能修改税务登记证号，若要修改委托企业税务登记证号，需退回业务报备后才能进行修改");
