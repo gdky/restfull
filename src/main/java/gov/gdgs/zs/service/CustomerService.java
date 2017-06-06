@@ -43,12 +43,13 @@ public class CustomerService {
 		return customerDao.getCustomers(page,pageSize,jid,map);
 	}
 
-	public void addCustomer(Map<String, Object> obj) {
+	public ResponseMessage addCustomer(Map<String, Object> obj) {
 		String uuid = Common.newUUID();
 		obj.put("ID", uuid);
 		obj.put("JG_ID", HashIdUtil.decode((String)obj.get("JG_ID")));
 		obj.put("ADDDATE", Common.getCurrentTime2MysqlDateTime());
 		customerDao.addCustomer(obj);
+		return new ResponseMessage(Type.success, "201", "保存客户信息成功");
 	}
 
 	public ResponseMessage updateCustomer(String id, Map<String,Object> obj) {
@@ -64,7 +65,7 @@ public class CustomerService {
 		}
 
 		customerDao.updateCustomer(id,obj);
-		return new ResponseMessage(Type.warning, "200", "修改成功");
+		return new ResponseMessage(Type.success, "200", "修改成功");
 	}
 
 	public void delCustomer(String id) {
