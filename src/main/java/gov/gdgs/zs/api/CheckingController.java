@@ -38,6 +38,28 @@ public class CheckingController {
 		return new ResponseEntity<>(chService.checkSPing(splx,jgid),HttpStatus.OK);
 	}
 	/**
+	 * 判断能否进行合并
+	 * @param jgid
+	 * @param splx
+	 * @return
+	 */
+	@RequestMapping(value = "/commont/checksping/doFix", method = { RequestMethod.GET })
+	public ResponseEntity<?> checkDoFix(
+			@RequestParam(value="sumbitValue", required=true) String sumbitValue,HttpServletRequest request) {
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(chService.checkDoFix(sumbitValue,user.getJgId(),user.getUsername()),HttpStatus.OK);
+	}
+	/**
+	 * 判断能否进行注销
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/commont/checksping/checkBeforeDelete", method = { RequestMethod.GET })
+	public ResponseEntity<?> checkBeforeDelete(HttpServletRequest request) {
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(chService.checkBeforeDelete(user.getUsername()),HttpStatus.OK);
+	}
+	/**
 	 * 判断机构自身审批中
 	 * @param jgid
 	 * @param splx
@@ -47,6 +69,12 @@ public class CheckingController {
 	public ResponseEntity<?> checkJGSPing(HttpServletRequest request) {
 		User user =  accountService.getUserFromHeaderToken(request);
 		return new ResponseEntity<>(chService.checkJGSPingSelf(user.getJgId()),HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/commont/checksping/checkSWSSP", method = { RequestMethod.GET })
+	public ResponseEntity<?> checkSWSSPing(HttpServletRequest request) {
+		User user =  accountService.getUserFromHeaderToken(request);
+		return new ResponseEntity<>(chService.checkSWSSPing(user.getJgId()),HttpStatus.OK);
 	}
 	/**
 	 * 判断机构是否可以设立分所

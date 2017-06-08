@@ -1,7 +1,10 @@
 package gov.gdgs.zs.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import gov.gdgs.zs.configuration.Config;
 import gov.gdgs.zs.dao.CheckingDao;
@@ -53,7 +56,56 @@ public class CheckingService {
 		}
 		return "";
 	}
-	
+	/**
+	 * 合并前机构检查
+	 * @param sumbitValue
+	 * @param jgid
+	 * @return
+	 */
+	public Map<String,Object> checkDoFix(String sumbitValue,Integer jgid,String userName){
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		if (sumbitValue != null) {
+			try {
+				sumbitValue = java.net.URLDecoder.decode(sumbitValue, "UTF-8");
+				ObjectMapper mapper = new ObjectMapper();
+				map = mapper.readValue(sumbitValue,
+						new TypeReference<Map<String, Object>>() {
+						});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		Map<String,Object> re=new HashMap<String,Object>();
+		ArrayList<String>mcList=(ArrayList<String>) map.get("SFMCLIST");
+		ArrayList<String>zsbhList=(ArrayList<String>) map.get("SFZSBHLIST");
+		if(!chDao.haveJGDWMC(map.get("XSWSMC").toString())){
+			re.put("re", "E");//已存在新机构名称
+			return re;
+		}
+		if(!mcList.contains(userName)){
+			re.put("re", "C");//需包含自身事务所
+			return re;
+		}
+		if(mcList.get(0).equals(mcList.get(mcList.size()-1))){
+			re.put("re", "D");//不能自己和自己合并
+			return re;
+		}
+		for(int i = 0;i<mcList.size();i++){
+			if(chDao.haveJG(mcList.get(i),zsbhList.get(i))){
+				re.put("re", "A");//不存在该事务所
+				return re;
+			}
+			if(!chDao.checkSWSSPing(mcList.get(i))){
+				re.put("re", "B");//事务所存在审批事项
+				return re;
+			}
+			if(!chDao.checkZYSWSSPing(mcList.get(i))){
+				re.put("re", "F");//执业税务师存在审批事项
+				return re;
+			}
+		}
+		return re;
+	}
 	public boolean checkJGSPingSelf(Integer jgid){
 		return this.chDao.checkJGSPing(jgid);
 	}
@@ -62,6 +114,13 @@ public class CheckingService {
 	}
 	public boolean checkIsBH(String spid){
 		return this.chDao.checkIsBH(spid);
+	}
+	
+	public boolean checkBeforeDelete(String jgmc){
+		return (this.chDao.checkSWSSPing(jgmc)&&chDao.checkZYSWSSPing(jgmc));
+	}
+	public boolean checkSWSSPing(Integer jgid){
+		return this.chDao.checkSWSSPing(jgid);
 	}
 	
 	//检查身份证身份证是否已存在
