@@ -12,7 +12,7 @@ import com.gdky.restfull.dao.BaseJdbcDao;
 @Repository
 public class CheckingDao extends BaseJdbcDao{
 	/**
-	 * 判断事务所审批中
+	 * 判断事务所设立审批中
 	 * @param jgid
 	 * @return false--审批中
 	 */
@@ -67,6 +67,59 @@ public class CheckingDao extends BaseJdbcDao{
 	 */
 	public boolean checkHBing(int jgid){
 		if(this.jdbcTemplate.queryForList("select id from zs_jghb where HBZT = 1 and jg_id =?",new Object[]{jgid}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * 判断事务所能否进行审批事项申请
+	 * @param jgid
+	 * @return false--审批中
+	 */
+	public boolean checkSWSSPing(int jgid){
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select 1 from zs_jg a where a.JGZT_DM='5' and a.PARENTJGID=?");
+		sb.append("			union ");
+		sb.append("			select 1 from zs_jgbgspb b where b.SPZT_DM='1' and b.JG_ID=?");
+		sb.append("			union");
+		sb.append("			select 1 from zs_jgzx c where c.SPZT='1' and c.JG_ID=?");
+		sb.append("			union ");
+		sb.append("			select 1 from zs_jghb_jgxx d where d.HBZT='1' and d.JG_ID=?");
+		if(this.jdbcTemplate.queryForList(sb.toString(),new Object[]{jgid,jgid,jgid,jgid}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * 判断事务所能否进行审批事项申请
+	 * @param jgmc
+	 * @return false--审批中
+	 */
+	public boolean checkSWSSPing(String jgmc){
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select 1 from zs_jg a,zs_jg e where a.JGZT_DM='5' and a.PARENTJGID=e.id and e.dwmc=? ");
+		sb.append("			union ");
+		sb.append("			select 1 from zs_jgbgspb b,zs_jg e where b.SPZT_DM='1' and b.JG_ID=e.id  and e.dwmc=?");
+		sb.append("			union");
+		sb.append("			select 1 from zs_jgzx c,zs_jg e where c.SPZT='1' and c.JG_ID=e.id and e.dwmc=?");
+		sb.append("			union ");
+		sb.append("			select 1 from zs_jghb_jgxx d,zs_jg e where d.HBZT='1' and d.JG_ID=e.id and e.dwmc=?");
+		if(this.jdbcTemplate.queryForList(sb.toString(),new Object[]{jgmc,jgmc,jgmc,jgmc}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	/**
+	 * 判断是否存在税务师审批中事项
+	 * @param jgmc
+	 * @return false--存在
+	 */
+	public boolean checkZYSWSSPing(String jgmc){
+		StringBuffer sb = new StringBuffer();
+		sb.append("		select 1 from zs_zysws a,zs_jg b where a.RYSPGCZT_DM in(2,4,6,9,12,11,7,8) and b.ID=a.JG_ID and b.DWMC=?");
+		sb.append("				union ");
+		sb.append("				select 2 from zs_fzyzzy c,zs_jg d where c.XORGID=d.ID and c.RYSPZT='0' and d.DWMC=?");
+		if(this.jdbcTemplate.queryForList(sb.toString(),new Object[]{jgmc,jgmc}).size()!=0){
 			return false;
 		}
 		return true;
@@ -137,4 +190,29 @@ public class CheckingDao extends BaseJdbcDao{
 		}
 		return true;
 	}
+	/**
+	 * 判断是否存在正常事务所
+	 * @param jgmc
+	 * @param jgzsbh
+	 * @return false--存在
+	 */
+	public boolean haveJG(String jgmc,String jgzsbh){
+		if(this.jdbcTemplate.queryForList("select 1 from zs_jg where JGZT_DM = '11' and yxbz='1' and dwmc=? and JGZCH=?",new Object[]{jgmc,jgzsbh}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * 判断是否已存在机构名称
+	 * @param xjgmc
+	 * @return false--已存在
+	 */
+	public boolean haveJGDWMC(String xjgmc){
+		if(this.jdbcTemplate.queryForList("select 1 from zs_jg where JGZT_DM = '11' and yxbz='1' and dwmc=? ",new Object[]{xjgmc}).size()!=0){
+			return false;
+		}
+		return true;
+	}
+	
 }
