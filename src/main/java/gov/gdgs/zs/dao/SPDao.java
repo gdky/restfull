@@ -845,7 +845,7 @@ public class SPDao extends BaseDao{
 		userEntity.put("uname", sqxm.get("dwmc"));
 		userEntity.put("names", sqxm.get("dwmc"));
 		userEntity.put("phone", sqxm.get("dhua"));
-		userEntity.put("jgId", rs);
+		userEntity.put("jgId", Integer.parseInt(rs.toString()) );
 		authService.addRoleUser(17,authService.addUsers(userEntity));
 		for(List<String> rec:nb){
 			String nbSql="insert into zs_nbjgsz (BMMC,JBZN,RS,ID,JG_ID) values(?,?,?,replace(uuid(),'-',''),?)";
