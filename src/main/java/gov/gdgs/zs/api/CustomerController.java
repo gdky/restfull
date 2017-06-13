@@ -66,8 +66,8 @@ public class CustomerController {
 	public  ResponseEntity<?> addCustomers(
 			@RequestBody Map<String,Object> obj){
 		
-		customService.addCustomer(obj);
-		return new ResponseEntity<>(ResponseMessage.success("添加成功"),HttpStatus.CREATED);
+		ResponseMessage rm = customService.addCustomer(obj);
+		return new ResponseEntity<>(rm,HttpStatus.CREATED);
 	}
 	
 	/**
