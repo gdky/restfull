@@ -469,6 +469,30 @@ public class CWBBDao extends BaseJdbcDao{
 		sb.append(" update zs_cwbb_lrgd set ztbj = 0 where id = ? ");
 		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
 	}
+	public void rjlrfpb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_lrfp set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
+	public void rjxjllb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_xjll set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
+	public void rjzcfzb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_zcfzgd set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
+	public void rjzcmxb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_zcmx set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
       
 
 }

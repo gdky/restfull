@@ -342,8 +342,6 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 		String sql="select a.id, a.nd,a.TIMEVALUE from zs_cwbb_zcfzgd a where a.JG_ID=? and a.nd=? and a.timevalue=?";
 		List<Map<String, Object>> rs = this.jdbcTemplate.queryForList(sql.toString(),new Object[]{jgId,nd,timevalue});
 		
-		// Map<String, Object> ob = new HashMap<>();
-		// ob.put("data", rs);
       if(rs.size()>0){
     	  
     	  //如果sbid是null，说明前台没有传过来，此时进行的是添加操作
@@ -351,7 +349,6 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
     	  //不是空，说明进行的是编辑操作.true不能再编辑
     	  else{
     		  String sbid = (String) where.get("sbid");
-    		  Integer ztbj=(Integer) where.get("ztbj");
 			  String dbid = (String) rs.get(0).get("ID");
 			  //前台传过来的id和后台id作比较，如果是相同的话说明是原条记录，原条记录可以编辑，返回false；不同的话就不是原条记录，不能编辑
 			  if(!sbid.equals(dbid)){
@@ -362,7 +359,7 @@ public class AddcwbbDao extends BaseJdbcDao implements IAddcwbbDao{
 			  }
     	  return true;
     	  }
-      else return false;
+      return false;
 		
 		
 		

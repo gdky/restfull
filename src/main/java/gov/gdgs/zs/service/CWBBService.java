@@ -185,5 +185,21 @@ public class CWBBService {
 			public void rjLrb(String id) {
 				cwbbDao.rjLrb(id);
 			}
+			public void rjlrfpb(String id) {
+				cwbbDao.rjlrfpb(id);
+				
+			}
+			public void rjxjllb(String id) {
+				cwbbDao.rjxjllb(id);
+				
+			}
+			public void rjzcfzb(String id) {
+				cwbbDao.rjzcfzb(id);
+				
+			}
+			public void rjzcmxb(String id) {
+				cwbbDao.rjzcmxb(id);
+				
+			}
 
 }

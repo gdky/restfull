@@ -156,5 +156,25 @@ public class CWBBController {
 		cwbbService.rjLrb(id);
 		return new ResponseEntity<>(ResponseMessage.success("reject success"),HttpStatus.OK);
 	}
+	@RequestMapping(value = "/rjlrfpb/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> rjlrfpb(@PathVariable("id") String id){
+		cwbbService.rjlrfpb(id);
+		return new ResponseEntity<>(ResponseMessage.success("reject success"),HttpStatus.OK);
+	}
+	@RequestMapping(value = "/rjxjllb/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> rjxjllb(@PathVariable("id") String id){
+		cwbbService.rjxjllb(id);
+		return new ResponseEntity<>(ResponseMessage.success("reject success"),HttpStatus.OK);
+	}
+	@RequestMapping(value = "/rjzcfzb/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> rjzcfzb(@PathVariable("id") String id){
+		cwbbService.rjzcfzb(id);
+		return new ResponseEntity<>(ResponseMessage.success("reject success"),HttpStatus.OK);
+	}
+	@RequestMapping(value = "/rjzcmxb/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> rjzcmxb(@PathVariable("id") String id){
+		cwbbService.rjzcmxb(id);
+		return new ResponseEntity<>(ResponseMessage.success("reject success"),HttpStatus.OK);
+	}
 
 }
