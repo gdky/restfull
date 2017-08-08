@@ -37,7 +37,7 @@ public class SDSCBBDao  extends BaseDao{
 				+ "3 then '退回' else null end as bbzt,a.frdbxm,DATE_FORMAT(a.sbrq,'%Y年%m月%d日') AS sbsj,a.tianbiaoren,a.suozhang");
 		sb.append("	 FROM zs_sdsb_swsjbqk a,zs_jg b,(SELECT @rownum:=?) zs_jg,dm_cs c,dm_jgxz d");
 		sb.append("		"+condition.getSql()+" ");
-		sb.append("	and a.JG_ID=b.ID and a.cs_dm = c.id and d.id = a. jgxz_dm");
+		sb.append("	and a.JG_ID=b.ID and a.cs_dm = c.id and d.id = a. jgxz_dm and (a.ztbj = 1 or a.ztbj = 2) ");
 		sb.append("		    LIMIT ?, ? ");
 		ArrayList<Object> params = condition.getParams();
 		params.add(0,(pn-1)*ps);
@@ -197,5 +197,32 @@ public class SDSCBBDao  extends BaseDao{
 		ob.put("page", meta);
 		
 		return ob;
+	}
+	public void rjb1(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_sdsb_swsjbqk set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
+	public void rjb2(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_sdsb_hyryqktj set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
+	public void rjb4(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_sdsb_jysrqk set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+	}
+	public void rjb5(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_sdsb_jygmtjb set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+	}
+	public void rjb6(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_sdsb_jzywqktjb set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
 	}
 }
