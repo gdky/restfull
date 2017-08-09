@@ -217,7 +217,10 @@ public class SDSCBBDao  extends BaseDao{
 	}
 	public void rjb5(String id) {
 		StringBuffer sb = new StringBuffer();
-		sb.append(" update zs_sdsb_jygmtjb set ztbj = 0 where id = ? ");
+		sb.append(" update zs_sdsb_jygmtjb t, ");
+		sb.append(" (select a.nd,a.JG_ID from zs_sdsb_jysrqk a where a. id = ?) d ");
+		sb.append(" set t.ZTBJ = 0 ");
+		sb.append(" where t.JG_ID = d.jg_id and t.nd = d.nd ");
 		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
 	}
 	public void rjb6(String id) {

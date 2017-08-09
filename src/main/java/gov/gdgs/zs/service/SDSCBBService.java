@@ -85,9 +85,6 @@ public class SDSCBBService {
 	}
 	public void rjb4(String id) {
 		sdscbbDao.rjb4(id);
-		
-	}
-	public void rjb5(String id) {
 		sdscbbDao.rjb5(id);
 		
 	}

@@ -75,11 +75,6 @@ public class SDSCBBController {
 		sdscbbService.rjb4(id);
 		return new ResponseEntity<>(ResponseMessage.success("reject success"),HttpStatus.OK);
 	}
-	@RequestMapping(value = "/rjb5/{id}", method = RequestMethod.GET)
-	public ResponseEntity<?> rjb5(@PathVariable("id") String id){
-		sdscbbService.rjb5(id);
-		return new ResponseEntity<>(ResponseMessage.success("reject success"),HttpStatus.OK);
-	}
 	@RequestMapping(value = "/rjb6/{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> rjb6(@PathVariable("id") String id){
 		sdscbbService.rjb6(id);
