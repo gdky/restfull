@@ -1,5 +1,6 @@
 package gov.gdgs.zs.api;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -37,5 +38,18 @@ public class SelectController {
 				@RequestParam(value = "where", required = false) String where){
 		Map<String,Object> map=selectService.getJgSelect(where);
 		return new ResponseEntity<>(map, HttpStatus.OK);
+	}
+
+	/**
+	 * 业务类型下拉框
+	 * @param isqy 不带此参数则选择所有有效业务类型，isqy为Y时只选取启用的业务类型
+	 * @return
+	 */
+	@RequestMapping(value = "/selector/ywlx", method = RequestMethod.GET)
+	public ResponseEntity<?> getYwlxSelector(
+			@RequestParam(value = "isqy", required = false) String isqy) {
+
+		List<Map<String, Object>> ls = selectService.getYwlxSelector(isqy);
+		return new ResponseEntity<>(ls, HttpStatus.OK);
 	}
 }

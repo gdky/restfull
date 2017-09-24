@@ -381,7 +381,7 @@ public class ClientsdsbDao extends BaseJdbcDao {
 	
 	public boolean checkAddJysrqkb(String jgid) {
 		int nd=(Calendar.getInstance().get(Calendar.YEAR))-1;
-		String swsqkSql="select b.ID from zs_sdsb_swsjbqk b where b.JG_ID=? and b.ZTBJ='2' and b.ND=year(sysdate())-1 ";
+		String swsqkSql="select b.ID from zs_sdsb_swsjbqk b where b.JG_ID=? and (b.ZTBJ=2 or b.ZTBJ=1) and b.ND=year(sysdate())-1 ";
 		List<String> ls=this.jdbcTemplate.queryForList(swsqkSql, new Object[]{jgid}, String.class);
 		if(ls.size()>0){
 			if(isExists(nd, jgid, "zs_sdsb_jysrqk")){

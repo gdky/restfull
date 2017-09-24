@@ -75,4 +75,21 @@ public class SDSCBBService {
 		}
 		return sdscbbDao.wsbbbcx(pn, ps, map);
 	}
+	public void rjb1(String id) {
+		sdscbbDao.rjb1(id);
+		
+	}
+	public void rjb2(String id) {
+		sdscbbDao.rjb2(id);
+		
+	}
+	public void rjb4(String id) {
+		sdscbbDao.rjb4(id);
+		sdscbbDao.rjb5(id);
+		
+	}
+	public void rjb6(String id) {
+		sdscbbDao.rjb6(id);
+		
+	}
 }

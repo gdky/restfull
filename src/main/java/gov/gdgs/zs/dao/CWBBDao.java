@@ -336,7 +336,7 @@ public class CWBBDao extends BaseJdbcDao{
 			sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' WHEN 2 THEN '通过' WHEN 3 THEN '退回' ELSE NULL END AS ZTBJ");
 			sb.append(" from "+Config.PROJECT_SCHEMA+"zs_sdsb_jzywqktjb a,zs_jg b,(SELECT @rownum:=?) temp");
 			sb.append(condition.getSql());//相当元 where x.xx like '%%'
-			sb.append(" and a.JG_ID=b.ID ) as t");
+			sb.append(" and a.JG_ID=b.ID and (a.ztbj = 1 or a.ztbj = 2)) as t");
 			sb.append("    LIMIT ?, ? ");
 			// 装嵌传值数组
 			int startIndex = pageSize * (page - 1);
@@ -424,7 +424,7 @@ public class CWBBDao extends BaseJdbcDao{
 			sb.append(" CASE a.ZTBJ WHEN 0 THEN '保存' WHEN 1 THEN '提交' WHEN 2 THEN '通过' WHEN 3 THEN '退回' ELSE NULL END AS ZTBJ");
 			sb.append(" from "+Config.PROJECT_SCHEMA+"zs_sdsb_jygmtjb a, zs_jg b,(SELECT @rownum:=?) temp");
 			sb.append(condition.getSql());//相当元 where x.xx like '%%'
-			sb.append(" and a.JG_ID=b.ID ) as t");
+			sb.append(" and a.JG_ID=b.ID and (a.ztbj = 1 or a.ztbj = 2) ) as t");
 			sb.append("    LIMIT ?, ? ");
 			// 装嵌传值数组
 			int startIndex = pageSize * (page - 1);
@@ -468,6 +468,30 @@ public class CWBBDao extends BaseJdbcDao{
 		StringBuffer sb = new StringBuffer();
 		sb.append(" update zs_cwbb_lrgd set ztbj = 0 where id = ? ");
 		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+	}
+	public void rjlrfpb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_lrfp set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
+	public void rjxjllb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_xjll set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
+	public void rjzcfzb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_zcfzgd set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
+	}
+	public void rjzcmxb(String id) {
+		StringBuffer sb = new StringBuffer();
+		sb.append(" update zs_cwbb_zcmx set ztbj = 0 where id = ? ");
+		this.jdbcTemplate.update(sb.toString(),new Object[]{id});
+		
 	}
       
 
