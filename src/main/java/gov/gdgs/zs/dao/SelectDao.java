@@ -39,4 +39,12 @@ public class SelectDao extends BaseJdbcDao{
 		return ob;
 	}
 
+    public List<Map<String,Object>> getYwlxSelector(String isqy) {
+		String sql = "select id,mc from dm_ywlx where yxbz =1 ";
+		if(isqy != null && isqy.equals("Y")){
+			sql += " and isqy = 1 ";
+		}
+		List<Map<String,Object>> ls = this.jdbcTemplate.queryForList(sql);
+		return ls;
+    }
 }

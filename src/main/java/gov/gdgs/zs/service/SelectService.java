@@ -3,6 +3,7 @@ package gov.gdgs.zs.service;
 import gov.gdgs.zs.dao.SelectDao;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -34,4 +35,7 @@ public class SelectService {
 		return selectDao.getJgSelect(map);
 	}
 
+    public List<Map<String,Object>> getYwlxSelector(String isqy) {
+		return selectDao.getYwlxSelector(isqy);
+    }
 }
